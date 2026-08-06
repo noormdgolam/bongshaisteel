@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bongshai Steel | Steel Building Manufacturer Bangladesh</title>
-  <meta name="description" content="Bongshai Steel is Bangladesh's premier steel building manufacturer specializing in Pre-Engineered Steel Factory Buildings, Warehouses, Structural Steel Buildings, Duplex Steel Homes, Cottages, and Container Houses.">
-  <meta name="keywords" content="Bongshai Steel, Steel Building Manufacturer, Pre-Engineered Steel Building, Steel Factory, Steel Warehouse, Duplex Steel Building, Container House Bangladesh">
+  <meta name="description" content="Bongshai Steel is Bangladesh's premier steel building manufacturer specializing in Pre-Engineered Steel Factory Buildings, Structural Steel Buildings, Duplex Steel Homes, Cottages, and Container Houses.">
+  <meta name="keywords" content="Bongshai Steel, Steel Building Manufacturer, Pre-Engineered Steel Building, Steel Factory, Structural Steel Building, Duplex Steel Building, Container House Bangladesh">
 
   <!-- Preconnect & Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -67,10 +67,6 @@
               <span class="dropdown-icon-dot"></span>
               <span>Steel Factory Building</span>
             </a>
-            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('warehouse');">
-              <span class="dropdown-icon-dot"></span>
-              <span>Steel Warehouse</span>
-            </a>
             <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('structural');">
               <span class="dropdown-icon-dot"></span>
               <span>Structural Steel Building</span>
@@ -129,7 +125,6 @@
           <a class="mobile-link" onclick="navigateToView('productsView')">Products</a>
           <ul class="mobile-sub-menu">
             <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('factory');">Steel Factory Building</a></li>
-            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('warehouse');">Steel Warehouse</a></li>
             <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('structural');">Structural Steel Building</a></li>
             <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('duplex');">Duplex Steel Building</a></li>
             <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('cottage');">Steel Cottage House</a></li>
@@ -156,7 +151,7 @@
         <div>
           <span class="hero-tag">Bangladesh's #1 Steel Building Manufacturer</span>
           <h2 class="hero-title">Next-Gen <span>Pre-Engineered</span> Steel Buildings</h2>
-          <p class="hero-description">We engineer, fabricate, and deliver high-strength steel factories, warehouses, multi-story structural complexes, duplex villas, resort cottages, and container offices nationwide.</p>
+          <p class="hero-description">We engineer, fabricate, and deliver high-strength steel factories, multi-story structural apartment complexes, duplex villas, resort cottages, and container offices nationwide.</p>
           <div class="hero-buttons">
             <button class="btn-primary-hero" onclick="navigateToView('productsView')">Explore Products</button>
             <button class="btn-secondary-hero" onclick="openQuoteModal()">Request Custom Quote</button>
@@ -210,61 +205,12 @@
         </div>
         <div class="products-grid" id="featuredGrid"></div>
         <div style="text-align:center; margin-top:40px;">
-          <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="navigateToView('productsView'); renderCatalog('all');">View Full Catalog (85+ Models)</button>
+          <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="navigateToView('productsView'); renderCatalog('all');">View Full Catalog (72 Models)</button>
         </div>
       </div>
     </section>
 
-    <!-- Building Cost Estimator Tool -->
-    <section class="estimator-section">
-      <div class="container">
-        <div class="estimator-card">
-          <div class="section-header" style="text-align:left; margin-bottom:30px;">
-            <span class="section-subtitle" style="color:#38bdf8;">Interactive Estimator</span>
-            <h2 class="section-title" style="color:#ffffff;">Steel Building Cost & Weight Calculator</h2>
-          </div>
 
-          <div class="estimator-grid">
-            <div>
-              <div class="form-group">
-                <label class="form-label">Product Category</label>
-                <select class="form-select" id="estType">
-                  <option value="factory">Steel Factory Building</option>
-                  <option value="warehouse">Steel Warehouse</option>
-                  <option value="structural">Structural Steel Building</option>
-                  <option value="duplex">Duplex Steel Building</option>
-                  <option value="cottage">Steel Cottage House</option>
-                  <option value="container">Steel Container House</option>
-                </select>
-              </div>
-
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                <div class="form-group">
-                  <label class="form-label">Building Length (ft)</label>
-                  <input type="number" class="form-input" id="estLength" value="100">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Building Width (ft)</label>
-                  <input type="number" class="form-input" id="estWidth" value="50">
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Eave Height (ft)</label>
-                <input type="number" class="form-input" id="estHeight" value="20">
-              </div>
-            </div>
-
-            <div class="estimator-result">
-              <span style="color:#94a3b8; font-weight:700; text-transform:uppercase; font-size:0.85rem;">Estimated Budget</span>
-              <div class="result-val" id="estCostDisplay">৳ 67,50,000</div>
-              <div class="result-weight" id="estWeightDisplay">Estimated Steel Weight: 17.5 Metric Tons</div>
-              <button class="btn-primary-hero" style="width:100%; border:none; cursor:pointer;" onclick="openQuoteModal()">Get Detailed Spec Quote</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 
   <!-- 2. PRODUCTS VIEW -->
@@ -278,7 +224,6 @@
       <div class="product-filters">
         <button class="filter-btn active" data-category="all">All Categories</button>
         <button class="filter-btn" data-category="factory">Steel Factory Building</button>
-        <button class="filter-btn" data-category="warehouse">Steel Warehouse</button>
         <button class="filter-btn" data-category="structural">Structural Steel Building</button>
         <button class="filter-btn" data-category="duplex">Duplex Steel Building</button>
         <button class="filter-btn" data-category="cottage">Steel Cottage House</button>
@@ -428,14 +373,13 @@
     <div class="footer-container">
       <div class="footer-col">
         <h4 style="color:#ffffff; font-size:1.5rem; font-family:var(--font-heading);">BONGSHAI STEEL</h4>
-        <p style="margin-top:10px;">Premier Steel Building Manufacturer delivering pre-engineered factories, warehouses, duplex steel homes, cottages, and container houses across Bangladesh.</p>
+        <p style="margin-top:10px;">Premier Steel Building Manufacturer delivering pre-engineered factories, structural apartment buildings, duplex steel homes, cottages, and container houses across Bangladesh.</p>
       </div>
 
       <div class="footer-col">
         <h4>Products</h4>
         <ul class="footer-links">
           <li><a onclick="navigateToView('productsView'); renderProducts('factory');">Steel Factory Building</a></li>
-          <li><a onclick="navigateToView('productsView'); renderProducts('warehouse');">Steel Warehouse</a></li>
           <li><a onclick="navigateToView('productsView'); renderProducts('structural');">Structural Steel Building</a></li>
           <li><a onclick="navigateToView('productsView'); renderProducts('duplex');">Duplex Steel Building</a></li>
           <li><a onclick="navigateToView('productsView'); renderProducts('cottage');">Steel Cottage House</a></li>

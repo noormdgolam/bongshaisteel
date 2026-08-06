@@ -15,20 +15,12 @@ const CATEGORIES = [
     image: "images/products/Model No-BH-IS-1006.webp"
   },
   {
-    key: "warehouse",
-    name: "Steel Warehouse",
-    icon: "📦",
-    priceLabel: "৳1,000 – ৳1,500 / sqft",
-    blurb: "High-bay logistics warehouses, 10m–14m eave height, cold storage PIR panels.",
-    image: "images/products/Model No-BH-WH-804.webp"
-  },
-  {
     key: "structural",
     name: "Structural Steel Building",
     icon: "🏢",
     priceLabel: "৳1,800 – ৳3,000 / sqft",
-    blurb: "Multi-story steel towers, composite decking concrete slab, BNBC code compliant.",
-    image: "images/products/bh-sb-305.webp"
+    blurb: "Multi-story steel apartment towers, composite decking concrete slab, BNBC code compliant.",
+    image: "images/products/bh-tsb-109.webp"
   },
   {
     key: "duplex",
@@ -115,73 +107,40 @@ function buildFactory() {
 }
 
 /* --------------------------------------------------------------------------
-   2. STEEL WAREHOUSE — BH-WH-801 to BH-WH-812
-   -------------------------------------------------------------------------- */
-function buildWarehouse() {
-  const names = [
-    "High-Bay Logistics Warehouse", "Cold Storage Steel Warehouse", "E-Commerce Fulfillment Center",
-    "Bonded Storage Warehouse", "Automated Distribution Hub", "Retail Goods Storage Facility",
-    "Bulk Cargo Warehouse", "Cross-Dock Logistics Terminal", "Pharmaceutical Cold Chain Warehouse",
-    "Raw Material Storage Shed", "Multi-Tenant Industrial Warehouse", "Export Cargo Consolidation Warehouse"
-  ];
-  const eaves = [10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 11, 12, 13];
-  const loads = ["3.5 Ton / m²", "4 Ton / m²", "4.5 Ton / m²", "5 Ton / m²", "5.5 Ton / m²", "4 Ton / m²",
-    "3.5 Ton / m²", "4.5 Ton / m²", "5 Ton / m²", "4 Ton / m²", "5.5 Ton / m²", "4.5 Ton / m²"];
-  const roofs = ["Insulated Skylight Panels", "100mm Cold Storage PIR Panel", "Double Skin Decking",
-    "80mm PIR Insulated Panel", "Insulated Skylight Panels", "Color Coated Deck", "Double Skin Decking",
-    "100mm Cold Storage PIR Panel", "Insulated Skylight Panels", "Color Coated Deck", "80mm PIR Insulated Panel", "Double Skin Decking"];
-
-  return names.map((name, i) => {
-    const num = 801 + i;
-    const price = lerp(1000, 1500, i, names.length);
-    return {
-      id: `bh-wh-${num}`,
-      category: "warehouse",
-      categoryName: "Steel Warehouse",
-      modelCode: `BH-WH-${num}`,
-      name,
-      desc: "High-clearance pre-engineered warehouse with mezzanine floor option, heavy forklift-rated slab, and rapid loading dock access.",
-      price: `৳${price.toLocaleString("en-IN")} / sqft`,
-      priceVal: price,
-      warranty: "15-Year Structural Warranty",
-      specs: [
-        { label: "Eave Height", val: `${eaves[i]}m` },
-        { label: "Floor Load", val: loads[i] },
-        { label: "Roofing", val: roofs[i] },
-        { label: "Bay Spacing", val: `${6 + (i % 3)}m Grid` }
-      ],
-      image: `images/products/Model No-BH-WH-${num}.webp`
-    };
-  });
-}
-
-/* --------------------------------------------------------------------------
-   3. STRUCTURAL STEEL BUILDING — BH-TB-101 to BH-TB-112
+   2. STRUCTURAL STEEL BUILDING — BH-TSB-101 to BH-TSB-112 (real "Apartment
+   Building" line; image per model verified against the live product page)
    -------------------------------------------------------------------------- */
 function buildStructural() {
   const names = [
-    "Commercial Steel Multi-Story Complex", "Steel Composite Apartment Tower", "Corporate Steel Office Tower",
-    "Mixed-Use Steel Commercial Building", "Steel-Framed Shopping Complex", "Institutional Steel Building",
-    "Steel Composite Hospital Block", "High-Rise Residential Steel Tower", "Steel Educational Campus Building",
-    "Multi-Level Parking Steel Structure", "Steel Composite Hotel Building", "Government Steel Administrative Building"
+    "Urban Steel Apartment Complex", "Modern Steel Residential Tower", "Family Steel Apartment Building",
+    "Riverside Steel Apartment Complex", "Compact Steel Apartment Block", "Premium Steel Residential Complex",
+    "Garden View Steel Apartment Tower", "Corner Plot Steel Apartment Building", "Mid-Rise Steel Residential Complex",
+    "Skyline Steel Apartment Tower", "Community Steel Apartment Complex", "Signature Steel Apartment Residence"
   ];
   const floors = ["3 to 5 Stories", "4 to 6 Stories", "5 to 7 Stories", "6 to 8 Stories", "5 to 10 Stories",
     "4 to 6 Stories", "6 to 9 Stories", "8 to 12 Stories", "3 to 5 Stories", "4 to 7 Stories", "6 to 10 Stories", "5 to 8 Stories"];
   const slabs = ["Composite Steel Decking", "Reinforced Composite Deck"];
   const seismic = ["BNBC Zone-2 Compliant", "BNBC Zone-3 Compliant", "BNBC Zone-4 Compliant", "Earthquake Resistant Design"];
   const speeds = [70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120, 90];
-  const imgSb = [301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312];
+  // Verified against each bh-tsb-1XX.html product page's own JSON-LD image field.
+  // 105's source page references a non-webp .jfif asset; substituted with the
+  // nearest real webp from the same series to keep the site all-WebP.
+  const images = [
+    "Model No-BH-TB-101.webp", "Model No-BH-TB-102.webp", "bh-tsb-103.webp", "Model No-BH-TB-104.webp",
+    "Model No-BH-TB-104.webp", "bh-tsb-106.webp", "dv-107.webp", "bh-tsb-108.webp",
+    "bh-tsb-109.webp", "bh-tsb-110.webp", "bh-tsb-111.webp", "bh-tsb-112.webp"
+  ];
 
   return names.map((name, i) => {
     const num = 101 + i;
     const price = lerp(1800, 3000, i, names.length);
     return {
-      id: `bh-tb-${num}`,
+      id: `bh-tsb-${num}`,
       category: "structural",
       categoryName: "Structural Steel Building",
-      modelCode: `BH-TB-${num}`,
+      modelCode: `BH-TSB-${num}`,
       name,
-      desc: "Multi-floor steel frame building with composite decking concrete slabs, rapid dry-construction erection, and BNBC seismic code compliance.",
+      desc: "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and BNBC seismic code compliance.",
       price: `৳${price.toLocaleString("en-IN")} / sqft`,
       priceVal: price,
       warranty: "25-Year Structural Warranty",
@@ -191,28 +150,33 @@ function buildStructural() {
         { label: "Seismic Rating", val: seismic[i % seismic.length] },
         { label: "Build Speed", val: `${speeds[i]} Days` }
       ],
-      image: `images/products/bh-sb-${imgSb[i]}.webp`
+      image: `images/products/${images[i]}`
     };
   });
 }
 
 /* --------------------------------------------------------------------------
-   4. DUPLEX STEEL BUILDING — BH-DV-101 to BH-DV-113
+   3. DUPLEX STEEL BUILDING — BH-DV-201 to BH-DV-212 (image per model verified
+   against the live product page's own JSON-LD image field)
    -------------------------------------------------------------------------- */
 function buildDuplex() {
   const names = [
     "Modern Minimalist Steel Duplex Villa", "Executive RC-Precast Hybrid Duplex", "Contemporary 4-Bedroom Steel Duplex",
     "Scandinavian Style Steel Duplex Home", "Premium Glass-Facade Steel Duplex", "Classic Bengal Steel Duplex Villa",
     "Family Garden Steel Duplex House", "Rooftop Terrace Steel Duplex Villa", "Double-Height Living Steel Duplex",
-    "Corner Plot Steel Duplex Residence", "Compact Urban Steel Duplex Home", "Resort-Style Steel Duplex Villa",
-    "Signature Collection Steel Duplex"
+    "Corner Plot Steel Duplex Residence", "Compact Urban Steel Duplex Home", "Resort-Style Steel Duplex Villa"
   ];
   const finishes = ["Precast Concrete + Tiles", "RC Concrete Board + Paint", "Fiber Cement Cladding + Tiles",
     "Textured Render + Composite Panel", "Full Glass Curtain + Precast"];
-  const speeds = [60, 65, 70, 62, 75, 68, 60, 80, 72, 65, 58, 78, 85];
+  const speeds = [60, 65, 70, 62, 75, 68, 60, 80, 72, 65, 58, 78];
+  const images = [
+    "dv-101.webp", "dv-102.webp", "villa_1_1782293220395.webp", "dv-104.webp",
+    "dv-105.webp", "dv-106.webp", "cottage_2_1782293207157.webp", "dv-108.webp",
+    "dv-109.webp", "dv-110.webp", "dv-111.webp", "dv-112.webp"
+  ];
 
   return names.map((name, i) => {
-    const num = 101 + i;
+    const num = 201 + i;
     const area = 1650 + i * 90;
     const price = 3000000 + i * 200000;
     return {
@@ -231,13 +195,13 @@ function buildDuplex() {
         { label: "Build Time", val: `${speeds[i]} Days` },
         { label: "Finish", val: finishes[i % finishes.length] }
       ],
-      image: `images/products/dv-${num}.webp`
+      image: `images/products/${images[i]}`
     };
   });
 }
 
 /* --------------------------------------------------------------------------
-   5. STEEL COTTAGE HOUSE — BH-CH-401 to BH-CH-412 & BH-TH-701 to BH-TH-712
+   4. STEEL COTTAGE HOUSE — BH-CH-401 to BH-CH-412 & BH-TH-701 to BH-TH-712
    -------------------------------------------------------------------------- */
 function buildCottage() {
   const chNames = [
@@ -307,7 +271,7 @@ function buildCottage() {
 }
 
 /* --------------------------------------------------------------------------
-   6. STEEL CONTAINER HOUSE — BH-CH-501 to BH-CH-512
+   5. STEEL CONTAINER HOUSE — BH-CH-501 to BH-CH-512
    -------------------------------------------------------------------------- */
 function buildContainer() {
   const names = [
@@ -353,7 +317,6 @@ function buildContainer() {
    -------------------------------------------------------------------------- */
 const PRODUCTS_DATA = [
   ...buildFactory(),
-  ...buildWarehouse(),
   ...buildStructural(),
   ...buildDuplex(),
   ...buildCottage(),
@@ -361,7 +324,7 @@ const PRODUCTS_DATA = [
 ];
 
 // One flagship model per category for the homepage teaser
-const FEATURED_IDS = ["bh-is-1006", "bh-wh-804", "bh-tb-105", "bh-dv-101", "bh-ch-401", "bh-ch-502"];
+const FEATURED_IDS = ["bh-is-1006", "bh-tsb-109", "bh-dv-201", "bh-ch-401", "bh-ch-502"];
 
 /* --------------------------------------------------------------------------
    INIT
@@ -540,7 +503,6 @@ function navigateToView(viewId) {
    -------------------------------------------------------------------------- */
 const ESTIMATOR_RATES = {
   factory:    { rate: 1500, weight: 4.5 },
-  warehouse:  { rate: 1250, weight: 3.2 },
   structural: { rate: 2400, weight: 6.5 },
   duplex:     { rate: 1800, weight: 4.2 },
   cottage:    { rate: 2200, weight: 3.5 },
