@@ -37,6 +37,7 @@ html {
   scroll-behavior: smooth;
   font-size: 16px;
   text-size-adjust: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -842,6 +843,21 @@ button, input, select, textarea {
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
+}
+
+.contact-card .form-input {
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.contact-card .form-input:focus {
+  border-color: var(--accent);
+}
+
+:root[data-theme="dark"] .contact-card .form-input {
+  background-color: #0f172a;
+  border-color: #334155;
 }
 
 /* ==========================================================================
