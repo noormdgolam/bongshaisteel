@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bongshai Steel | Steel Building Manufacturer Bangladesh</title>
+  <meta name="description" content="Bongshai Steel is Bangladesh's premier steel building manufacturer specializing in Pre-Engineered Steel Factory Buildings, Warehouses, Structural Steel Buildings, Duplex Steel Homes, Cottages, and Container Houses.">
+  <meta name="keywords" content="Bongshai Steel, Steel Building Manufacturer, Pre-Engineered Steel Building, Steel Factory, Steel Warehouse, Duplex Steel Building, Container House Bangladesh">
+
+  <!-- Preconnect & Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       TOP UTILITY BAR & BRAND HEADER (MATCHING USER SCREENSHOT)
+       ========================================================================== -->
+  <header class="top-header">
+    <div class="top-container">
+      <div class="brand-wrapper">
+        <h1 class="brand-title">BONGSHAI STEEL</h1>
+        <span class="brand-subtitle">Steel Building Manufacturer</span>
+      </div>
+
+      <div class="top-contact-info">
+        <div class="contact-item">
+          <!-- Location Icon -->
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <span>House #18, Road #18, Sector #10, Uttara C/A, Dhaka</span>
+        </div>
+
+        <div class="contact-item">
+          <!-- Phone Icon -->
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          <a href="tel:+8801789949060">+8801789-949060</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN NAVIGATION BAR (BLUE BAR MATCHING SCREENSHOT)
+       ========================================================================== -->
+  <nav class="main-navbar">
+    <div class="nav-container">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigateToView('homeView')">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigateToView('companyView')">Company</a>
+        </li>
+
+        <!-- PRODUCTS MEGA DROPDOWN (ALL 6 USER ITEMS) -->
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigateToView('productsView')">
+            Products
+            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </a>
+          <div class="dropdown-menu">
+            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('factory');">
+              <span class="dropdown-icon-dot"></span>
+              <span>Steel Factory Building</span>
+            </a>
+            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('warehouse');">
+              <span class="dropdown-icon-dot"></span>
+              <span>Steel Warehouse</span>
+            </a>
+            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('structural');">
+              <span class="dropdown-icon-dot"></span>
+              <span>Structural Steel Building</span>
+            </a>
+            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('duplex');">
+              <span class="dropdown-icon-dot"></span>
+              <span>Duplex Steel Building</span>
+            </a>
+            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('cottage');">
+              <span class="dropdown-icon-dot"></span>
+              <span>Steel Cottage House</span>
+            </a>
+            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('container');">
+              <span class="dropdown-icon-dot"></span>
+              <span>Steel Container House</span>
+            </a>
+          </div>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigateToView('servicesView')">Services</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigateToView('safetyView')">Health And Safety Policy</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigateToView('careersView')">Job Circular</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigateToView('contactView')">Contact Us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" onclick="navigateToView('mediaView')">Media</a>
+        </li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+        <button class="btn-quote" onclick="openQuoteModal()">Get a Quote</button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open Navigation">☰</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3>Bongshai Steel</h3>
+        <button class="drawer-close" id="drawerClose">✕</button>
+      </div>
+      <ul class="mobile-menu">
+        <li><a class="mobile-link" onclick="navigateToView('homeView')">Home</a></li>
+        <li><a class="mobile-link" onclick="navigateToView('companyView')">Company</a></li>
+        <li>
+          <a class="mobile-link" onclick="navigateToView('productsView')">Products</a>
+          <ul class="mobile-sub-menu">
+            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('factory');">Steel Factory Building</a></li>
+            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('warehouse');">Steel Warehouse</a></li>
+            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('structural');">Structural Steel Building</a></li>
+            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('duplex');">Duplex Steel Building</a></li>
+            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('cottage');">Steel Cottage House</a></li>
+            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('container');">Steel Container House</a></li>
+          </ul>
+        </li>
+        <li><a class="mobile-link" onclick="navigateToView('servicesView')">Services</a></li>
+        <li><a class="mobile-link" onclick="navigateToView('safetyView')">Health & Safety Policy</a></li>
+        <li><a class="mobile-link" onclick="navigateToView('careersView')">Job Circular</a></li>
+        <li><a class="mobile-link" onclick="navigateToView('contactView')">Contact Us</a></li>
+        <li><a class="mobile-link" onclick="navigateToView('mediaView')">Media</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       VIEW CONTAINER (INSTANT SPA NAVIGATION VIEWS)
+       ========================================================================== -->
+
+  <!-- 1. HOME VIEW -->
+  <main id="homeView" class="page-view active-view">
+    <section class="hero-section">
+      <div class="hero-container">
+        <div>
+          <span class="hero-tag">Bangladesh's #1 Steel Building Manufacturer</span>
+          <h2 class="hero-title">Next-Gen <span>Pre-Engineered</span> Steel Buildings</h2>
+          <p class="hero-description">We engineer, fabricate, and deliver high-strength steel factories, warehouses, multi-story structural complexes, duplex villas, resort cottages, and container offices nationwide.</p>
+          <div class="hero-buttons">
+            <button class="btn-primary-hero" onclick="navigateToView('productsView')">Explore Products</button>
+            <button class="btn-secondary-hero" onclick="openQuoteModal()">Request Custom Quote</button>
+          </div>
+        </div>
+        <div class="hero-image-wrap">
+          <img src="images/products/Model No-BH-IS-1001.webp" alt="Bongshai Steel Factory" decoding="async">
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Banner -->
+    <section class="stats-banner">
+      <div class="stats-container">
+        <div class="stat-item">
+          <h3>500+</h3>
+          <p>Projects Completed</p>
+        </div>
+        <div class="stat-item">
+          <h3>50 Years</h3>
+          <p>Structural Warranty</p>
+        </div>
+        <div class="stat-item">
+          <h3>100%</h3>
+          <p>BNBC Code Compliance</p>
+        </div>
+        <div class="stat-item">
+          <h3>60 Days</h3>
+          <p>Rapid Average Erection</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Category Overview Cards -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Complete Catalog</span>
+          <h2 class="section-title">Browse by Building Category</h2>
+        </div>
+        <div class="category-cards-grid" id="categoryCardsGrid"></div>
+      </div>
+    </section>
+
+    <!-- Featured Models -->
+    <section class="section" style="padding-top:0;">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Popular This Month</span>
+          <h2 class="section-title">Flagship Models Across Every Category</h2>
+        </div>
+        <div class="products-grid" id="featuredGrid"></div>
+        <div style="text-align:center; margin-top:40px;">
+          <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="navigateToView('productsView'); renderCatalog('all');">View Full Catalog (85+ Models)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Building Cost Estimator Tool -->
+    <section class="estimator-section">
+      <div class="container">
+        <div class="estimator-card">
+          <div class="section-header" style="text-align:left; margin-bottom:30px;">
+            <span class="section-subtitle" style="color:#38bdf8;">Interactive Estimator</span>
+            <h2 class="section-title" style="color:#ffffff;">Steel Building Cost & Weight Calculator</h2>
+          </div>
+
+          <div class="estimator-grid">
+            <div>
+              <div class="form-group">
+                <label class="form-label">Product Category</label>
+                <select class="form-select" id="estType">
+                  <option value="factory">Steel Factory Building</option>
+                  <option value="warehouse">Steel Warehouse</option>
+                  <option value="structural">Structural Steel Building</option>
+                  <option value="duplex">Duplex Steel Building</option>
+                  <option value="cottage">Steel Cottage House</option>
+                  <option value="container">Steel Container House</option>
+                </select>
+              </div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div class="form-group">
+                  <label class="form-label">Building Length (ft)</label>
+                  <input type="number" class="form-input" id="estLength" value="100">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Building Width (ft)</label>
+                  <input type="number" class="form-input" id="estWidth" value="50">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Eave Height (ft)</label>
+                <input type="number" class="form-input" id="estHeight" value="20">
+              </div>
+            </div>
+
+            <div class="estimator-result">
+              <span style="color:#94a3b8; font-weight:700; text-transform:uppercase; font-size:0.85rem;">Estimated Budget</span>
+              <div class="result-val" id="estCostDisplay">৳ 67,50,000</div>
+              <div class="result-weight" id="estWeightDisplay">Estimated Steel Weight: 17.5 Metric Tons</div>
+              <button class="btn-primary-hero" style="width:100%; border:none; cursor:pointer;" onclick="openQuoteModal()">Get Detailed Spec Quote</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 2. PRODUCTS VIEW -->
+  <section id="productsView" class="page-view section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Complete Catalog</span>
+        <h2 class="section-title">Bongshai Steel Products & Models</h2>
+      </div>
+
+      <div class="product-filters">
+        <button class="filter-btn active" data-category="all">All Categories</button>
+        <button class="filter-btn" data-category="factory">Steel Factory Building</button>
+        <button class="filter-btn" data-category="warehouse">Steel Warehouse</button>
+        <button class="filter-btn" data-category="structural">Structural Steel Building</button>
+        <button class="filter-btn" data-category="duplex">Duplex Steel Building</button>
+        <button class="filter-btn" data-category="cottage">Steel Cottage House</button>
+        <button class="filter-btn" data-category="container">Steel Container House</button>
+      </div>
+
+      <div id="productsGridPage"></div>
+    </div>
+  </section>
+
+  <!-- 3. COMPANY VIEW -->
+  <section id="companyView" class="page-view section">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-content">
+          <span class="section-subtitle">About Bongshai Steel</span>
+          <h2>Pioneering Steel Construction in Bangladesh</h2>
+          <p>Bongshai Steel is a premier steel building manufacturer and EPC contractor based in Uttara, Dhaka. We engineer durable, earthquake-resistant, pre-engineered steel buildings (PEB) and modular steel structures.</p>
+          <p>Our state-of-the-art manufacturing factory delivers high precision steel beams, C/Z purlins, decking sheets, and insulated sandwich panels designed for 50+ year lifespans under BNBC building regulations.</p>
+        </div>
+        <div>
+          <img src="images/products/industrial_shed_1_1782293275650.webp" alt="Factory Facility" style="border-radius:12px; box-shadow:var(--shadow-lg);">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. SERVICES VIEW -->
+  <section id="servicesView" class="page-view section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Turnkey Solutions</span>
+        <h2 class="section-title">Our Specialized Services</h2>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <h3>Architectural & Structural Design</h3>
+          <p>Complete 3D CAD modeling, Tekla structural detailing, and BNBC seismic load calculations by expert structural engineers.</p>
+        </div>
+        <div class="service-card">
+          <h3>Precision Steel Fabrication</h3>
+          <p>Automated CNC cutting, SAW welding, surface sandblasting, and epoxy anti-corrosion coating in our Uttara factory.</p>
+        </div>
+        <div class="service-card">
+          <h3>On-Site Erection & Installation</h3>
+          <p>Experienced site erection crews, heavy crane mobilization, high-strength bolt tightening, and safety supervision.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. HEALTH & SAFETY VIEW -->
+  <section id="safetyView" class="page-view section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Zero Accident Commitment</span>
+        <h2 class="section-title">Health And Safety Policy (EHS)</h2>
+      </div>
+      <div class="about-content" style="max-width:800px; margin:0 auto;">
+        <p>Bongshai Steel maintains strict Environmental, Health, and Safety (EHS) policies across all factory floors and construction erection sites nationwide.</p>
+        <ul style="margin:20px 0; padding-left:20px; color:var(--text-main); font-weight:600; line-height:2;">
+          <li>Mandatory PPE compliance (hard hats, safety harnesses, steel-toe boots).</li>
+          <li>ISO 9001, 14001, and OHSAS 18001 safety protocol compliance.</li>
+          <li>100% certified crane operators and certified high-altitude welders.</li>
+          <li>Regular site hazard audits and emergency response protocols.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. JOB CIRCULAR VIEW -->
+  <section id="careersView" class="page-view section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Career Opportunities</span>
+        <h2 class="section-title">Active Job Circular</h2>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <h3>Senior Structural Engineer (PEB)</h3>
+          <p><strong>Location:</strong> Uttara, Dhaka | <strong>Experience:</strong> 5+ Years</p>
+          <p>Proficient in Tekla Structures, STAAD Pro, and BNBC code calculation for pre-engineered steel buildings.</p>
+          <button class="btn-detail" style="margin-top:15px;" onclick="openJobModal('Senior Structural Engineer (PEB)')">Apply Now</button>
+        </div>
+        <div class="service-card">
+          <h3>Site Erection Project Manager</h3>
+          <p><strong>Location:</strong> Field Sites Nationwide | <strong>Experience:</strong> 7+ Years</p>
+          <p>Supervise site erection, crane scheduling, safety protocols, and client project handovers.</p>
+          <button class="btn-detail" style="margin-top:15px;" onclick="openJobModal('Site Erection Project Manager')">Apply Now</button>
+        </div>
+        <div class="service-card">
+          <h3>Quality Control & Welding Inspector</h3>
+          <p><strong>Location:</strong> Uttara Factory, Dhaka | <strong>Experience:</strong> 4+ Years</p>
+          <p>CSWIP/AWS certified welding inspection, NDT coordination, and ISO 9001 quality documentation.</p>
+          <button class="btn-detail" style="margin-top:15px;" onclick="openJobModal('Quality Control & Welding Inspector')">Apply Now</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CONTACT VIEW -->
+  <section id="contactView" class="page-view section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Get In Touch</span>
+        <h2 class="section-title">Contact Bongshai Steel</h2>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h3>Corporate Office</h3>
+          <p style="margin-bottom:12px;"><strong>Address:</strong> House #18, Road #18, Sector #10, Uttara C/A, Dhaka</p>
+          <p style="margin-bottom:12px;"><strong>Phone:</strong> +8801789-949060</p>
+          <p style="margin-bottom:12px;"><strong>Email:</strong> sales@bongshaisteel.com</p>
+          <p style="margin-bottom:12px;"><strong>Working Hours:</strong> Sat - Thu (9:00 AM - 7:00 PM)</p>
+        </div>
+        <div class="contact-card">
+          <h3>Send Us a Message</h3>
+          <form onsubmit="handleQuoteSubmit(event)">
+            <input type="text" placeholder="Your Name" required class="form-input" style="margin-bottom:12px;">
+            <input type="tel" placeholder="Phone Number" required class="form-input" style="margin-bottom:12px;">
+            <textarea placeholder="Your Message or Project Details..." rows="4" class="form-input" style="margin-bottom:12px;"></textarea>
+            <button type="submit" class="btn-primary-hero" style="width:100%; border:none; cursor:pointer;">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. MEDIA VIEW -->
+  <section id="mediaView" class="page-view section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-subtitle">Media & Gallery</span>
+        <h2 class="section-title">Project Photo Showcase</h2>
+      </div>
+      <div class="media-grid" id="mediaGallery"></div>
+    </div>
+  </section>
+
+  <!-- Global Modal Overlay -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box" id="modalContent"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4 style="color:#ffffff; font-size:1.5rem; font-family:var(--font-heading);">BONGSHAI STEEL</h4>
+        <p style="margin-top:10px;">Premier Steel Building Manufacturer delivering pre-engineered factories, warehouses, duplex steel homes, cottages, and container houses across Bangladesh.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Products</h4>
+        <ul class="footer-links">
+          <li><a onclick="navigateToView('productsView'); renderProducts('factory');">Steel Factory Building</a></li>
+          <li><a onclick="navigateToView('productsView'); renderProducts('warehouse');">Steel Warehouse</a></li>
+          <li><a onclick="navigateToView('productsView'); renderProducts('structural');">Structural Steel Building</a></li>
+          <li><a onclick="navigateToView('productsView'); renderProducts('duplex');">Duplex Steel Building</a></li>
+          <li><a onclick="navigateToView('productsView'); renderProducts('cottage');">Steel Cottage House</a></li>
+          <li><a onclick="navigateToView('productsView'); renderProducts('container');">Steel Container House</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <p>📍 House #18, Road #18, Sector #10, Uttara C/A, Dhaka</p>
+        <p style="margin-top:8px;">📞 +8801789-949060</p>
+        <p style="margin-top:8px;">✉️ sales@bongshaisteel.com</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 Bongshai Steel. All Rights Reserved. Designed for Ultra Fast Performance.</p>
+    </div>
+  </footer>
+
+  <!-- Script -->
+  <script src="app.js"></script>
+</body>
+</html>
