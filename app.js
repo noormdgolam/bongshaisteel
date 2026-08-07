@@ -616,7 +616,6 @@ function navigateToView(viewId, updateHash = true) {
       productsView: "products",
       servicesView: "services",
       safetyView: "safety",
-      estimatorView: "estimator",
       contactView: "contact"
     };
     if (map[viewId]) updateUrlHash(map[viewId]);
@@ -775,7 +774,6 @@ function closeModal() {
       productsView: "products",
       servicesView: "services",
       safetyView: "safety",
-      estimatorView: "estimator",
       contactView: "contact"
     };
     if (map[activeView.id]) updateUrlHash(map[activeView.id]);
