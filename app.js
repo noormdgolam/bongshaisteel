@@ -324,6 +324,8 @@ function handleHashRoute() {
       navigateToView("servicesView", false);
     } else if (rawHash === "safety" || rawHash === "safetyView") {
       navigateToView("safetyView", false);
+    } else if (rawHash === "faq" || rawHash === "faqView") {
+      navigateToView("faqView", false);
     } else if (rawHash === "estimator" || rawHash === "estimatorView") {
       navigateToView("homeView", false);
       openQuoteModal();
@@ -774,6 +776,7 @@ function closeModal() {
       productsView: "products",
       servicesView: "services",
       safetyView: "safety",
+      faqView: "faq",
       contactView: "contact"
     };
     if (map[activeView.id]) updateUrlHash(map[activeView.id]);
