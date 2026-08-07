@@ -1387,6 +1387,12 @@ button.cat-card {
   .frame-customizer-grid > div {
     min-width: 0;
   }
+  .estimator-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .estimator-main-grid > div {
+    min-width: 0;
+  }
   .nav-menu {
     display: none;
   }
@@ -1408,5 +1414,8 @@ button.cat-card {
   }
   .modal-spec-grid {
     grid-template-columns: 1fr;
+  }
+  .estimator-stats-grid {
+    grid-template-columns: 1fr !important;
   }
 }

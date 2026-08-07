@@ -645,52 +645,6 @@ function handleQuoteSubmit(e) {
 }
 
 /* ==========================================================================
-   MULTI-CURRENCY GLOBAL CONVERTER SYSTEM
-   ========================================================================== */
-let currentGlobalCurrency = "BDT";
-
-const CURRENCY_RATES = {
-  BDT: { symbol: "৳", rate: 1, suffix: "" },
-  USD: { symbol: "$", rate: 1 / 118, suffix: " USD" },
-  EUR: { symbol: "€", rate: 1 / 128, suffix: " EUR" },
-  AED: { symbol: "AED ", rate: 1 / 32, suffix: "" }
-};
-
-function fmtTaka(bdtAmount) {
-  return "৳" + Math.round(bdtAmount).toLocaleString("en-US");
-}
-
-function changeGlobalCurrency(currCode) {
-  if (!CURRENCY_RATES[currCode]) return;
-  currentGlobalCurrency = currCode;
-
-  // Re-render product cards and active views with updated currency
-  if (activeView === "productsView") {
-    renderPrefabSubcategory(activePrefabSubcat);
-  } else if (activeView === "homeView") {
-    renderFeatured();
-  }
-  calculateBuildingEstimate();
-}
-
-function fmtCurrency(bdtAmount) {
-  const config = CURRENCY_RATES[currentGlobalCurrency] || CURRENCY_RATES.BDT;
-  const converted = bdtAmount * config.rate;
-
-  if (currentGlobalCurrency === "BDT") {
-    return fmtTaka(bdtAmount);
-  }
-
-  if (converted >= 1000000) {
-    return `${config.symbol}${(converted / 1000000).toFixed(2)} Million${config.suffix}`;
-  } else if (converted >= 1000) {
-    return `${config.symbol}${Math.round(converted).toLocaleString('en-US')}${config.suffix}`;
-  } else {
-    return `${config.symbol}${converted.toFixed(2)}${config.suffix}`;
-  }
-}
-
-/* ==========================================================================
    THREE.JS 3D WEBGL STRUCTURAL STEEL PORTAL FRAME INSPECTOR
    ========================================================================== */
 let threeScene, threeCamera, threeRenderer, steelFrameGroup, steelMaterial, roofMaterial, floorMaterial, wallMaterial;
@@ -900,9 +854,20 @@ function init3dSteelCanvas() {
     if (e.touches.length < 2) previousPinchDistance = null;
   });
 
+  // Only render while the canvas is actually on-screen — it sits partway down
+  // the home page, and without this the render loop burns CPU/GPU forever in
+  // the background even when scrolled past or navigated away from entirely.
+  let is3dVisible = true;
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver((entries) => {
+      is3dVisible = entries[0].isIntersecting;
+    }, { threshold: 0.01 }).observe(container);
+  }
+
   // Animation Loop
   function animate3d() {
     requestAnimationFrame(animate3d);
+    if (!is3dVisible) return;
     if (!isDragging3d && steelFrameGroup) {
       steelFrameGroup.rotation.y += 0.003; // Gentle auto-spin
     }
@@ -974,27 +939,23 @@ function update3dExplosion(val) {
 }
 
 /* ==========================================================================
-   INSTANT STEEL BUILDING WEIGHT & COST ESTIMATOR CALCULATOR
+   INSTANT STEEL BUILDING WEIGHT & AREA ESTIMATOR CALCULATOR
    ========================================================================== */
 function calculateBuildingEstimate() {
   const len = parseFloat(document.getElementById("estLength")?.value) || 0;
   const wid = parseFloat(document.getElementById("estWidth")?.value) || 0;
-  const hgt = parseFloat(document.getElementById("estHeight")?.value) || 0;
   const flr = parseInt(document.getElementById("estFloors")?.value, 10) || 1;
 
   const totalAreaSqft = len * wid * flr;
   const steelTons = (totalAreaSqft * 3.5 / 1000).toFixed(1);
-  const costBDT = totalAreaSqft * 450;
   const days = Math.max(15, Math.ceil(totalAreaSqft / 500));
 
   const resArea = document.getElementById("resArea");
   const resSteel = document.getElementById("resSteel");
-  const resCost = document.getElementById("resCost");
   const resDays = document.getElementById("resDays");
 
   if (resArea) resArea.textContent = `${totalAreaSqft.toLocaleString('en-US')} sqft`;
   if (resSteel) resSteel.textContent = `${steelTons} MT`;
-  if (resCost) resCost.textContent = fmtCurrency(costBDT);
   if (resDays) resDays.textContent = `${days} Days`;
 }
 
