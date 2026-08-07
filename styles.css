@@ -503,13 +503,13 @@ button {
 }
 
 /* ==========================================================================
-   WORLD-CLASS HERO BANNER
+   WORLD-CLASS HERO BANNER (BRIGHT CORPORATE LIGHT THEME)
    ========================================================================== */
 
 .hero-section {
   position: relative;
-  background: linear-gradient(135deg, #090d16 0%, #0f172a 60%, #1e293b 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 60%, #e2e8f0 100%);
+  color: var(--text-primary);
   padding: 90px 24px 100px 24px;
   overflow: hidden;
 }
@@ -521,7 +521,7 @@ button {
   right: -100px;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(4, 102, 200, 0.08) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -538,9 +538,9 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: rgba(14, 165, 233, 0.15);
-  border: 1px solid var(--border-glow);
-  color: var(--accent-cyan);
+  background: rgba(4, 102, 200, 0.08);
+  border: 1px solid rgba(4, 102, 200, 0.2);
+  color: var(--primary-navy);
   padding: 8px 20px;
   border-radius: var(--radius-pill);
   font-size: 0.85rem;
@@ -557,17 +557,18 @@ button {
   line-height: 1.1;
   margin-bottom: 24px;
   letter-spacing: -1px;
+  color: #0f172a;
 }
 
 .hero-title span {
-  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  background: linear-gradient(135deg, #0466c8 0%, #023e8a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .hero-description {
   font-size: 1.2rem;
-  color: var(--text-dim);
+  color: #475569;
   margin-bottom: 36px;
   max-width: 560px;
   line-height: 1.7;
@@ -587,31 +588,32 @@ button {
   font-weight: 800;
   font-size: 1.05rem;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-  border: 1px solid var(--border-glow);
-  box-shadow: 0 8px 25px rgba(4, 102, 200, 0.4);
+  border: none;
+  box-shadow: 0 8px 25px rgba(4, 102, 200, 0.3);
   cursor: pointer;
 }
 
 .btn-primary-hero:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(4, 102, 200, 0.6);
+  box-shadow: 0 12px 35px rgba(4, 102, 200, 0.5);
 }
 
 .btn-secondary-hero {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: var(--primary-navy);
   padding: 16px 36px;
   border-radius: var(--radius-pill);
   font-weight: 800;
   font-size: 1.05rem;
   transition: border-color var(--transition-fast), background-color var(--transition-fast);
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary-hero:hover {
-  border-color: var(--accent-cyan);
-  background: rgba(14, 165, 233, 0.1);
+  border-color: var(--primary-navy);
+  background: rgba(4, 102, 200, 0.05);
 }
 
 .hero-image-wrap {
@@ -624,6 +626,40 @@ button {
 
 .hero-image-wrap img {
   width: 100%;
+}
+
+/* 3D Configurator UI */
+.form-select-custom {
+  width: 100%;
+  padding: 10px 14px;
+  background-color: #050811;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.form-select-custom-light {
+  width: 100%;
+  padding: 11px 14px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-sm);
+  color: #0f172a;
+  font-size: 0.9rem;
+  font-weight: 700;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.form-select-custom-light:focus {
+  border-color: var(--primary-navy);
+}
+
+.hero-image-wrap img {
   height: 460px;
   object-fit: cover;
 }
@@ -1230,6 +1266,9 @@ button.cat-card {
   }
   .hero-container {
     grid-template-columns: 1fr;
+  }
+  .frame-customizer-grid {
+    grid-template-columns: 1fr !important;
   }
   .nav-menu {
     display: none;

@@ -296,6 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderCatalog("all");
   setupEventListeners();
   setupTheme();
+  init3dSteelCanvas();
 });
 
 /* --------------------------------------------------------------------------
@@ -322,39 +323,33 @@ function productCardHTML(p) {
   `;
 }
 
-// Home page "Browse by Product Line" cards — one per MAIN_CATEGORIES entry.
-// Prefab Buildings gets a real photo + model count; the other four (no real
-// products yet) get an icon-only "Coming Soon" treatment instead of a
-// fabricated photo or invented product count.
+// Home page "Browse by Product Line" cards — renders image + description + model count for all categories.
 function renderCategoryCards() {
   const container = document.getElementById("categoryCardsGrid");
   if (!container) return;
-  container.innerHTML = MAIN_CATEGORIES.map(c => {
-    if (c.ready) {
-      return `
-        <button type="button" class="cat-card" onclick="goToMainCategory('${c.key}')">
-          <div class="cat-card-img">
-            <img ${responsiveImgAttrs("images/products/Model No-BH-IS-1006.webp", "(max-width: 640px) 100vw, 360px")} alt="${c.name}" loading="lazy" decoding="async">
-          </div>
-          <div class="cat-card-body">
-            <h3 class="cat-card-title">${c.icon} ${c.name}</h3>
-            <p class="cat-card-desc">${c.blurb}</p>
-            <span class="cat-card-link">${PRODUCTS_DATA.length} Models →</span>
-          </div>
-        </button>
-      `;
-    }
+  container.innerHTML = CATEGORIES.map(c => {
+    const modelCount = PRODUCTS_DATA.filter(p => p.category === c.key).length;
     return `
-      <button type="button" class="cat-card" onclick="goToMainCategory('${c.key}')">
-        <div class="cat-card-body" style="padding-top:40px; text-align:center;">
-          <div style="font-size:2.8rem; margin-bottom:16px;">${c.icon}</div>
-          <h3 class="cat-card-title">${c.name}</h3>
+      <button type="button" class="cat-card" onclick="navigateToCategory('${c.key}')">
+        <div class="cat-card-img">
+          <img ${responsiveImgAttrs(c.image, "(max-width: 640px) 100vw, 360px")} alt="${c.name}" loading="lazy" decoding="async">
+        </div>
+        <div class="cat-card-body">
+          <h3 class="cat-card-title">${c.icon} ${c.name}</h3>
           <p class="cat-card-desc">${c.blurb}</p>
-          <span class="coming-soon-badge">Coming Soon</span>
+          <span class="cat-card-link">${modelCount} Models →</span>
         </div>
       </button>
     `;
   }).join("");
+}
+
+function navigateToCategory(catKey) {
+  navigateToView("productsView");
+  const cat = CATEGORIES.find(c => c.key === catKey);
+  const title = document.getElementById("productsViewTitle");
+  if (title && cat) title.textContent = cat.name;
+  renderCatalog(catKey);
 }
 
 // Routes a Products-nav / home-card click to the shared Products view,
@@ -645,4 +640,219 @@ function handleQuoteSubmit(e) {
   alert("Thank you! Your quote request has been submitted successfully. Our engineering team at Bongshai Steel will contact you shortly.");
   closeModal();
 }
+
+/* ==========================================================================
+   THREE.JS 3D WEBGL STRUCTURAL STEEL PORTAL FRAME INSPECTOR
+   ========================================================================== */
+let threeScene, threeCamera, threeRenderer, steelFrameGroup, steelMaterial, roofMaterial, floorMaterial, wallMaterial;
+let isDragging3d = false, previousMousePosition = { x: 0, y: 0 };
+let leftWallMesh, rightWallMesh, floorMesh;
+
+function init3dSteelCanvas() {
+  const canvas = document.getElementById("steel3dCanvas");
+  const container = document.getElementById("canvas3dContainer");
+  if (!canvas || !container || typeof THREE === "undefined") return;
+
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+
+  // Scene, Camera, Renderer
+  threeScene = new THREE.Scene();
+  threeScene.background = new THREE.Color(0x050811);
+
+  threeCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+  threeCamera.position.set(25, 20, 35);
+  threeCamera.lookAt(0, 5, 0);
+
+  threeRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  threeRenderer.setSize(width, height);
+  threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // Ambient & Directional Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+  threeScene.add(ambientLight);
+
+  const dirLight1 = new THREE.DirectionalLight(0x38bdf8, 1.2);
+  dirLight1.position.set(20, 40, 20);
+  threeScene.add(dirLight1);
+
+  const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+  dirLight2.position.set(-20, 20, -20);
+  threeScene.add(dirLight2);
+
+  // Materials
+  steelMaterial = new THREE.MeshStandardMaterial({
+    color: 0x0466c8,
+    metalness: 0.8,
+    roughness: 0.3
+  });
+
+  roofMaterial = new THREE.MeshStandardMaterial({
+    color: 0x38bdf8,
+    metalness: 0.5,
+    roughness: 0.4,
+    transparent: true,
+    opacity: 0.85,
+    side: THREE.DoubleSide
+  });
+
+  floorMaterial = new THREE.MeshStandardMaterial({
+    color: 0x334155,
+    roughness: 0.8,
+    metalness: 0.2
+  });
+
+  wallMaterial = new THREE.MeshStandardMaterial({
+    color: 0x64748b,
+    roughness: 0.5,
+    metalness: 0.5,
+    transparent: true,
+    opacity: 0.5,
+    side: THREE.DoubleSide
+  });
+
+  // Construct 3D Steel Portal Frame
+  steelFrameGroup = new THREE.Group();
+
+  // 1. REINFORCED CONCRETE FLOOR SLAB
+  floorMesh = new THREE.Mesh(new THREE.BoxGeometry(32, 0.4, 38), floorMaterial);
+  floorMesh.position.set(0, -0.2, 0);
+  steelFrameGroup.add(floorMesh);
+
+  // 2. SIDE WALL CLADDING PANELS
+  leftWallMesh = new THREE.Mesh(new THREE.PlaneGeometry(32, 12), wallMaterial);
+  leftWallMesh.position.set(-12, 6, 0);
+  leftWallMesh.rotation.y = Math.PI / 2;
+  steelFrameGroup.add(leftWallMesh);
+
+  rightWallMesh = new THREE.Mesh(new THREE.PlaneGeometry(32, 12), wallMaterial);
+  rightWallMesh.position.set(12, 6, 0);
+  rightWallMesh.rotation.y = -Math.PI / 2;
+  steelFrameGroup.add(rightWallMesh);
+
+  // 3. COLUMNS & RAFTER BEAMS (BAY FRAMES)
+  for (let z = -15; z <= 15; z += 10) {
+    // Left Column
+    const colLeft = new THREE.Mesh(new THREE.BoxGeometry(0.8, 12, 0.8), steelMaterial);
+    colLeft.position.set(-12, 6, z);
+    steelFrameGroup.add(colLeft);
+
+    // Right Column
+    const colRight = new THREE.Mesh(new THREE.BoxGeometry(0.8, 12, 0.8), steelMaterial);
+    colRight.position.set(12, 6, z);
+    steelFrameGroup.add(colRight);
+
+    // Left Rafter
+    const rafterLeft = new THREE.Mesh(new THREE.BoxGeometry(13, 0.6, 0.6), steelMaterial);
+    rafterLeft.position.set(-6, 13.5, z);
+    rafterLeft.rotation.z = 0.25;
+    steelFrameGroup.add(rafterLeft);
+
+    // Right Rafter
+    const rafterRight = new THREE.Mesh(new THREE.BoxGeometry(13, 0.6, 0.6), steelMaterial);
+    rafterRight.position.set(6, 13.5, z);
+    rafterRight.rotation.z = -0.25;
+    steelFrameGroup.add(rafterRight);
+  }
+
+  // 4. LONGITUDINAL PURLINS (ROOF BARS)
+  for (let x = -11; x <= 11; x += 3.6) {
+    const purlin = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 32), steelMaterial);
+    const heightOffset = 12 + (1 - Math.abs(x) / 12) * 3;
+    purlin.position.set(x, heightOffset, 0);
+    steelFrameGroup.add(purlin);
+  }
+
+  // 5. ROOF DECKING & CLADDING SLAB
+  const roofLeft = new THREE.Mesh(new THREE.PlaneGeometry(14, 32), roofMaterial);
+  roofLeft.position.set(-6, 13.7, 0);
+  roofLeft.rotation.x = Math.PI / 2;
+  roofLeft.rotation.y = 0.25;
+  steelFrameGroup.add(roofLeft);
+
+  const roofRight = new THREE.Mesh(new THREE.PlaneGeometry(14, 32), roofMaterial);
+  roofRight.position.set(6, 13.7, 0);
+  roofRight.rotation.x = Math.PI / 2;
+  roofRight.rotation.y = -0.25;
+  steelFrameGroup.add(roofRight);
+
+  threeScene.add(steelFrameGroup);
+
+  // Mouse Orbit Controls
+  canvas.addEventListener("mousedown", (e) => {
+    isDragging3d = true;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+  });
+
+  window.addEventListener("mouseup", () => { isDragging3d = false; });
+
+  canvas.addEventListener("mousemove", (e) => {
+    if (!isDragging3d || !steelFrameGroup) return;
+    const deltaX = e.clientX - previousMousePosition.x;
+    const deltaY = e.clientY - previousMousePosition.y;
+
+    steelFrameGroup.rotation.y += deltaX * 0.008;
+    steelFrameGroup.rotation.x += deltaY * 0.005;
+
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+  });
+
+  // Animation Loop
+  function animate3d() {
+    requestAnimationFrame(animate3d);
+    if (!isDragging3d && steelFrameGroup) {
+      steelFrameGroup.rotation.y += 0.003; // Gentle auto-spin
+    }
+    threeRenderer.render(threeScene, threeCamera);
+  }
+
+  animate3d();
+
+  // Resize Handler
+  window.addEventListener("resize", () => {
+    if (!container || !threeRenderer || !threeCamera) return;
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    threeCamera.aspect = w / h;
+    threeCamera.updateProjectionMatrix();
+    threeRenderer.setSize(w, h);
+  });
+}
+
+function update3dFrameColor(colorVal) {
+  if (!steelMaterial) return;
+  if (colorVal === "blue") steelMaterial.color.setHex(0x0466c8);
+  else if (colorVal === "grey") steelMaterial.color.setHex(0x334155);
+  else if (colorVal === "red") steelMaterial.color.setHex(0x991b1b);
+  else if (colorVal === "silver") steelMaterial.color.setHex(0x94a3b8);
+}
+
+function update3dInsulation(insulationVal) {
+  if (!roofMaterial) return;
+  if (insulationVal === "pu") roofMaterial.color.setHex(0x38bdf8);
+  else if (insulationVal === "eps") roofMaterial.color.setHex(0xf8fafc);
+  else if (insulationVal === "pir") roofMaterial.color.setHex(0xf59e0b);
+  else if (insulationVal === "single") roofMaterial.color.setHex(0x64748b);
+}
+
+function update3dWall(wallVal) {
+  if (!wallMaterial) return;
+  if (wallVal === "full") {
+    wallMaterial.opacity = 0.85;
+    wallMaterial.color.setHex(0x475569);
+  } else if (wallVal === "semi") {
+    wallMaterial.opacity = 0.35;
+    wallMaterial.color.setHex(0x38bdf8);
+  } else if (wallVal === "none") {
+    wallMaterial.opacity = 0.0;
+  }
+}
+
+function update3dFloor(floorVal) {
+  if (!floorMaterial) return;
+  if (floorVal === "concrete") floorMaterial.color.setHex(0x475569);
+  else if (floorVal === "epoxy") floorMaterial.color.setHex(0x059669);
+  else if (floorVal === "dark") floorMaterial.color.setHex(0x1e293b);
+}
+
 

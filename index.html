@@ -22,10 +22,11 @@
   <meta property="og:image" content="images/products/Model%20No-BH-IS-1001.webp">
   <meta property="og:locale" content="en_BD">
 
-  <!-- Fonts & Stylesheet -->
+  <!-- Fonts, Three.js 3D Engine & Stylesheet -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -49,7 +50,7 @@
         <div class="contact-item">
           <!-- Location Icon -->
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-          <span>House #18, Road #18, Sector #10, Uttara C/A, Dhaka – 1230</span>
+          <span>Uttara C/A, Dhaka – 1230</span>
         </div>
 
         <div class="contact-item">
@@ -190,6 +191,74 @@
         <div class="stat-item">
           <h3>98%</h3>
           <p>Global Client Satisfaction</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3D WebGL Structural Steel Inspector & Customizer -->
+    <section class="section tech-grid-bg" style="background-color:#ffffff; color:var(--text-primary); padding:90px 24px; border-bottom:1px solid var(--border-light);">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle" style="color:var(--primary-navy);">Interactive 3D WebGL Engine</span>
+          <h2 class="section-title" style="color:var(--text-primary);">3D Structural Steel Portal Frame Inspector</h2>
+          <p style="color:var(--text-muted); max-width:640px; margin:12px auto 0 auto;">Rotate, zoom, and customize a 3D structural steel portal frame in real time. Inspect columns, I-beams, purlins, roof panels, floor slab, and side walls built to AISC & Eurocode standards.</p>
+        </div>
+
+        <div class="frame-customizer-grid" style="display:grid; grid-template-columns: 1fr 340px; gap:30px; align-items:start;">
+          <!-- 3D Canvas Viewport -->
+          <div style="position:relative; border-radius:var(--radius-lg); overflow:hidden; border:1px solid var(--border-light); box-shadow:var(--shadow-lg); background:#0f172a; height:500px;" id="canvas3dContainer">
+            <canvas id="steel3dCanvas" style="width:100%; height:100%; display:block; cursor:grab;"></canvas>
+            <div style="position:absolute; bottom:20px; left:20px; background:rgba(255,255,255,0.92); backdrop-filter:blur(6px); padding:8px 16px; border-radius:var(--radius-pill); font-size:0.8rem; font-weight:800; color:var(--primary-navy); border:1px solid var(--border-light); box-shadow:var(--shadow-sm);">
+              🖱️ Drag mouse to rotate • Scroll to zoom 3D Structure
+            </div>
+          </div>
+
+          <!-- 3D Configurator Control Panel -->
+          <div style="background:#ffffff; border-radius:var(--radius-lg); padding:28px; border:1px solid var(--border-light); box-shadow:var(--shadow-md);">
+            <h3 style="font-family:var(--font-heading); font-size:1.3rem; margin-bottom:20px; color:var(--primary-navy); border-bottom:1px solid var(--border-light); padding-bottom:12px; font-weight:800;">Frame Customizer</h3>
+            
+            <div style="margin-bottom:16px;">
+              <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">Structural Color Finish</label>
+              <select id="configColor" class="form-select-custom-light" onchange="update3dFrameColor(this.value)">
+                <option value="blue">Steel Royal Blue (AISC)</option>
+                <option value="grey">Charcoal Grey Metallic</option>
+                <option value="red">Crimson Anti-Corrosion Primer</option>
+                <option value="silver">Galvanized Steel Silver</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">Roof Insulation & Decking</label>
+              <select id="configInsulation" class="form-select-custom-light" onchange="update3dInsulation(this.value)">
+                <option value="pu">75mm PU Sandwich Panel (Blue)</option>
+                <option value="eps">50mm EPS Thermal Board (White)</option>
+                <option value="pir">100mm PIR Cold Panel (Amber)</option>
+                <option value="single">Single Sheet Uninsulated (Grey)</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">Side Wall Cladding</label>
+              <select id="configWall" class="form-select-custom-light" onchange="update3dWall(this.value)">
+                <option value="full">Full Insulated Sandwich Wall</option>
+                <option value="semi">Semi-Transparent Daylight Panels</option>
+                <option value="none">Open Framing (No Walls)</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom:20px;">
+              <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">Concrete Floor Finish</label>
+              <select id="configFloor" class="form-select-custom-light" onchange="update3dFloor(this.value)">
+                <option value="concrete">Reinforced Concrete Slab (Grey)</option>
+                <option value="epoxy">Industrial Epoxy Coating (Green)</option>
+                <option value="dark">Heavy Duty Polished Floor (Dark)</option>
+              </select>
+            </div>
+
+            <button class="btn-primary-hero" style="width:100%; border:none; cursor:pointer;" onclick="openQuoteModal('Custom 3D Frame')">
+              Get Quote For Custom 3D Frame
+            </button>
+          </div>
         </div>
       </div>
     </section>
