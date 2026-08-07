@@ -211,7 +211,7 @@ function buildCottage() {
       categoryName: "Steel Cottage House",
       modelCode: `BH-CH-${400 + i + 1}`,
       name,
-      desc: "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and a fast 25–35 day on-site setup.",
+      desc: "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
       price: fmtLakh(price),
       priceVal: price,
       image: chImages[i] === "412" ? "images/products/bh-ch-412.webp" : `images/products/Model No-BH-CH-${400 + i + 1}.webp`
@@ -256,7 +256,7 @@ function buildContainer() {
       categoryName: "Steel Container House",
       modelCode: `BH-CH-${num}`,
       name,
-      desc: "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid 1–2 day delivery.",
+      desc: "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
       price: fmtLakh(price),
       priceVal: price,
       image: `images/products/bh-ch-${num}.webp`
