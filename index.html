@@ -96,32 +96,32 @@
         <li class="nav-item">
           <button class="nav-link" type="button" onclick="navigateToView('homeView')">Home</button>
         </li>
-        <!-- PRODUCTS MEGA DROPDOWN (ALL 5 CATEGORIES) -->
+        <!-- PRODUCTS MEGA DROPDOWN (5 MAIN PRODUCT LINES) -->
         <li class="nav-item">
-          <button class="nav-link" type="button" onclick="navigateToView('productsView')" aria-haspopup="true" aria-expanded="false">
+          <button class="nav-link" type="button" onclick="goToMainCategory('prefab')" aria-haspopup="true" aria-expanded="false">
             Products
             <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="dropdown-menu" role="menu">
-            <button class="dropdown-link" type="button" role="menuitem" onclick="navigateToView('productsView'); renderProducts('factory');">
+            <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('prefab')">
               <span class="dropdown-icon-dot"></span>
-              <span>Steel Factory Building</span>
+              <span>Prefab Buildings</span>
             </button>
-            <button class="dropdown-link" type="button" role="menuitem" onclick="navigateToView('productsView'); renderProducts('structural');">
+            <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('structure')">
               <span class="dropdown-icon-dot"></span>
-              <span>Structural Steel Building</span>
+              <span>Steel Structure</span>
             </button>
-            <button class="dropdown-link" type="button" role="menuitem" onclick="navigateToView('productsView'); renderProducts('duplex');">
+            <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('furniture')">
               <span class="dropdown-icon-dot"></span>
-              <span>Duplex Steel Building</span>
+              <span>Steel Furniture</span>
             </button>
-            <button class="dropdown-link" type="button" role="menuitem" onclick="navigateToView('productsView'); renderProducts('cottage');">
+            <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('doorgate')">
               <span class="dropdown-icon-dot"></span>
-              <span>Steel Cottage House</span>
+              <span>Door and Gate</span>
             </button>
-            <button class="dropdown-link" type="button" role="menuitem" onclick="navigateToView('productsView'); renderProducts('container');">
+            <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('siteothers')">
               <span class="dropdown-icon-dot"></span>
-              <span>Steel Container House</span>
+              <span>Site and Others Steel Products</span>
             </button>
           </div>
         </li>
@@ -155,13 +155,13 @@
       <ul class="mobile-menu">
         <li><button class="mobile-link" type="button" onclick="navigateToView('homeView')">Home</button></li>
         <li>
-          <button class="mobile-link" type="button" onclick="navigateToView('productsView')">Products</button>
+          <button class="mobile-link" type="button" onclick="goToMainCategory('prefab')">Products</button>
           <ul class="mobile-sub-menu">
-            <li><button class="mobile-sub-link" type="button" onclick="navigateToView('productsView'); renderProducts('factory');">Steel Factory Building</button></li>
-            <li><button class="mobile-sub-link" type="button" onclick="navigateToView('productsView'); renderProducts('structural');">Structural Steel Building</button></li>
-            <li><button class="mobile-sub-link" type="button" onclick="navigateToView('productsView'); renderProducts('duplex');">Duplex Steel Building</button></li>
-            <li><button class="mobile-sub-link" type="button" onclick="navigateToView('productsView'); renderProducts('cottage');">Steel Cottage House</button></li>
-            <li><button class="mobile-sub-link" type="button" onclick="navigateToView('productsView'); renderProducts('container');">Steel Container House</button></li>
+            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('prefab')">Prefab Buildings</button></li>
+            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('structure')">Steel Structure</button></li>
+            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('furniture')">Steel Furniture</button></li>
+            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('doorgate')">Door and Gate</button></li>
+            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('siteothers')">Site and Others Steel Products</button></li>
           </ul>
         </li>
         <li><button class="mobile-link" type="button" onclick="navigateToView('servicesView')">Services</button></li>
@@ -221,7 +221,7 @@
       <div class="container">
         <div class="section-header">
           <span class="section-subtitle">Complete Catalog</span>
-          <h2 class="section-title">Browse by Building Category</h2>
+          <h2 class="section-title">Browse by Product Line</h2>
         </div>
         <div class="category-cards-grid" id="categoryCardsGrid"></div>
       </div>
@@ -231,8 +231,8 @@
     <section class="section" style="padding-top:0;">
       <div class="container">
         <div class="section-header">
-          <span class="section-subtitle">Featured Selection</span>
-          <h2 class="section-title">Flagship Models Across Every Category</h2>
+          <span class="section-subtitle">Prefab Buildings — Featured Selection</span>
+          <h2 class="section-title">Flagship Models Across Every Building Type</h2>
         </div>
         <div class="products-grid" id="featuredGrid"></div>
         <div style="text-align:center; margin-top:40px;">
@@ -251,12 +251,12 @@
         <!-- ===== CATEGORY SIDEBAR ===== -->
         <aside class="cat-sidebar" aria-label="Product categories">
           <button class="cat-sidebar-toggle" type="button" id="catSidebarToggle" aria-controls="catSidebarBody" aria-expanded="false">
-            <span>All Products</span>
+            <span>Prefab Buildings</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="cat-sidebar-header">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-            All Products
+            Prefab Buildings
           </div>
           <div class="cat-sidebar-body" id="catSidebarBody">
             <button class="cat-item active" type="button" data-category="all">
@@ -294,8 +294,8 @@
         <!-- ===== CATALOG CONTENT ===== -->
         <div class="page-sidebar-content">
           <div class="section-header" style="text-align:left;">
-            <span class="section-subtitle">Complete Catalog</span>
-            <h2 class="section-title">Bongshai Steel Products & Models</h2>
+            <span class="section-subtitle">Prefab Buildings</span>
+            <h2 class="section-title">Complete Building Catalog</h2>
           </div>
           <div id="productsGridPage"></div>
         </div>
@@ -303,7 +303,14 @@
     </div>
   </section>
 
-  <!-- 3. SERVICES VIEW -->
+  <!-- 3. COMING SOON VIEW (Steel Structure / Furniture / Door & Gate / Site & Others) -->
+  <section id="comingSoonView" class="page-view section">
+    <div class="container">
+      <div id="comingSoonContent"></div>
+    </div>
+  </section>
+
+  <!-- 4. SERVICES VIEW -->
   <section id="servicesView" class="page-view section">
     <div class="container">
       <div class="section-header">
@@ -327,7 +334,7 @@
     </div>
   </section>
 
-  <!-- 4. HEALTH & SAFETY VIEW -->
+  <!-- 5. HEALTH & SAFETY VIEW -->
   <section id="safetyView" class="page-view section">
     <div class="container">
       <div class="section-header">
@@ -346,7 +353,7 @@
     </div>
   </section>
 
-  <!-- 5. CONTACT VIEW -->
+  <!-- 6. CONTACT VIEW -->
   <section id="contactView" class="page-view section">
     <div class="container">
       <div class="section-header">
@@ -390,11 +397,11 @@
       <div class="footer-col">
         <h4>Products</h4>
         <ul class="footer-links">
-          <li><button type="button" onclick="navigateToView('productsView'); renderProducts('factory');">Steel Factory Building</button></li>
-          <li><button type="button" onclick="navigateToView('productsView'); renderProducts('structural');">Structural Steel Building</button></li>
-          <li><button type="button" onclick="navigateToView('productsView'); renderProducts('duplex');">Duplex Steel Building</button></li>
-          <li><button type="button" onclick="navigateToView('productsView'); renderProducts('cottage');">Steel Cottage House</button></li>
-          <li><button type="button" onclick="navigateToView('productsView'); renderProducts('container');">Steel Container House</button></li>
+          <li><button type="button" onclick="goToMainCategory('prefab')">Prefab Buildings</button></li>
+          <li><button type="button" onclick="goToMainCategory('structure')">Steel Structure</button></li>
+          <li><button type="button" onclick="goToMainCategory('furniture')">Steel Furniture</button></li>
+          <li><button type="button" onclick="goToMainCategory('doorgate')">Door and Gate</button></li>
+          <li><button type="button" onclick="goToMainCategory('siteothers')">Site and Others Steel Products</button></li>
         </ul>
       </div>
 

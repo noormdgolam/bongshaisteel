@@ -3,7 +3,51 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   CATEGORY METADATA (drives nav dropdown, home category cards, filters)
+   MAIN PRODUCT LINES (drives the Products nav dropdown + home cards).
+   Only "Prefab Buildings" has real catalog data right now; the other four
+   are real planned product lines with no models yet — they route to an
+   honest "Coming Soon" view rather than showing invented products.
+   -------------------------------------------------------------------------- */
+const MAIN_CATEGORIES = [
+  {
+    key: "prefab",
+    name: "Prefab Buildings",
+    icon: "🏗️",
+    blurb: "Pre-engineered steel factories, apartment buildings, duplex homes, cottages, and container houses.",
+    ready: true
+  },
+  {
+    key: "structure",
+    name: "Steel Structure",
+    icon: "🏛️",
+    blurb: "Structural steel fabrication for industrial and commercial projects.",
+    ready: false
+  },
+  {
+    key: "furniture",
+    name: "Steel Furniture",
+    icon: "🪑",
+    blurb: "Durable steel furniture for home, office, and industrial use.",
+    ready: false
+  },
+  {
+    key: "doorgate",
+    name: "Door and Gate",
+    icon: "🚪",
+    blurb: "Custom steel doors and gates built to order.",
+    ready: false
+  },
+  {
+    key: "siteothers",
+    name: "Site and Others Steel Products",
+    icon: "🔧",
+    blurb: "Additional steel products and on-site fabrication services.",
+    ready: false
+  }
+];
+
+/* --------------------------------------------------------------------------
+   PREFAB BUILDING CATEGORIES (drives the Prefab Buildings sidebar/catalog)
    -------------------------------------------------------------------------- */
 const CATEGORIES = [
   {
@@ -314,28 +358,75 @@ function productCardHTML(p) {
   `;
 }
 
+// Home page "Browse by Product Line" cards — one per MAIN_CATEGORIES entry.
+// Prefab Buildings gets a real photo + model count; the other four (no real
+// products yet) get an icon-only "Coming Soon" treatment instead of a
+// fabricated photo or invented product count.
 function renderCategoryCards() {
   const container = document.getElementById("categoryCardsGrid");
   if (!container) return;
-  container.innerHTML = CATEGORIES.map(c => {
-    const count = PRODUCTS_DATA.filter(p => p.category === c.key).length;
+  container.innerHTML = MAIN_CATEGORIES.map(c => {
+    if (c.ready) {
+      return `
+        <button type="button" class="glass-card category-card-home" onclick="goToMainCategory('${c.key}')">
+          <div class="cat-home-thumb">
+            <img ${responsiveImgAttrs("images/products/Model No-BH-IS-1006.webp", "(max-width: 640px) 100vw, 320px")} alt="${c.name}" loading="lazy" decoding="async">
+          </div>
+          <div class="cat-home-body">
+            <span class="cat-home-icon">${c.icon}</span>
+            <h3>${c.name}</h3>
+            <p>${c.blurb}</p>
+            <div class="cat-home-footer">
+              <span class="cat-home-price">${CATEGORIES.length} Categories</span>
+              <span class="cat-home-count">${PRODUCTS_DATA.length} Models →</span>
+            </div>
+          </div>
+        </button>
+      `;
+    }
     return `
-      <button type="button" class="glass-card category-card-home" onclick="navigateToView('productsView'); renderCatalog('${c.key}');">
-        <div class="cat-home-thumb">
-          <img ${responsiveImgAttrs(c.image, "(max-width: 640px) 100vw, 320px")} alt="${c.name}" loading="lazy" decoding="async">
-        </div>
+      <button type="button" class="glass-card category-card-home coming-soon-card" onclick="goToMainCategory('${c.key}')">
+        <div class="cat-home-icon-large">${c.icon}</div>
         <div class="cat-home-body">
-          <span class="cat-home-icon">${c.icon}</span>
           <h3>${c.name}</h3>
           <p>${c.blurb}</p>
           <div class="cat-home-footer">
-            <span class="cat-home-price">${c.priceLabel}</span>
-            <span class="cat-home-count">${count} Models →</span>
+            <span class="coming-soon-badge">Coming Soon</span>
           </div>
         </div>
       </button>
     `;
   }).join("");
+}
+
+// Routes a Products-nav / home-card click to either the real Prefab
+// Buildings catalog or the shared "Coming Soon" placeholder view.
+function goToMainCategory(key) {
+  const cat = MAIN_CATEGORIES.find(c => c.key === key);
+  if (!cat) return;
+  if (cat.ready) {
+    navigateToView("productsView");
+    renderCatalog("all");
+  } else {
+    renderComingSoon(cat);
+    navigateToView("comingSoonView");
+  }
+}
+
+function renderComingSoon(cat) {
+  const container = document.getElementById("comingSoonContent");
+  if (!container) return;
+  container.innerHTML = `
+    <div class="section-header">
+      <span class="section-subtitle">Coming Soon</span>
+      <h2 class="section-title">${cat.icon} ${cat.name}</h2>
+    </div>
+    <div class="coming-soon-box">
+      <p>${cat.blurb}</p>
+      <p>This product line is launching soon. Contact our team for early access, custom orders, or bulk inquiries.</p>
+      <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="openQuoteModal()">Contact Us</button>
+    </div>
+  `;
 }
 
 function renderFeatured() {
@@ -371,11 +462,6 @@ function renderCatalog(filterCategory) {
     const items = PRODUCTS_DATA.filter(p => p.category === filterCategory);
     container.innerHTML = `<div class="products-grid">${items.map(productCardHTML).join("")}</div>`;
   }
-}
-
-// Legacy shim: nav dropdown / footer links call renderProducts(category)
-function renderProducts(category) {
-  renderCatalog(category);
 }
 
 /* --------------------------------------------------------------------------

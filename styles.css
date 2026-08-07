@@ -1200,6 +1200,68 @@ select:focus-visible,
   color: var(--text-light);
 }
 
+/* Coming Soon variant of the home category card — no real photo/product
+   count exists yet for these lines, so it uses an icon instead of a photo
+   and an honest "Coming Soon" badge instead of a fabricated model count. */
+.coming-soon-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 36px 22px;
+  opacity: 0.9;
+}
+
+.coming-soon-card .cat-home-icon-large {
+  font-size: 2.6rem;
+  margin-bottom: 14px;
+}
+
+.coming-soon-card .cat-home-body {
+  padding: 0;
+  width: 100%;
+}
+
+.coming-soon-card .cat-home-footer {
+  justify-content: center;
+  border-top: none;
+  padding-top: 8px;
+}
+
+.coming-soon-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Coming Soon page content (Steel Structure / Furniture / Door & Gate / Site & Others) */
+.coming-soon-box {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 50px 40px;
+  box-shadow: var(--shadow-md);
+}
+
+.coming-soon-box p {
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  font-size: 1.05rem;
+}
+
+.coming-soon-box p:last-of-type {
+  margin-bottom: 28px;
+}
+
 /* ==========================================================================
    FULL CATALOG GROUPING (PRODUCTS VIEW)
    ========================================================================== */
