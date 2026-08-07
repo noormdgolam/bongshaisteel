@@ -665,20 +665,42 @@ function openProductModal(productId, updateHash = true) {
   const modalBox = document.getElementById("modalContent");
   if (!modalOverlay || !modalBox) return;
 
+  const waMsg = encodeURIComponent(`Hello Bongshai Steel! I would like to inquire about ${product.modelCode} (${product.name}). Please send technical specs and quotation.`);
+
   modalBox.innerHTML = `
     <div class="modal-header">
       <h3 class="modal-title" id="modalTitle">${product.name} (${product.modelCode})</h3>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-    <div class="modal-body">
-      <img ${responsiveImgAttrs(product.image, "(max-width: 650px) 100vw, 650px")} alt="${product.name}" style="width:100%; height:280px; object-fit:cover; border-radius:8px; margin-bottom:20px;">
-      <p style="font-size:1.05rem; color:var(--text-muted); margin-bottom:20px;">${product.desc}</p>
+    <div class="modal-body" style="padding-top:10px;">
+      <div style="position:relative; margin-bottom:20px; border-radius:12px; overflow:hidden;">
+        <img ${responsiveImgAttrs(product.image, "(max-width: 650px) 100vw, 650px")} alt="${product.name}" style="width:100%; height:290px; object-fit:cover; display:block;">
+        <span style="position:absolute; top:12px; left:12px; background:var(--primary-navy); color:#ffffff; font-size:0.75rem; font-weight:800; padding:6px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px;">AISC & BNBC Certified</span>
+      </div>
 
-      <p style="margin-bottom:20px;"><strong>Category:</strong> ${product.categoryName}</p>
+      <p style="font-size:1.05rem; color:var(--text-muted); line-height:1.6; margin-bottom:20px;">${product.desc}</p>
 
-      <button class="btn-modal-cta" onclick="openQuoteModal('${product.modelCode}')">
-        Request Official Quote for ${product.modelCode}
-      </button>
+      <!-- Technical Specifications Table -->
+      <div style="background:#f8fafc; border:1px solid var(--border-light); border-radius:10px; padding:18px; margin-bottom:24px;">
+        <h4 style="font-size:0.95rem; font-weight:800; color:var(--primary-navy); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">Technical Engineering Specs</h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.88rem;">
+          <div><strong style="color:var(--text-dark);">Category:</strong> ${product.categoryName}</div>
+          <div><strong style="color:var(--text-dark);">Model Code:</strong> ${product.modelCode}</div>
+          <div><strong style="color:var(--text-dark);">Steel Grade:</strong> Q355B / SS400 High-Tensile</div>
+          <div><strong style="color:var(--text-dark);">Design Standard:</strong> AISC 360 / BNBC 2020</div>
+          <div><strong style="color:var(--text-dark);">Cladding:</strong> PU / PIR / EPS Sandwich</div>
+          <div><strong style="color:var(--text-dark);">Export Freight:</strong> Containerized (40ft HC)</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <button class="btn-modal-cta" style="margin-top:0;" onclick="openQuoteModal('${product.modelCode}')">
+          Request Official Quote
+        </button>
+        <a href="https://wa.me/8801789949060?text=${waMsg}" target="_blank" rel="noopener noreferrer" class="btn-modal-cta" style="margin-top:0; background:#25D366; text-decoration:none; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px;">
+          💬 WhatsApp Inquiry
+        </a>
+      </div>
     </div>
   `;
 
