@@ -524,6 +524,9 @@ function navigateToView(viewId) {
     targetView.classList.add("active-view");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+  if (viewId === "estimatorView") {
+    calculateBuildingEstimate();
+  }
   const drawer = document.getElementById("mobileDrawer");
   if (drawer && drawer.classList.contains("active")) closeDrawer();
 }
@@ -639,6 +642,52 @@ function handleQuoteSubmit(e) {
   e.preventDefault();
   alert("Thank you! Your quote request has been submitted successfully. Our engineering team at Bongshai Steel will contact you shortly.");
   closeModal();
+}
+
+/* ==========================================================================
+   MULTI-CURRENCY GLOBAL CONVERTER SYSTEM
+   ========================================================================== */
+let currentGlobalCurrency = "BDT";
+
+const CURRENCY_RATES = {
+  BDT: { symbol: "৳", rate: 1, suffix: "" },
+  USD: { symbol: "$", rate: 1 / 118, suffix: " USD" },
+  EUR: { symbol: "€", rate: 1 / 128, suffix: " EUR" },
+  AED: { symbol: "AED ", rate: 1 / 32, suffix: "" }
+};
+
+function fmtTaka(bdtAmount) {
+  return "৳" + Math.round(bdtAmount).toLocaleString("en-US");
+}
+
+function changeGlobalCurrency(currCode) {
+  if (!CURRENCY_RATES[currCode]) return;
+  currentGlobalCurrency = currCode;
+
+  // Re-render product cards and active views with updated currency
+  if (activeView === "productsView") {
+    renderPrefabSubcategory(activePrefabSubcat);
+  } else if (activeView === "homeView") {
+    renderFeatured();
+  }
+  calculateBuildingEstimate();
+}
+
+function fmtCurrency(bdtAmount) {
+  const config = CURRENCY_RATES[currentGlobalCurrency] || CURRENCY_RATES.BDT;
+  const converted = bdtAmount * config.rate;
+
+  if (currentGlobalCurrency === "BDT") {
+    return fmtTaka(bdtAmount);
+  }
+
+  if (converted >= 1000000) {
+    return `${config.symbol}${(converted / 1000000).toFixed(2)} Million${config.suffix}`;
+  } else if (converted >= 1000) {
+    return `${config.symbol}${Math.round(converted).toLocaleString('en-US')}${config.suffix}`;
+  } else {
+    return `${config.symbol}${converted.toFixed(2)}${config.suffix}`;
+  }
 }
 
 /* ==========================================================================
@@ -797,6 +846,60 @@ function init3dSteelCanvas() {
     previousMousePosition = { x: e.clientX, y: e.clientY };
   });
 
+  // Scroll-to-zoom (mouse/trackpad)
+  function clampCameraDistance(newPos) {
+    const dist = newPos.length();
+    if (dist > 15 && dist < 90) threeCamera.position.copy(newPos);
+  }
+  canvas.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const scale = e.deltaY > 0 ? 1.08 : 0.92;
+    clampCameraDistance(threeCamera.position.clone().multiplyScalar(scale));
+  }, { passive: false });
+
+  // Touch Controls — single-finger drag to rotate, two-finger pinch to zoom
+  let previousPinchDistance = null;
+
+  function touchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  canvas.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 1) {
+      isDragging3d = true;
+      previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    } else if (e.touches.length === 2) {
+      isDragging3d = false;
+      previousPinchDistance = touchDistance(e.touches);
+    }
+  }, { passive: true });
+
+  canvas.addEventListener("touchmove", (e) => {
+    if (e.touches.length === 1 && isDragging3d && steelFrameGroup) {
+      e.preventDefault();
+      const deltaX = e.touches[0].clientX - previousMousePosition.x;
+      const deltaY = e.touches[0].clientY - previousMousePosition.y;
+
+      steelFrameGroup.rotation.y += deltaX * 0.008;
+      steelFrameGroup.rotation.x += deltaY * 0.005;
+
+      previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    } else if (e.touches.length === 2 && previousPinchDistance !== null) {
+      e.preventDefault();
+      const newDistance = touchDistance(e.touches);
+      const scale = previousPinchDistance / newDistance;
+      clampCameraDistance(threeCamera.position.clone().multiplyScalar(scale));
+      previousPinchDistance = newDistance;
+    }
+  }, { passive: false });
+
+  canvas.addEventListener("touchend", (e) => {
+    isDragging3d = false;
+    if (e.touches.length < 2) previousPinchDistance = null;
+  });
+
   // Animation Loop
   function animate3d() {
     requestAnimationFrame(animate3d);
@@ -848,11 +951,96 @@ function update3dWall(wallVal) {
   }
 }
 
+let roofMeshLeft, roofMeshRight;
+
 function update3dFloor(floorVal) {
   if (!floorMaterial) return;
   if (floorVal === "concrete") floorMaterial.color.setHex(0x475569);
   else if (floorVal === "epoxy") floorMaterial.color.setHex(0x059669);
   else if (floorVal === "dark") floorMaterial.color.setHex(0x1e293b);
 }
+
+/* 3D Exploded Structural View Slider */
+function update3dExplosion(val) {
+  const num = parseFloat(val) || 0;
+  const label = document.getElementById("explVal");
+  if (label) label.textContent = `${Math.round(num)}%`;
+
+  const factor = num / 100;
+  if (leftWallMesh) leftWallMesh.position.x = -12 - factor * 8;
+  if (rightWallMesh) rightWallMesh.position.x = 12 + factor * 8;
+
+  if (roofMaterial) roofMaterial.opacity = Math.max(0.2, 0.85 - factor * 0.5);
+}
+
+/* ==========================================================================
+   INSTANT STEEL BUILDING WEIGHT & COST ESTIMATOR CALCULATOR
+   ========================================================================== */
+function calculateBuildingEstimate() {
+  const len = parseFloat(document.getElementById("estLength")?.value) || 0;
+  const wid = parseFloat(document.getElementById("estWidth")?.value) || 0;
+  const hgt = parseFloat(document.getElementById("estHeight")?.value) || 0;
+  const flr = parseInt(document.getElementById("estFloors")?.value, 10) || 1;
+
+  const totalAreaSqft = len * wid * flr;
+  const steelTons = (totalAreaSqft * 3.5 / 1000).toFixed(1);
+  const costBDT = totalAreaSqft * 450;
+  const days = Math.max(15, Math.ceil(totalAreaSqft / 500));
+
+  const resArea = document.getElementById("resArea");
+  const resSteel = document.getElementById("resSteel");
+  const resCost = document.getElementById("resCost");
+  const resDays = document.getElementById("resDays");
+
+  if (resArea) resArea.textContent = `${totalAreaSqft.toLocaleString('en-US')} sqft`;
+  if (resSteel) resSteel.textContent = `${steelTons} MT`;
+  if (resCost) resCost.textContent = fmtCurrency(costBDT);
+  if (resDays) resDays.textContent = `${days} Days`;
+}
+
+/* ==========================================================================
+   REAL-TIME CATALOG SEARCH & FILTER ENGINE
+   ========================================================================== */
+function filterProductsBySearch(query) {
+  const q = (query || "").trim().toLowerCase();
+  const container = document.getElementById("productsViewContainer");
+  if (!container) return;
+
+  if (!q) {
+    renderCatalog("all");
+    return;
+  }
+
+  const matches = PRODUCTS_DATA.filter(p => 
+    p.name.toLowerCase().includes(q) ||
+    p.modelCode.toLowerCase().includes(q) ||
+    p.categoryName.toLowerCase().includes(q) ||
+    p.desc.toLowerCase().includes(q)
+  );
+
+  if (matches.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:50px 20px; color:var(--text-muted);">
+        <h3 style="font-size:1.4rem; color:var(--primary-navy); margin-bottom:8px;">No matching steel models found</h3>
+        <p>Try searching for "BH-IS", "Duplex", "Container", or "Factory".</p>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div style="margin-bottom:20px; font-weight:700; color:var(--primary-navy);">
+        Showing ${matches.length} search results for "${query}"
+      </div>
+      <div class="products-grid">${matches.map(productCardHTML).join("")}</div>
+    `;
+  }
+}
+
+// Trigger initial estimation calculation on load
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    init3dSteelCanvas();
+    calculateBuildingEstimate();
+  }, 500);
+});
 
 
