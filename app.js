@@ -95,15 +95,6 @@ function buildFactory() {
     "Electronics Assembly Factory", "Cement & Building Materials Plant", "Food Processing Factory Shed",
     "Plastic & Packaging Manufacturing Unit", "Heavy Machinery Production Hall", "Chemical Processing Steel Plant"
   ];
-  const spans = [30, 32, 35, 38, 40, 42, 45, 48, 50, 36, 44, 40];
-  const cranes = ["10 Ton EOT Crane Ready", "15 Ton EOT Crane Ready", "20 Ton EOT Crane Ready", "25 Ton EOT Crane Ready",
-    "30 Ton EOT Crane Ready", "35 Ton EOT Crane Ready", "40 Ton EOT Crane Ready", "45 Ton EOT Crane Ready",
-    "50 Ton EOT Crane Ready", "Hoist Crane Compatible", "20 Ton EOT Crane Ready", "10 Ton EOT Crane Ready"];
-  const roofs = ["75mm PU Sandwich Panel", "100mm PU Insulated Panel", "PU Insulation + Skylight", "EPS Insulated Sheet",
-    "Color Coated Deck", "PIR Insulated Roof", "75mm PU Sandwich Panel", "100mm PU Insulated Panel",
-    "PU Insulation + Skylight", "EPS Insulated Sheet", "PIR Insulated Roof", "Color Coated Deck"];
-  const frames = ["Q355B Heavy Steel", "SS400 Steel Frame", "Q345 Portal Frame", "Galvanized Heavy Steel"];
-
   return names.map((name, i) => {
     const num = 1001 + i;
     const price = lerp(1200, 1800, i, names.length);
@@ -116,13 +107,6 @@ function buildFactory() {
       desc: "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines nationwide.",
       price: `৳${price.toLocaleString("en-IN")} / sqft`,
       priceVal: price,
-      warranty: "20-Year Structural Warranty",
-      specs: [
-        { label: "Clear Span", val: `${spans[i]}m` },
-        { label: "Crane Capacity", val: cranes[i] },
-        { label: "Roofing", val: roofs[i] },
-        { label: "Steel Frame", val: frames[i % frames.length] }
-      ],
       image: `images/products/Model No-BH-IS-${num}.webp`
     };
   });
@@ -139,11 +123,6 @@ function buildStructural() {
     "Garden View Steel Apartment Tower", "Corner Plot Steel Apartment Building", "Mid-Rise Steel Residential Complex",
     "Skyline Steel Apartment Tower", "Community Steel Apartment Complex", "Signature Steel Apartment Residence"
   ];
-  const floors = ["3 to 5 Stories", "4 to 6 Stories", "5 to 7 Stories", "6 to 8 Stories", "5 to 10 Stories",
-    "4 to 6 Stories", "6 to 9 Stories", "8 to 12 Stories", "3 to 5 Stories", "4 to 7 Stories", "6 to 10 Stories", "5 to 8 Stories"];
-  const slabs = ["Composite Steel Decking", "Reinforced Composite Deck"];
-  const seismic = ["BNBC Zone-2 Compliant", "BNBC Zone-3 Compliant", "BNBC Zone-4 Compliant", "Earthquake Resistant Design"];
-  const speeds = [70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120, 90];
   // Verified against each bh-tsb-1XX.html product page's own JSON-LD image field.
   // 105's source page references a non-webp .jfif asset; substituted with the
   // nearest real webp from the same series to keep the site all-WebP.
@@ -165,13 +144,6 @@ function buildStructural() {
       desc: "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and BNBC seismic code compliance.",
       price: `৳${price.toLocaleString("en-IN")} / sqft`,
       priceVal: price,
-      warranty: "25-Year Structural Warranty",
-      specs: [
-        { label: "Floors", val: floors[i] },
-        { label: "Slab System", val: slabs[i % slabs.length] },
-        { label: "Seismic Rating", val: seismic[i % seismic.length] },
-        { label: "Build Speed", val: `${speeds[i]} Days` }
-      ],
       image: `images/products/${images[i]}`
     };
   });
@@ -188,9 +160,6 @@ function buildDuplex() {
     "Family Garden Steel Duplex House", "Rooftop Terrace Steel Duplex Villa", "Double-Height Living Steel Duplex",
     "Corner Plot Steel Duplex Residence", "Compact Urban Steel Duplex Home", "Resort-Style Steel Duplex Villa"
   ];
-  const finishes = ["Precast Concrete + Tiles", "RC Concrete Board + Paint", "Fiber Cement Cladding + Tiles",
-    "Textured Render + Composite Panel", "Full Glass Curtain + Precast"];
-  const speeds = [60, 65, 70, 62, 75, 68, 60, 80, 72, 65, 58, 78];
   const images = [
     "dv-101.webp", "dv-102.webp", "villa_1_1782293220395.webp", "dv-104.webp",
     "dv-105.webp", "dv-106.webp", "cottage_2_1782293207157.webp", "dv-108.webp",
@@ -199,7 +168,6 @@ function buildDuplex() {
 
   return names.map((name, i) => {
     const num = 201 + i;
-    const area = 1650 + i * 90;
     const price = 3000000 + i * 200000;
     return {
       id: `bh-dv-${num}`,
@@ -210,13 +178,6 @@ function buildDuplex() {
       desc: "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
       price: fmtLakh(price),
       priceVal: price,
-      warranty: "50-Year Structural Warranty",
-      specs: [
-        { label: "Total Area", val: `${area.toLocaleString("en-IN")} sqft` },
-        { label: "Layout", val: "4 Bed / 4 Bath" },
-        { label: "Build Time", val: `${speeds[i]} Days` },
-        { label: "Finish", val: finishes[i % finishes.length] }
-      ],
       image: `images/products/${images[i]}`
     };
   });
@@ -238,8 +199,6 @@ function buildCottage() {
     "Backyard Steel Tiny Guest House", "Mountain View Steel Tiny Cabin", "Urban Steel Micro-Living Unit",
     "Farmstead Steel Tiny House", "Eco-Friendly Steel Tiny Home", "Deluxe Steel Tiny House"
   ];
-  const layouts = ["1 Bed + Living + Porch", "2 Bed + 1 Bath + Deck", "1 Bed + Open Kitchen", "Studio + Loft"];
-  const insulations = ["EPS Thermal Board", "PU Heat Insulation", "Fiber Cement Cladding", "Rockwool Insulated Panel"];
   const chImages = ["401", "402", "403", "404", "405", "406", "407", "408", "409", "410", "411", "412"];
 
   const products = [];
@@ -255,13 +214,6 @@ function buildCottage() {
       desc: "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and a fast 25–35 day on-site setup.",
       price: fmtLakh(price),
       priceVal: price,
-      warranty: "20-Year Structural Warranty",
-      specs: [
-        { label: "Floor Area", val: `${420 + i * 15} sqft` },
-        { label: "Layout", val: layouts[i % layouts.length] },
-        { label: "Insulation", val: insulations[i % insulations.length] },
-        { label: "Setup Time", val: `${25 + (i % 6)} Days` }
-      ],
       image: chImages[i] === "412" ? "images/products/bh-ch-412.webp" : `images/products/Model No-BH-CH-${400 + i + 1}.webp`
     });
   });
@@ -278,13 +230,6 @@ function buildCottage() {
       desc: "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
       price: fmtLakh(price),
       priceVal: price,
-      warranty: "20-Year Structural Warranty",
-      specs: [
-        { label: "Floor Area", val: `${560 + i * 12} sqft` },
-        { label: "Layout", val: layouts[(i + 2) % layouts.length] },
-        { label: "Insulation", val: insulations[(i + 1) % insulations.length] },
-        { label: "Setup Time", val: `${28 + (i % 8)} Days` }
-      ],
       image: `images/products/Model No-BH-TH-${num}.webp`
     });
   });
@@ -302,16 +247,8 @@ function buildContainer() {
     "20ft Labor Accommodation Container", "40ft Container Guest House", "20ft Portable Toilet & Utility Container",
     "40ft Container Office Complex", "20ft Emergency Relief Container Unit", "40ft Luxury Container Villa"
   ];
-  const types = ["Site Office / Cabin", "Residential / Resort Home", "Security / Guard Post", "Residential Home",
-    "Retail / Kiosk", "Commercial / Café", "Labor Accommodation", "Guest House", "Utility / Sanitation",
-    "Commercial Office", "Relief / Emergency Unit", "Luxury Residential Villa"];
-  const features = ["Plug & Play Electricals", "Full Height Glass Front", "AC Port + LED Lighting", "Fitted Kitchen + Bath",
-    "Display Windows + Counter", "Commercial Kitchen Vent", "Bunk Bed Fit-Out", "Ensuite Bathroom",
-    "Water & Drainage Fitted", "Meeting Room Partition", "Rapid Deploy Skid Base", "Premium Interior Finish"];
-
   return names.map((name, i) => {
     const num = 501 + i;
-    const is40 = name.startsWith("40ft");
     const price = lerp(450000, 1200000, i, names.length);
     return {
       id: `bh-ch-${num}`,
@@ -322,13 +259,6 @@ function buildContainer() {
       desc: "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid 1–2 day delivery.",
       price: fmtLakh(price),
       priceVal: price,
-      warranty: "10-Year Container Structure Warranty",
-      specs: [
-        { label: "Size", val: is40 ? "40ft x 8ft x 9.6ft High Cube" : "20ft x 8ft x 8.6ft" },
-        { label: "Type", val: types[i] },
-        { label: "Features", val: features[i] },
-        { label: "Setup", val: is40 ? "2-Day Plug & Play" : "Instant 1-Day Delivery" }
-      ],
       image: `images/products/bh-ch-${num}.webp`
     };
   });
@@ -375,10 +305,6 @@ function productCardHTML(p) {
         <span class="product-category">${p.categoryName}</span>
         <h3 class="product-name">${p.name}</h3>
         <p class="product-desc">${p.desc}</p>
-
-        <div class="product-specs">
-          ${p.specs.map(s => `<div class="spec-item"><span class="spec-label">${s.label}</span><span class="spec-val">${s.val}</span></div>`).join("")}
-        </div>
 
         <div class="product-footer">
           <div class="product-price">${p.price}</div>
@@ -689,8 +615,6 @@ function openProductModal(productId) {
       <div class="modal-spec-grid">
         <div><strong>Category:</strong> ${product.categoryName}</div>
         <div><strong>Price Estimate:</strong> ${product.price}</div>
-        ${product.specs.map(s => `<div><strong>${s.label}:</strong> ${s.val}</div>`).join("")}
-        <div><strong>Warranty:</strong> ${product.warranty}</div>
       </div>
 
       <button class="btn-modal-cta" onclick="openQuoteModal('${product.modelCode}')">
