@@ -351,8 +351,8 @@ function renderCatalog(filterCategory) {
   const container = document.getElementById("productsGridPage");
   if (!container) return;
 
-  // Sync filter button active state
-  document.querySelectorAll(".filter-btn").forEach(b => {
+  // Sync sidebar category active state
+  document.querySelectorAll(".cat-item").forEach(b => {
     b.classList.toggle("active", b.getAttribute("data-category") === filterCategory);
   });
 
@@ -395,9 +395,27 @@ function renderMediaGallery() {
    EVENT LISTENERS
    -------------------------------------------------------------------------- */
 function setupEventListeners() {
-  document.querySelectorAll(".filter-btn").forEach(btn => {
-    btn.addEventListener("click", () => renderCatalog(btn.getAttribute("data-category")));
+  document.querySelectorAll(".cat-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+      renderCatalog(btn.getAttribute("data-category"));
+      const sidebarBody = document.getElementById("catSidebarBody");
+      const sidebarToggle = document.getElementById("catSidebarToggle");
+      if (sidebarBody && sidebarBody.classList.contains("open")) {
+        sidebarBody.classList.remove("open");
+        if (sidebarToggle) sidebarToggle.setAttribute("aria-expanded", "false");
+      }
+    });
   });
+
+  const sidebarToggle = document.getElementById("catSidebarToggle");
+  const sidebarBody = document.getElementById("catSidebarBody");
+  if (sidebarToggle && sidebarBody) {
+    sidebarToggle.addEventListener("click", () => {
+      const isOpen = sidebarBody.classList.toggle("open");
+      sidebarToggle.classList.toggle("open", isOpen);
+      sidebarToggle.setAttribute("aria-expanded", String(isOpen));
+    });
+  }
 
   const hamburger = document.getElementById("hamburgerBtn");
   const drawer = document.getElementById("mobileDrawer");

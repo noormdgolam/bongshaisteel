@@ -1360,6 +1360,195 @@ select:focus-visible,
   font-weight: 700;
 }
 
+/* ==========================================================================
+   PRODUCT CATEGORY SIDEBAR (PRODUCTS VIEW)
+   ========================================================================== */
+
+.page-with-sidebar {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.cat-sidebar {
+  position: sticky;
+  top: 96px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+}
+
+.cat-sidebar-toggle {
+  display: none;
+}
+
+.cat-sidebar-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  color: #ffffff;
+  padding: 16px 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cat-sidebar-header svg {
+  width: 16px;
+  height: 16px;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.cat-group-label {
+  padding: 12px 20px 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border-top: 1px solid var(--border-color);
+  margin-top: 4px;
+}
+
+.cat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.7rem 20px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-main);
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast), padding-left var(--transition-fast);
+}
+
+.cat-item:hover {
+  color: var(--primary);
+  background: var(--primary-light);
+  padding-left: 24px;
+}
+
+.cat-item.active {
+  color: var(--primary);
+  font-weight: 700;
+  background: var(--primary-light);
+  border-left: 3px solid var(--primary);
+  padding-left: 17px;
+}
+
+.cat-chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  margin-left: auto;
+  transition: transform 0.25s ease;
+}
+
+.cat-item.active .cat-chevron {
+  color: var(--primary);
+  transform: rotate(90deg);
+}
+
+.cat-sidebar-cta {
+  padding: 20px;
+  border-top: 1px solid var(--border-color);
+  background: #f8fafc;
+}
+
+.cat-sidebar-cta button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.7rem 16px;
+  background-color: #10b981;
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.cat-sidebar-cta button:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+}
+
+:root[data-theme="dark"] .cat-sidebar-cta {
+  background: var(--dark-surface);
+}
+
+/* Mobile: collapse sidebar into a toggle-able drawer */
+@media (max-width: 1024px) {
+  .page-with-sidebar {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .cat-sidebar {
+    position: static;
+    margin-bottom: 30px;
+  }
+
+  .cat-sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+  }
+
+  .cat-sidebar-toggle svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s ease;
+  }
+
+  .cat-sidebar-toggle.open svg {
+    transform: rotate(180deg);
+  }
+
+  .cat-sidebar-header {
+    display: none;
+  }
+
+  .cat-sidebar-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .cat-sidebar-body.open {
+    max-height: 600px;
+  }
+}
+
 /* Responsive Rules */
 @media (max-width: 1024px) {
   .top-container {

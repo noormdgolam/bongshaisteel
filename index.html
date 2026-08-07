@@ -259,21 +259,59 @@
   <!-- 2. PRODUCTS VIEW -->
   <section id="productsView" class="page-view section">
     <div class="container">
-      <div class="section-header">
-        <span class="section-subtitle">Complete Catalog</span>
-        <h2 class="section-title">Bongshai Steel Products & Models</h2>
-      </div>
+      <div class="page-with-sidebar">
+        <!-- ===== CATEGORY SIDEBAR ===== -->
+        <aside class="cat-sidebar" aria-label="Product categories">
+          <button class="cat-sidebar-toggle" type="button" id="catSidebarToggle" aria-controls="catSidebarBody" aria-expanded="false">
+            <span>All Products</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="cat-sidebar-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            All Products
+          </div>
+          <div class="cat-sidebar-body" id="catSidebarBody">
+            <button class="cat-item active" type="button" data-category="all">
+              All Categories
+              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <div class="cat-group-label">Residential</div>
+            <button class="cat-item" type="button" data-category="structural">
+              Structural Steel Building
+              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button class="cat-item" type="button" data-category="duplex">
+              Duplex Steel Building
+              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button class="cat-item" type="button" data-category="cottage">
+              Steel Cottage House
+              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <div class="cat-group-label">Industrial & Commercial</div>
+            <button class="cat-item" type="button" data-category="factory">
+              Steel Factory Building
+              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button class="cat-item" type="button" data-category="container">
+              Steel Container House
+              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <div class="cat-sidebar-cta">
+              <button type="button" onclick="openQuoteModal()">📞 Get a Free Quote</button>
+            </div>
+          </div>
+        </aside>
 
-      <div class="product-filters">
-        <button class="filter-btn active" data-category="all">All Categories</button>
-        <button class="filter-btn" data-category="factory">Steel Factory Building</button>
-        <button class="filter-btn" data-category="structural">Structural Steel Building</button>
-        <button class="filter-btn" data-category="duplex">Duplex Steel Building</button>
-        <button class="filter-btn" data-category="cottage">Steel Cottage House</button>
-        <button class="filter-btn" data-category="container">Steel Container House</button>
+        <!-- ===== CATALOG CONTENT ===== -->
+        <div class="page-sidebar-content">
+          <div class="section-header" style="text-align:left;">
+            <span class="section-subtitle">Complete Catalog</span>
+            <h2 class="section-title">Bongshai Steel Products & Models</h2>
+          </div>
+          <div id="productsGridPage"></div>
+        </div>
       </div>
-
-      <div id="productsGridPage"></div>
     </div>
   </section>
 
