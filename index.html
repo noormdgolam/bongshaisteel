@@ -96,11 +96,7 @@
         <li class="nav-item">
           <button class="nav-link" type="button" onclick="navigateToView('homeView')">Home</button>
         </li>
-        <li class="nav-item">
-          <button class="nav-link" type="button" onclick="navigateToView('companyView')">Company</button>
-        </li>
-
-        <!-- PRODUCTS MEGA DROPDOWN (ALL 6 USER ITEMS) -->
+        <!-- PRODUCTS MEGA DROPDOWN (ALL 5 CATEGORIES) -->
         <li class="nav-item">
           <button class="nav-link" type="button" onclick="navigateToView('productsView')" aria-haspopup="true" aria-expanded="false">
             Products
@@ -137,13 +133,7 @@
           <button class="nav-link" type="button" onclick="navigateToView('safetyView')">Health And Safety Policy</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" type="button" onclick="navigateToView('careersView')">Job Circular</button>
-        </li>
-        <li class="nav-item">
           <button class="nav-link" type="button" onclick="navigateToView('contactView')">Contact Us</button>
-        </li>
-        <li class="nav-item">
-          <button class="nav-link" type="button" onclick="navigateToView('mediaView')">Media</button>
         </li>
       </ul>
 
@@ -164,7 +154,6 @@
       </div>
       <ul class="mobile-menu">
         <li><button class="mobile-link" type="button" onclick="navigateToView('homeView')">Home</button></li>
-        <li><button class="mobile-link" type="button" onclick="navigateToView('companyView')">Company</button></li>
         <li>
           <button class="mobile-link" type="button" onclick="navigateToView('productsView')">Products</button>
           <ul class="mobile-sub-menu">
@@ -177,9 +166,7 @@
         </li>
         <li><button class="mobile-link" type="button" onclick="navigateToView('servicesView')">Services</button></li>
         <li><button class="mobile-link" type="button" onclick="navigateToView('safetyView')">Health & Safety Policy</button></li>
-        <li><button class="mobile-link" type="button" onclick="navigateToView('careersView')">Job Circular</button></li>
         <li><button class="mobile-link" type="button" onclick="navigateToView('contactView')">Contact Us</button></li>
-        <li><button class="mobile-link" type="button" onclick="navigateToView('mediaView')">Media</button></li>
       </ul>
     </div>
   </div>
@@ -316,24 +303,7 @@
     </div>
   </section>
 
-  <!-- 3. COMPANY VIEW -->
-  <section id="companyView" class="page-view section">
-    <div class="container">
-      <div class="about-grid">
-        <div class="about-content">
-          <span class="section-subtitle">About Bongshai Steel</span>
-          <h2>Pioneering Steel Construction in Bangladesh</h2>
-          <p>Bongshai Steel is a premier steel building manufacturer and EPC contractor based in Uttara, Dhaka. We engineer durable, earthquake-resistant, pre-engineered steel buildings (PEB) and modular steel structures.</p>
-          <p>Our team backs every build with ISO-certified quality management and material testing, delivering structures designed for a 50–60 year lifespan.</p>
-        </div>
-        <div>
-          <img src="images/products/industrial_shed_1_1782293275650.webp" srcset="images/products/industrial_shed_1_1782293275650-400w.webp 400w, images/products/industrial_shed_1_1782293275650-700w.webp 700w, images/products/industrial_shed_1_1782293275650.webp 1024w" sizes="(max-width: 1024px) 100vw, 590px" alt="Factory Facility" loading="lazy" decoding="async" style="border-radius:12px; box-shadow:var(--shadow-lg);">
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. SERVICES VIEW -->
+  <!-- 3. SERVICES VIEW -->
   <section id="servicesView" class="page-view section">
     <div class="container">
       <div class="section-header">
@@ -357,7 +327,7 @@
     </div>
   </section>
 
-  <!-- 5. HEALTH & SAFETY VIEW -->
+  <!-- 4. HEALTH & SAFETY VIEW -->
   <section id="safetyView" class="page-view section">
     <div class="container">
       <div class="section-header">
@@ -376,34 +346,7 @@
     </div>
   </section>
 
-  <!-- 6. JOB CIRCULAR VIEW -->
-  <section id="careersView" class="page-view section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-subtitle">Career Opportunities</span>
-        <h2 class="section-title">Active Job Circular</h2>
-      </div>
-      <div class="services-grid">
-        <div class="service-card">
-          <h3>Project Manager</h3>
-          <p><strong>Department:</strong> Project Management</p>
-          <button class="btn-detail" style="margin-top:15px;" onclick="openJobModal('Project Manager')">Apply Now</button>
-        </div>
-        <div class="service-card">
-          <h3>Quality Control (QC) Engineer</h3>
-          <p><strong>Department:</strong> Civil / Architecture</p>
-          <button class="btn-detail" style="margin-top:15px;" onclick="openJobModal('Quality Control (QC) Engineer')">Apply Now</button>
-        </div>
-        <div class="service-card">
-          <h3>Site Engineer</h3>
-          <p><strong>Department:</strong> Civil Engineering</p>
-          <button class="btn-detail" style="margin-top:15px;" onclick="openJobModal('Site Engineer')">Apply Now</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 7. CONTACT VIEW -->
+  <!-- 5. CONTACT VIEW -->
   <section id="contactView" class="page-view section">
     <div class="container">
       <div class="section-header">
@@ -428,17 +371,6 @@
           </form>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- 8. MEDIA VIEW -->
-  <section id="mediaView" class="page-view section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-subtitle">Media & Gallery</span>
-        <h2 class="section-title">Project Photo Showcase</h2>
-      </div>
-      <div class="media-grid" id="mediaGallery"></div>
     </div>
   </section>
 

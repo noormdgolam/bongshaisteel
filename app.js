@@ -285,7 +285,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderCategoryCards();
   renderFeatured();
   renderCatalog("all");
-  renderMediaGallery();
   setupEventListeners();
   setupEstimator();
   setupTheme();
@@ -377,18 +376,6 @@ function renderCatalog(filterCategory) {
 // Legacy shim: nav dropdown / footer links call renderProducts(category)
 function renderProducts(category) {
   renderCatalog(category);
-}
-
-function renderMediaGallery() {
-  const container = document.getElementById("mediaGallery");
-  if (!container) return;
-  const sample = PRODUCTS_DATA.filter((_, i) => i % 7 === 0).slice(0, 12);
-  container.innerHTML = sample.map(p => `
-    <div class="media-item">
-      <img ${responsiveImgAttrs(p.image, "(max-width: 640px) 100vw, 280px")} alt="${p.name}" loading="lazy" decoding="async">
-      <span class="media-caption">${p.modelCode} — ${p.categoryName}</span>
-    </div>
-  `).join("");
 }
 
 /* --------------------------------------------------------------------------
@@ -680,50 +667,6 @@ function openQuoteModal(modelCode = "") {
   openOverlay(modalOverlay, modalBox.querySelector(".modal-close"));
 }
 
-function openJobModal(jobTitle = "") {
-  const modalOverlay = document.getElementById("modalOverlay");
-  const modalBox = document.getElementById("modalContent");
-  if (!modalOverlay || !modalBox) return;
-
-  modalBox.innerHTML = `
-    <div class="modal-header">
-      <h3 class="modal-title" id="modalTitle">Apply ${jobTitle ? `— ${jobTitle}` : ""}</h3>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <form onsubmit="handleJobSubmit(event)">
-        <div class="form-field">
-          <label>Full Name</label>
-          <input type="text" required placeholder="e.g. Fahmida Islam">
-        </div>
-        <div class="form-field">
-          <label>Phone Number</label>
-          <input type="tel" required placeholder="+88017XXXXXXXX">
-        </div>
-        <div class="form-field">
-          <label>Email Address</label>
-          <input type="email" required placeholder="you@example.com">
-        </div>
-        <div class="form-field">
-          <label>Position Applying For</label>
-          <input type="text" value="${jobTitle}" placeholder="Position title">
-        </div>
-        <div class="form-field">
-          <label>Years of Relevant Experience</label>
-          <input type="text" placeholder="e.g. 5 Years">
-        </div>
-        <div class="form-field">
-          <label>Cover Note / CV Link</label>
-          <textarea rows="3" placeholder="Paste a Google Drive / LinkedIn link, or a short note about yourself..."></textarea>
-        </div>
-        <button type="submit" class="btn-modal-submit">Submit Application</button>
-      </form>
-    </div>
-  `;
-
-  openOverlay(modalOverlay, modalBox.querySelector(".modal-close"));
-}
-
 function closeModal() {
   const modalOverlay = document.getElementById("modalOverlay");
   if (modalOverlay) closeOverlay(modalOverlay);
@@ -732,11 +675,5 @@ function closeModal() {
 function handleQuoteSubmit(e) {
   e.preventDefault();
   alert("Thank you! Your quote request has been submitted successfully. Our engineering team at Bongshai Steel will contact you shortly.");
-  closeModal();
-}
-
-function handleJobSubmit(e) {
-  e.preventDefault();
-  alert("Thank you for applying! Our HR team will review your application and get back to you if shortlisted.");
   closeModal();
 }
