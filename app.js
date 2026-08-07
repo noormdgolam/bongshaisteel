@@ -686,18 +686,7 @@ function openProductModal(productId, updateHash = true) {
 
       <p style="font-size:1.05rem; color:var(--text-muted); line-height:1.6; margin-bottom:20px;">${product.desc}</p>
 
-      <!-- Technical Specifications Table -->
-      <div style="background:#f8fafc; border:1px solid var(--border-light); border-radius:10px; padding:18px; margin-bottom:24px;">
-        <h4 style="font-size:0.95rem; font-weight:800; color:var(--primary-navy); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px;">Technical Engineering Specs</h4>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.88rem;">
-          <div><strong style="color:var(--text-dark);">Category:</strong> ${product.categoryName}</div>
-          <div><strong style="color:var(--text-dark);">Model Code:</strong> ${product.modelCode}</div>
-          <div><strong style="color:var(--text-dark);">Steel Grade:</strong> Q355B / SS400 High-Tensile</div>
-          <div><strong style="color:var(--text-dark);">Design Standard:</strong> AISC 360 / BNBC 2020</div>
-          <div><strong style="color:var(--text-dark);">Cladding:</strong> PU / PIR / EPS Sandwich</div>
-          <div><strong style="color:var(--text-dark);">Export Freight:</strong> Containerized (40ft HC)</div>
-        </div>
-      </div>
+      <p style="margin-bottom:24px;"><strong>Category:</strong> ${product.categoryName}</p>
 
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
         <button class="btn-modal-cta" style="margin-top:0;" onclick="openQuoteModal('${product.modelCode}')">
