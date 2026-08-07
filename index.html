@@ -556,8 +556,18 @@
       </div>
 
       <!-- Instant Search & Filter Bar -->
-      <div style="max-width:540px; margin:0 auto 40px auto; position:relative;">
+      <div style="max-width:680px; margin:0 auto 25px auto; position:relative;">
         <input type="text" id="catalogSearchInput" placeholder="🔍 Search model code (BH-IS-1001, BH-DV-207), name, or type..." class="form-select-custom-light" style="padding:14px 20px; font-size:1rem; border-radius:var(--radius-pill); box-shadow:var(--shadow-sm);" oninput="filterProductsBySearch(this.value)">
+      </div>
+
+      <!-- Quick Category Filter Pills -->
+      <div style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:40px;">
+        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('all')">All Models (72)</button>
+        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('factory')">🏭 Factory (12)</button>
+        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('structural')">🏢 Structural (12)</button>
+        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('duplex')">🏘️ Duplex (12)</button>
+        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('cottage')">🏡 Cottage (24)</button>
+        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('container')">🚢 Container (12)</button>
       </div>
 
       <div id="productsViewContainer"></div>

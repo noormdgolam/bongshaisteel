@@ -419,8 +419,14 @@ function renderCategoryCards() {
 
 function navigateToCategory(catKey, updateHash = true) {
   navigateToView("productsView", false);
-  const cat = CATEGORIES.find(c => c.key === catKey);
   const title = document.getElementById("productsViewTitle");
+  if (catKey === "all") {
+    if (title) title.textContent = "Full Products Catalog (72 Models)";
+    renderCatalog("all");
+    if (updateHash) updateUrlHash("products");
+    return;
+  }
+  const cat = CATEGORIES.find(c => c.key === catKey);
   if (title && cat) title.textContent = cat.name;
   renderCatalog(catKey);
   if (updateHash) updateUrlHash("category-" + catKey);
