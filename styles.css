@@ -66,6 +66,18 @@ button, input, select, textarea {
   font-size: inherit;
 }
 
+/* Visible keyboard-focus ring — only for keyboard users, never for mouse clicks */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
 /* ==========================================================================
    TOP BAR & NAVIGATION (MATCHING SCREENSHOT)
    ========================================================================== */
@@ -171,6 +183,9 @@ button, input, select, textarea {
   transition: background-color var(--transition-fast);
   cursor: pointer;
   white-space: nowrap;
+  background: none;
+  border: none;
+  font-family: inherit;
 }
 
 .nav-link:hover, .nav-link.active {
@@ -205,7 +220,8 @@ button, input, select, textarea {
   overflow: hidden;
 }
 
-.nav-item:hover .dropdown-menu {
+.nav-item:hover .dropdown-menu,
+.nav-item:focus-within .dropdown-menu {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -215,11 +231,17 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
   padding: 14px 20px;
   color: #1e293b;
   font-weight: 600;
   font-size: 0.95rem;
+  border: none;
   border-bottom: 1px solid #f1f5f9;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
@@ -286,7 +308,7 @@ button, input, select, textarea {
   z-index: 2000;
   opacity: 0;
   visibility: hidden;
-  transition: opacity var(--transition-fast), visibility var(--transition-fast);
+  transition: opacity var(--transition-fast);
 }
 
 .mobile-drawer.active {
@@ -334,10 +356,16 @@ button, input, select, textarea {
 
 .mobile-link {
   display: block;
+  width: 100%;
   padding: 10px 0;
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-main);
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .mobile-sub-menu {
@@ -351,10 +379,16 @@ button, input, select, textarea {
 
 .mobile-sub-link {
   display: block;
+  width: 100%;
   padding: 6px 0;
   font-size: 0.95rem;
   color: var(--primary);
   font-weight: 600;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 /* ==========================================================================
@@ -879,7 +913,7 @@ button, input, select, textarea {
   padding: 20px;
   opacity: 0;
   visibility: hidden;
-  transition: opacity var(--transition-fast), visibility var(--transition-fast);
+  transition: opacity var(--transition-fast);
 }
 
 .modal-overlay.active {
@@ -963,7 +997,19 @@ button, input, select, textarea {
   gap: 10px;
 }
 
-.footer-links a:hover {
+.footer-links button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.footer-links a:hover,
+.footer-links button:hover {
   color: var(--accent);
 }
 
@@ -1073,6 +1119,9 @@ button, input, select, textarea {
 
 .glass-card {
   display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   cursor: pointer;
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -1081,6 +1130,9 @@ button, input, select, textarea {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: var(--shadow-md);
+  font-family: inherit;
+  text-align: left;
+  color: inherit;
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
   will-change: transform;
 }

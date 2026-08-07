@@ -6,6 +6,27 @@
   <title>Bongshai Steel | Steel Building Manufacturer Bangladesh</title>
   <meta name="description" content="Bongshai Steel is Bangladesh's premier steel building manufacturer specializing in Pre-Engineered Steel Factory Buildings, Structural Steel Buildings, Duplex Steel Homes, Cottages, and Container Houses.">
   <meta name="keywords" content="Bongshai Steel, Steel Building Manufacturer, Pre-Engineered Steel Building, Steel Factory, Structural Steel Building, Duplex Steel Building, Container House Bangladesh">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0466c8">
+
+  <!-- Favicon -->
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="images/logo-icon-192.webp">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Bongshai Steel">
+  <meta property="og:title" content="Bongshai Steel | Steel Building Manufacturer Bangladesh">
+  <meta property="og:description" content="Bongshai Steel is Bangladesh's premier steel building manufacturer specializing in Pre-Engineered Steel Factory Buildings, Structural Steel Buildings, Duplex Steel Homes, Cottages, and Container Houses.">
+  <meta property="og:image" content="images/products/Model%20No-BH-IS-1001.webp">
+  <meta property="og:locale" content="en_BD">
+  <!-- og:url / canonical intentionally omitted until this site has a production domain -->
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bongshai Steel | Steel Building Manufacturer Bangladesh">
+  <meta name="twitter:description" content="Bangladesh's premier steel building manufacturer: factories, structural apartment buildings, duplex homes, cottages, and container houses.">
+  <meta name="twitter:image" content="images/products/Model%20No-BH-IS-1001.webp">
 
   <!-- Preconnect & Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,6 +35,28 @@
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": ["GeneralContractor", "HomeAndConstructionBusiness"],
+    "name": "Bongshai Steel",
+    "description": "Bangladesh's premier steel building manufacturer specializing in pre-engineered steel factories, structural apartment buildings, duplex homes, cottages, and container houses.",
+    "telephone": "+8801789949060",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "House #18, Road #18, Sector #10",
+      "addressLocality": "Uttara",
+      "addressRegion": "Dhaka",
+      "addressCountry": "BD"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Bangladesh"
+    }
+  }
+  </script>
 </head>
 <body>
 
@@ -50,92 +93,92 @@
     <div class="nav-container">
       <ul class="nav-menu">
         <li class="nav-item">
-          <a class="nav-link" onclick="navigateToView('homeView')">Home</a>
+          <button class="nav-link" type="button" onclick="navigateToView('homeView')">Home</button>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="navigateToView('companyView')">Company</a>
+          <button class="nav-link" type="button" onclick="navigateToView('companyView')">Company</button>
         </li>
 
         <!-- PRODUCTS MEGA DROPDOWN (ALL 6 USER ITEMS) -->
         <li class="nav-item">
-          <a class="nav-link" onclick="navigateToView('productsView')">
+          <button class="nav-link" type="button" onclick="navigateToView('productsView')" aria-haspopup="true" aria-expanded="false">
             Products
             <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-          </a>
-          <div class="dropdown-menu">
-            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('factory');">
+          </button>
+          <div class="dropdown-menu" role="menu">
+            <button class="dropdown-link" type="button" role="menuitem" onclick="navigateToView('productsView'); renderProducts('factory');">
               <span class="dropdown-icon-dot"></span>
               <span>Steel Factory Building</span>
-            </a>
-            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('structural');">
+            </button>
+            <button class="dropdown-link" type="button" role="menuitem" onclick="navigateToView('productsView'); renderProducts('structural');">
               <span class="dropdown-icon-dot"></span>
               <span>Structural Steel Building</span>
-            </a>
-            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('duplex');">
+            </button>
+            <button class="dropdown-link" type="button" role="menuitem" onclick="navigateToView('productsView'); renderProducts('duplex');">
               <span class="dropdown-icon-dot"></span>
               <span>Duplex Steel Building</span>
-            </a>
-            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('cottage');">
+            </button>
+            <button class="dropdown-link" type="button" role="menuitem" onclick="navigateToView('productsView'); renderProducts('cottage');">
               <span class="dropdown-icon-dot"></span>
               <span>Steel Cottage House</span>
-            </a>
-            <a class="dropdown-link" onclick="navigateToView('productsView'); renderProducts('container');">
+            </button>
+            <button class="dropdown-link" type="button" role="menuitem" onclick="navigateToView('productsView'); renderProducts('container');">
               <span class="dropdown-icon-dot"></span>
               <span>Steel Container House</span>
-            </a>
+            </button>
           </div>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" onclick="navigateToView('servicesView')">Services</a>
+          <button class="nav-link" type="button" onclick="navigateToView('servicesView')">Services</button>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="navigateToView('safetyView')">Health And Safety Policy</a>
+          <button class="nav-link" type="button" onclick="navigateToView('safetyView')">Health And Safety Policy</button>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="navigateToView('careersView')">Job Circular</a>
+          <button class="nav-link" type="button" onclick="navigateToView('careersView')">Job Circular</button>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="navigateToView('contactView')">Contact Us</a>
+          <button class="nav-link" type="button" onclick="navigateToView('contactView')">Contact Us</button>
         </li>
         <li class="nav-item">
-          <a class="nav-link" onclick="navigateToView('mediaView')">Media</a>
+          <button class="nav-link" type="button" onclick="navigateToView('mediaView')">Media</button>
         </li>
       </ul>
 
       <div class="nav-actions">
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
         <button class="btn-quote" onclick="openQuoteModal()">Get a Quote</button>
-        <button class="hamburger" id="hamburgerBtn" aria-label="Open Navigation">☰</button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open Navigation" aria-haspopup="true" aria-expanded="false" aria-controls="mobileDrawer">☰</button>
       </div>
     </div>
   </nav>
 
   <!-- Mobile Navigation Drawer -->
-  <div class="mobile-drawer" id="mobileDrawer">
+  <div class="mobile-drawer" id="mobileDrawer" role="dialog" aria-modal="true" aria-label="Mobile navigation">
     <div class="drawer-content">
       <div class="drawer-header">
         <h3>Bongshai Steel</h3>
-        <button class="drawer-close" id="drawerClose">✕</button>
+        <button class="drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
       </div>
       <ul class="mobile-menu">
-        <li><a class="mobile-link" onclick="navigateToView('homeView')">Home</a></li>
-        <li><a class="mobile-link" onclick="navigateToView('companyView')">Company</a></li>
+        <li><button class="mobile-link" type="button" onclick="navigateToView('homeView')">Home</button></li>
+        <li><button class="mobile-link" type="button" onclick="navigateToView('companyView')">Company</button></li>
         <li>
-          <a class="mobile-link" onclick="navigateToView('productsView')">Products</a>
+          <button class="mobile-link" type="button" onclick="navigateToView('productsView')">Products</button>
           <ul class="mobile-sub-menu">
-            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('factory');">Steel Factory Building</a></li>
-            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('structural');">Structural Steel Building</a></li>
-            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('duplex');">Duplex Steel Building</a></li>
-            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('cottage');">Steel Cottage House</a></li>
-            <li><a class="mobile-sub-link" onclick="navigateToView('productsView'); renderProducts('container');">Steel Container House</a></li>
+            <li><button class="mobile-sub-link" type="button" onclick="navigateToView('productsView'); renderProducts('factory');">Steel Factory Building</button></li>
+            <li><button class="mobile-sub-link" type="button" onclick="navigateToView('productsView'); renderProducts('structural');">Structural Steel Building</button></li>
+            <li><button class="mobile-sub-link" type="button" onclick="navigateToView('productsView'); renderProducts('duplex');">Duplex Steel Building</button></li>
+            <li><button class="mobile-sub-link" type="button" onclick="navigateToView('productsView'); renderProducts('cottage');">Steel Cottage House</button></li>
+            <li><button class="mobile-sub-link" type="button" onclick="navigateToView('productsView'); renderProducts('container');">Steel Container House</button></li>
           </ul>
         </li>
-        <li><a class="mobile-link" onclick="navigateToView('servicesView')">Services</a></li>
-        <li><a class="mobile-link" onclick="navigateToView('safetyView')">Health & Safety Policy</a></li>
-        <li><a class="mobile-link" onclick="navigateToView('careersView')">Job Circular</a></li>
-        <li><a class="mobile-link" onclick="navigateToView('contactView')">Contact Us</a></li>
-        <li><a class="mobile-link" onclick="navigateToView('mediaView')">Media</a></li>
+        <li><button class="mobile-link" type="button" onclick="navigateToView('servicesView')">Services</button></li>
+        <li><button class="mobile-link" type="button" onclick="navigateToView('safetyView')">Health & Safety Policy</button></li>
+        <li><button class="mobile-link" type="button" onclick="navigateToView('careersView')">Job Circular</button></li>
+        <li><button class="mobile-link" type="button" onclick="navigateToView('contactView')">Contact Us</button></li>
+        <li><button class="mobile-link" type="button" onclick="navigateToView('mediaView')">Media</button></li>
       </ul>
     </div>
   </div>
@@ -158,7 +201,7 @@
           </div>
         </div>
         <div class="hero-image-wrap">
-          <img src="images/products/Model No-BH-IS-1001.webp" alt="Bongshai Steel Factory" decoding="async">
+          <img src="images/products/Model No-BH-IS-1001.webp" srcset="images/products/Model%20No-BH-IS-1001-400w.webp 400w, images/products/Model%20No-BH-IS-1001-700w.webp 700w, images/products/Model%20No-BH-IS-1001.webp 1024w" sizes="(max-width: 1024px) 100vw, 590px" alt="Bongshai Steel Factory" decoding="async" loading="eager" fetchpriority="high">
         </div>
       </div>
     </section>
@@ -245,7 +288,7 @@
           <p>Our state-of-the-art manufacturing factory delivers high precision steel beams, C/Z purlins, decking sheets, and insulated sandwich panels designed for 50+ year lifespans under BNBC building regulations.</p>
         </div>
         <div>
-          <img src="images/products/industrial_shed_1_1782293275650.webp" alt="Factory Facility" style="border-radius:12px; box-shadow:var(--shadow-lg);">
+          <img src="images/products/industrial_shed_1_1782293275650.webp" srcset="images/products/industrial_shed_1_1782293275650-400w.webp 400w, images/products/industrial_shed_1_1782293275650-700w.webp 700w, images/products/industrial_shed_1_1782293275650.webp 1024w" sizes="(max-width: 1024px) 100vw, 590px" alt="Factory Facility" loading="lazy" decoding="async" style="border-radius:12px; box-shadow:var(--shadow-lg);">
         </div>
       </div>
     </div>
@@ -365,7 +408,7 @@
 
   <!-- Global Modal Overlay -->
   <div class="modal-overlay" id="modalOverlay">
-    <div class="modal-box" id="modalContent"></div>
+    <div class="modal-box" id="modalContent" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div>
   </div>
 
   <!-- Footer -->
@@ -379,11 +422,11 @@
       <div class="footer-col">
         <h4>Products</h4>
         <ul class="footer-links">
-          <li><a onclick="navigateToView('productsView'); renderProducts('factory');">Steel Factory Building</a></li>
-          <li><a onclick="navigateToView('productsView'); renderProducts('structural');">Structural Steel Building</a></li>
-          <li><a onclick="navigateToView('productsView'); renderProducts('duplex');">Duplex Steel Building</a></li>
-          <li><a onclick="navigateToView('productsView'); renderProducts('cottage');">Steel Cottage House</a></li>
-          <li><a onclick="navigateToView('productsView'); renderProducts('container');">Steel Container House</a></li>
+          <li><button type="button" onclick="navigateToView('productsView'); renderProducts('factory');">Steel Factory Building</button></li>
+          <li><button type="button" onclick="navigateToView('productsView'); renderProducts('structural');">Structural Steel Building</button></li>
+          <li><button type="button" onclick="navigateToView('productsView'); renderProducts('duplex');">Duplex Steel Building</button></li>
+          <li><button type="button" onclick="navigateToView('productsView'); renderProducts('cottage');">Steel Cottage House</button></li>
+          <li><button type="button" onclick="navigateToView('productsView'); renderProducts('container');">Steel Container House</button></li>
         </ul>
       </div>
 

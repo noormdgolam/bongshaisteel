@@ -63,6 +63,28 @@ function fmtLakh(n) {
   return `${fmtTaka(n)} (৳${(n / 100000).toFixed(1)} Lakh)`;
 }
 
+// Source photos missing a -700w variant on disk (verified against images/products/).
+const NO_700W = new Set([
+  "images/products/Model No-BH-TB-101.webp",
+  "images/products/bh-tsb-108.webp",
+  "images/products/Model No-BH-TH-708.webp",
+  "images/products/Model No-BH-TH-711.webp"
+]);
+
+// Builds src/srcset/sizes attributes for a responsive <img>, using the
+// -400w/-700w variants that already exist on disk alongside each full-size photo.
+// srcset entries must be URI-encoded: unlike a plain src, whitespace in a
+// srcset candidate is the delimiter between the URL and its width descriptor,
+// and several of these filenames ("Model No-BH-...") contain literal spaces.
+function responsiveImgAttrs(imagePath, sizes) {
+  const base = imagePath.replace(/\.webp$/, "");
+  const enc = (p) => encodeURI(p);
+  const candidates = [`${enc(base)}-400w.webp 400w`];
+  if (!NO_700W.has(imagePath)) candidates.push(`${enc(base)}-700w.webp 700w`);
+  candidates.push(`${enc(imagePath)} 1024w`);
+  return `src="${imagePath}" srcset="${candidates.join(", ")}" sizes="${sizes}"`;
+}
+
 /* --------------------------------------------------------------------------
    1. STEEL FACTORY BUILDING — BH-IS-1001 to BH-IS-1012
    -------------------------------------------------------------------------- */
@@ -346,7 +368,7 @@ function productCardHTML(p) {
   return `
     <div class="product-card">
       <div class="product-thumb">
-        <img src="${p.image}" alt="${p.name}" loading="lazy" decoding="async">
+        <img ${responsiveImgAttrs(p.image, "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 350px")} alt="${p.name}" loading="lazy" decoding="async">
         <span class="product-badge">${p.modelCode}</span>
       </div>
       <div class="product-body">
@@ -373,9 +395,9 @@ function renderCategoryCards() {
   container.innerHTML = CATEGORIES.map(c => {
     const count = PRODUCTS_DATA.filter(p => p.category === c.key).length;
     return `
-      <a class="glass-card category-card-home" onclick="navigateToView('productsView'); renderCatalog('${c.key}');">
+      <button type="button" class="glass-card category-card-home" onclick="navigateToView('productsView'); renderCatalog('${c.key}');">
         <div class="cat-home-thumb">
-          <img src="${c.image}" alt="${c.name}" loading="lazy" decoding="async">
+          <img ${responsiveImgAttrs(c.image, "(max-width: 640px) 100vw, 320px")} alt="${c.name}" loading="lazy" decoding="async">
         </div>
         <div class="cat-home-body">
           <span class="cat-home-icon">${c.icon}</span>
@@ -386,7 +408,7 @@ function renderCategoryCards() {
             <span class="cat-home-count">${count} Models →</span>
           </div>
         </div>
-      </a>
+      </button>
     `;
   }).join("");
 }
@@ -437,7 +459,7 @@ function renderMediaGallery() {
   const sample = PRODUCTS_DATA.filter((_, i) => i % 7 === 0).slice(0, 12);
   container.innerHTML = sample.map(p => `
     <div class="media-item">
-      <img src="${p.image}" alt="${p.name}" loading="lazy" decoding="async">
+      <img ${responsiveImgAttrs(p.image, "(max-width: 640px) 100vw, 280px")} alt="${p.name}" loading="lazy" decoding="async">
       <span class="media-caption">${p.modelCode} — ${p.categoryName}</span>
     </div>
   `).join("");
@@ -455,11 +477,77 @@ function setupEventListeners() {
   const drawer = document.getElementById("mobileDrawer");
   const drawerClose = document.getElementById("drawerClose");
 
-  if (hamburger && drawer) hamburger.addEventListener("click", () => drawer.classList.add("active"));
-  if (drawerClose && drawer) drawerClose.addEventListener("click", () => drawer.classList.remove("active"));
+  if (hamburger && drawer) {
+    hamburger.addEventListener("click", () => {
+      openOverlay(drawer);
+      hamburger.setAttribute("aria-expanded", "true");
+    });
+    drawer.addEventListener("click", (e) => {
+      if (e.target === drawer) closeDrawer();
+    });
+  }
+  if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
+
+  const modalOverlay = document.getElementById("modalOverlay");
+  if (modalOverlay) {
+    modalOverlay.addEventListener("click", (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    const overlay = activeOverlay();
+    if (!overlay) return;
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      if (overlay.id === "mobileDrawer") closeDrawer(); else closeModal();
+      return;
+    }
+
+    if (e.key === "Tab") {
+      const focusable = getFocusable(overlay);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
+
+  setupDropdownAria();
 
   const themeToggle = document.getElementById("themeToggle");
   if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
+}
+
+// Keeps aria-expanded on the Products trigger in sync with the CSS-driven
+// :hover / :focus-within dropdown visibility.
+function setupDropdownAria() {
+  document.querySelectorAll(".nav-item").forEach(item => {
+    const trigger = item.querySelector(":scope > .nav-link[aria-haspopup]");
+    const menu = item.querySelector(".dropdown-menu");
+    if (!trigger || !menu) return;
+    const setExpanded = (val) => trigger.setAttribute("aria-expanded", String(val));
+    item.addEventListener("mouseenter", () => setExpanded(true));
+    item.addEventListener("mouseleave", () => setExpanded(false));
+    item.addEventListener("focusin", () => setExpanded(true));
+    item.addEventListener("focusout", (e) => {
+      if (!item.contains(e.relatedTarget)) setExpanded(false);
+    });
+  });
+}
+
+function closeDrawer() {
+  const drawer = document.getElementById("mobileDrawer");
+  const hamburger = document.getElementById("hamburgerBtn");
+  if (drawer) closeOverlay(drawer);
+  if (hamburger) hamburger.setAttribute("aria-expanded", "false");
 }
 
 /* --------------------------------------------------------------------------
@@ -495,7 +583,7 @@ function navigateToView(viewId) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   const drawer = document.getElementById("mobileDrawer");
-  if (drawer) drawer.classList.remove("active");
+  if (drawer && drawer.classList.contains("active")) closeDrawer();
 }
 
 /* --------------------------------------------------------------------------
@@ -544,6 +632,41 @@ function setupEstimator() {
 }
 
 /* --------------------------------------------------------------------------
+   OVERLAY ACCESSIBILITY — shared by the modal overlay and the mobile drawer:
+   focus trap, Escape-to-close, backdrop-click-to-close, focus restore.
+   -------------------------------------------------------------------------- */
+let lastFocusedElement = null;
+
+function getFocusable(container) {
+  return Array.from(container.querySelectorAll(
+    'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )).filter(el => el.offsetParent !== null);
+}
+
+function openOverlay(overlayEl, focusEl) {
+  lastFocusedElement = document.activeElement;
+  overlayEl.classList.add("active");
+  const target = focusEl || getFocusable(overlayEl)[0];
+  if (target) target.focus();
+}
+
+function closeOverlay(overlayEl) {
+  overlayEl.classList.remove("active");
+  if (lastFocusedElement && document.body.contains(lastFocusedElement)) {
+    lastFocusedElement.focus();
+  }
+  lastFocusedElement = null;
+}
+
+function activeOverlay() {
+  const modal = document.getElementById("modalOverlay");
+  const drawer = document.getElementById("mobileDrawer");
+  if (modal && modal.classList.contains("active")) return modal;
+  if (drawer && drawer.classList.contains("active")) return drawer;
+  return null;
+}
+
+/* --------------------------------------------------------------------------
    MODAL POPUPS — PRODUCT SPEC SHEET / QUOTE / JOB APPLICATION
    -------------------------------------------------------------------------- */
 function openProductModal(productId) {
@@ -556,11 +679,11 @@ function openProductModal(productId) {
 
   modalBox.innerHTML = `
     <div class="modal-header">
-      <h3 class="modal-title">${product.name} (${product.modelCode})</h3>
+      <h3 class="modal-title" id="modalTitle">${product.name} (${product.modelCode})</h3>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <img src="${product.image}" alt="${product.name}" style="width:100%; height:280px; object-fit:cover; border-radius:8px; margin-bottom:20px;">
+      <img ${responsiveImgAttrs(product.image, "(max-width: 650px) 100vw, 650px")} alt="${product.name}" style="width:100%; height:280px; object-fit:cover; border-radius:8px; margin-bottom:20px;">
       <p style="font-size:1.05rem; color:var(--text-muted); margin-bottom:20px;">${product.desc}</p>
 
       <div class="modal-spec-grid">
@@ -576,7 +699,7 @@ function openProductModal(productId) {
     </div>
   `;
 
-  modalOverlay.classList.add("active");
+  openOverlay(modalOverlay, modalBox.querySelector(".modal-close"));
 }
 
 function openQuoteModal(modelCode = "") {
@@ -586,7 +709,7 @@ function openQuoteModal(modelCode = "") {
 
   modalBox.innerHTML = `
     <div class="modal-header">
-      <h3 class="modal-title">Get Official Quote ${modelCode ? `for ${modelCode}` : ""}</h3>
+      <h3 class="modal-title" id="modalTitle">Get Official Quote ${modelCode ? `for ${modelCode}` : ""}</h3>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
@@ -612,7 +735,7 @@ function openQuoteModal(modelCode = "") {
     </div>
   `;
 
-  modalOverlay.classList.add("active");
+  openOverlay(modalOverlay, modalBox.querySelector(".modal-close"));
 }
 
 function openJobModal(jobTitle = "") {
@@ -622,7 +745,7 @@ function openJobModal(jobTitle = "") {
 
   modalBox.innerHTML = `
     <div class="modal-header">
-      <h3 class="modal-title">Apply ${jobTitle ? `— ${jobTitle}` : ""}</h3>
+      <h3 class="modal-title" id="modalTitle">Apply ${jobTitle ? `— ${jobTitle}` : ""}</h3>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
@@ -656,12 +779,12 @@ function openJobModal(jobTitle = "") {
     </div>
   `;
 
-  modalOverlay.classList.add("active");
+  openOverlay(modalOverlay, modalBox.querySelector(".modal-close"));
 }
 
 function closeModal() {
   const modalOverlay = document.getElementById("modalOverlay");
-  if (modalOverlay) modalOverlay.classList.remove("active");
+  if (modalOverlay) closeOverlay(modalOverlay);
 }
 
 function handleQuoteSubmit(e) {
