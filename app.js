@@ -719,6 +719,10 @@ function openQuoteModal(modelCode = "") {
   const modalBox = document.getElementById("modalContent");
   if (!modalOverlay || !modalBox) return;
 
+  const isUS = modelCode.includes("USA");
+  const isCA = modelCode.includes("Canada");
+  const isAU = modelCode.includes("Australia");
+
   modalBox.innerHTML = `
     <div class="modal-header">
       <h3 class="modal-title" id="modalTitle">Get Official Quote ${modelCode ? `for ${modelCode}` : ""}</h3>
@@ -727,22 +731,45 @@ function openQuoteModal(modelCode = "") {
     <div class="modal-body">
       <form onsubmit="handleQuoteSubmit(event)">
         <div class="form-field">
-          <label>Your Full Name</label>
-          <input type="text" required placeholder="Full name">
+          <label>Your Full Name / Company Name</label>
+          <input type="text" required placeholder="Full name or Company">
         </div>
         <div class="form-field">
-          <label>Phone Number (with country code)</label>
-          <input type="tel" required placeholder="e.g. +1 234 567 8900">
+          <label>Phone Number / WhatsApp (with country code)</label>
+          <input type="tel" required placeholder="e.g. +1 234 567 8900 or +61 400 000 000">
         </div>
         <div class="form-field">
-          <label>Project Location (City, Country)</label>
-          <input type="text" placeholder="e.g. Dubai, UAE">
+          <label>Project Destination (City, Country)</label>
+          <input type="text" required placeholder="${isUS ? 'e.g. Houston, TX, USA' : isCA ? 'e.g. Vancouver, BC, Canada' : isAU ? 'e.g. Sydney, NSW, Australia' : 'e.g. Dubai, UAE / Houston, USA / Sydney, AU'}">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+          <div>
+            <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">Preferred Currency</label>
+            <select class="form-select-custom-light" style="padding:10px;">
+              <option value="USD" ${isUS || (!isCA && !isAU) ? "selected" : ""}>USD ($ - United States)</option>
+              <option value="CAD" ${isCA ? "selected" : ""}>CAD ($ - Canada)</option>
+              <option value="AUD" ${isAU ? "selected" : ""}>AUD ($ - Australia)</option>
+              <option value="EUR">EUR (€ - Europe)</option>
+              <option value="AED">AED (Dirhams - UAE)</option>
+              <option value="SAR">SAR (Riyals - Saudi Arabia)</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">Building Standard</label>
+            <select class="form-select-custom-light" style="padding:10px;">
+              <option value="AISC" ${isUS || (!isCA && !isAU) ? "selected" : ""}>AISC 360 / IBC (USA)</option>
+              <option value="CSA" ${isCA ? "selected" : ""}>CSA S16 / NBC (Canada)</option>
+              <option value="ASNZS" ${isAU ? "selected" : ""}>AS/NZS 4100 (Australia)</option>
+              <option value="EURO">Eurocode 3 (Europe)</option>
+              <option value="BNBC">BNBC 2020 (Asia)</option>
+            </select>
+          </div>
         </div>
         <div class="form-field">
-          <label>Building Dimensions / Requirements</label>
-          <textarea rows="3" placeholder="Specify length, width, height or model details..."></textarea>
+          <label>Building Dimensions / Specs</label>
+          <textarea rows="3" placeholder="Specify length, width, eave height, insulation or model requirements..."></textarea>
         </div>
-        <button type="submit" class="btn-modal-cta">Submit Quote Request</button>
+        <button type="submit" class="btn-modal-cta">Submit Formal Quote Request</button>
       </form>
     </div>
   `;
