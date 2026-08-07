@@ -325,7 +325,8 @@ function handleHashRoute() {
     } else if (rawHash === "safety" || rawHash === "safetyView") {
       navigateToView("safetyView", false);
     } else if (rawHash === "estimator" || rawHash === "estimatorView") {
-      navigateToView("estimatorView", false);
+      navigateToView("homeView", false);
+      openQuoteModal();
     } else if (rawHash === "contact" || rawHash === "contactView") {
       navigateToView("contactView", false);
     } else if (rawHash.startsWith("category-")) {
@@ -605,9 +606,6 @@ function navigateToView(viewId, updateHash = true) {
   if (targetView) {
     targetView.classList.add("active-view");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-  if (viewId === "estimatorView") {
-    calculateBuildingEstimate();
   }
   const drawer = document.getElementById("mobileDrawer");
   if (drawer && drawer.classList.contains("active")) closeDrawer();
@@ -1085,27 +1083,6 @@ function update3dExplosion(val) {
 }
 
 /* ==========================================================================
-   INSTANT STEEL BUILDING WEIGHT & AREA ESTIMATOR CALCULATOR
-   ========================================================================== */
-function calculateBuildingEstimate() {
-  const len = parseFloat(document.getElementById("estLength")?.value) || 0;
-  const wid = parseFloat(document.getElementById("estWidth")?.value) || 0;
-  const flr = parseInt(document.getElementById("estFloors")?.value, 10) || 1;
-
-  const totalAreaSqft = len * wid * flr;
-  const steelTons = (totalAreaSqft * 3.5 / 1000).toFixed(1);
-  const days = Math.max(15, Math.ceil(totalAreaSqft / 500));
-
-  const resArea = document.getElementById("resArea");
-  const resSteel = document.getElementById("resSteel");
-  const resDays = document.getElementById("resDays");
-
-  if (resArea) resArea.textContent = `${totalAreaSqft.toLocaleString('en-US')} sqft`;
-  if (resSteel) resSteel.textContent = `${steelTons} MT`;
-  if (resDays) resDays.textContent = `${days} Days`;
-}
-
-/* ==========================================================================
    REAL-TIME CATALOG SEARCH & FILTER ENGINE
    ========================================================================== */
 function filterProductsBySearch(query) {
@@ -1142,11 +1119,10 @@ function filterProductsBySearch(query) {
   }
 }
 
-// Trigger initial estimation calculation on load
+// Initialize 3D Canvas on window load
 window.addEventListener("load", () => {
   setTimeout(() => {
     init3dSteelCanvas();
-    calculateBuildingEstimate();
   }, 500);
 });
 
