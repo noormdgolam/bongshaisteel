@@ -293,8 +293,18 @@ const FEATURED_IDS = ["bh-is-1006", "bh-tsb-109", "bh-dv-201", "bh-ch-401", "bh-
 let isRoutingFromHash = false;
 
 function handleHashRoute() {
-  const rawHash = (window.location.hash || "").trim().replace(/^#/, "");
+  let rawHash = (window.location.hash || "").trim().replace(/^#/, "");
   if (!rawHash) return;
+
+  // Support a "?q=" search term appended to the products hash (used by the
+  // WebSite SearchAction schema's sitelinks search box target).
+  let searchQuery = null;
+  const queryIndex = rawHash.indexOf("?");
+  if (queryIndex !== -1) {
+    const params = new URLSearchParams(rawHash.slice(queryIndex + 1));
+    searchQuery = params.get("q");
+    rawHash = rawHash.slice(0, queryIndex);
+  }
 
   isRoutingFromHash = true;
 
@@ -303,7 +313,13 @@ function handleHashRoute() {
       navigateToView("homeView", false);
     } else if (rawHash === "products" || rawHash === "productsView") {
       navigateToView("productsView", false);
-      renderCatalog("all");
+      if (searchQuery) {
+        const searchInput = document.getElementById("catalogSearchInput");
+        if (searchInput) searchInput.value = searchQuery;
+        filterProductsBySearch(searchQuery);
+      } else {
+        renderCatalog("all");
+      }
     } else if (rawHash === "services" || rawHash === "servicesView") {
       navigateToView("servicesView", false);
     } else if (rawHash === "safety" || rawHash === "safetyView") {
