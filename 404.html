@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bongshai Steel | Page Redirect</title>
+  <meta name="robots" content="noindex, follow">
+  <script>
+    (function() {
+      const path = window.location.pathname.toLowerCase();
+      // Catch legacy product HTML pages like /bh-tsb-101.html or /bh-is-1001
+      const match = path.match(/\/(bh-[a-z]+-\d+)(\.html)?/);
+      if (match && match[1]) {
+        window.location.replace("https://www.bongshaisteel.com/#product-" + match[1]);
+      } else {
+        window.location.replace("https://www.bongshaisteel.com/");
+      }
+    })();
+  </script>
+</head>
+<body>
+  <p>Redirecting to <a href="https://www.bongshaisteel.com/">Bongshai Steel</a>...</p>
+</body>
+</html>
