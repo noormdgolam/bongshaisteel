@@ -288,8 +288,60 @@ const PRODUCTS_DATA = [
 const FEATURED_IDS = ["bh-is-1006", "bh-tsb-109", "bh-dv-201", "bh-ch-401", "bh-ch-502"];
 
 /* --------------------------------------------------------------------------
-   INIT
+   INIT & SPA HASH ROUTER
    -------------------------------------------------------------------------- */
+let isRoutingFromHash = false;
+
+function handleHashRoute() {
+  const rawHash = (window.location.hash || "").trim().replace(/^#/, "");
+  if (!rawHash) return;
+
+  isRoutingFromHash = true;
+
+  try {
+    if (rawHash === "home" || rawHash === "homeView") {
+      navigateToView("homeView", false);
+    } else if (rawHash === "products" || rawHash === "productsView") {
+      navigateToView("productsView", false);
+      renderCatalog("all");
+    } else if (rawHash === "services" || rawHash === "servicesView") {
+      navigateToView("servicesView", false);
+    } else if (rawHash === "safety" || rawHash === "safetyView") {
+      navigateToView("safetyView", false);
+    } else if (rawHash === "estimator" || rawHash === "estimatorView") {
+      navigateToView("estimatorView", false);
+    } else if (rawHash === "contact" || rawHash === "contactView") {
+      navigateToView("contactView", false);
+    } else if (rawHash.startsWith("category-")) {
+      const catKey = rawHash.replace("category-", "");
+      const prefabCat = CATEGORIES.find(c => c.key === catKey);
+      if (prefabCat) {
+        navigateToCategory(catKey, false);
+      } else {
+        goToMainCategory(catKey, false);
+      }
+    } else if (rawHash.startsWith("product-")) {
+      const prodId = rawHash.replace("product-", "");
+      const product = PRODUCTS_DATA.find(p => p.id === prodId || p.modelCode.toLowerCase() === prodId.toLowerCase());
+      if (product) {
+        navigateToCategory(product.category, false);
+        openProductModal(product.id, false);
+      }
+    }
+  } finally {
+    isRoutingFromHash = false;
+  }
+}
+
+function updateUrlHash(newHash) {
+  if (isRoutingFromHash) return;
+  if (window.history && window.history.replaceState) {
+    window.history.replaceState(null, "", "#" + newHash);
+  } else {
+    window.location.hash = newHash;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   renderCategoryCards();
   renderFeatured();
@@ -297,6 +349,11 @@ document.addEventListener("DOMContentLoaded", () => {
   setupEventListeners();
   setupTheme();
   init3dSteelCanvas();
+
+  window.addEventListener("hashchange", handleHashRoute);
+  if (window.location.hash) {
+    handleHashRoute();
+  }
 });
 
 /* --------------------------------------------------------------------------
@@ -344,21 +401,22 @@ function renderCategoryCards() {
   }).join("");
 }
 
-function navigateToCategory(catKey) {
-  navigateToView("productsView");
+function navigateToCategory(catKey, updateHash = true) {
+  navigateToView("productsView", false);
   const cat = CATEGORIES.find(c => c.key === catKey);
   const title = document.getElementById("productsViewTitle");
   if (title && cat) title.textContent = cat.name;
   renderCatalog(catKey);
+  if (updateHash) updateUrlHash("category-" + catKey);
 }
 
 // Routes a Products-nav / home-card click to the shared Products view,
 // rendering either the real Prefab Buildings catalog or an honest
 // "Coming Soon" placeholder for the four product lines with no models yet.
-function goToMainCategory(key) {
+function goToMainCategory(key, updateHash = true) {
   const cat = MAIN_CATEGORIES.find(c => c.key === key);
   if (!cat) return;
-  navigateToView("productsView");
+  navigateToView("productsView", false);
   const title = document.getElementById("productsViewTitle");
   if (title) title.textContent = cat.name;
   if (cat.ready) {
@@ -366,7 +424,9 @@ function goToMainCategory(key) {
   } else {
     renderComingSoon(cat);
   }
+  if (updateHash) updateUrlHash("category-" + key);
 }
+
 
 function renderComingSoon(cat) {
   const container = document.getElementById("productsViewContainer");
@@ -517,7 +577,7 @@ function toggleTheme() {
 /* --------------------------------------------------------------------------
    NAVIGATION VIEW SWITCHER (INSTANT SPA NAVIGATION)
    -------------------------------------------------------------------------- */
-function navigateToView(viewId) {
+function navigateToView(viewId, updateHash = true) {
   document.querySelectorAll(".page-view").forEach(v => v.classList.remove("active-view"));
   const targetView = document.getElementById(viewId);
   if (targetView) {
@@ -529,6 +589,18 @@ function navigateToView(viewId) {
   }
   const drawer = document.getElementById("mobileDrawer");
   if (drawer && drawer.classList.contains("active")) closeDrawer();
+
+  if (updateHash) {
+    const map = {
+      homeView: "home",
+      productsView: "products",
+      servicesView: "services",
+      safetyView: "safety",
+      estimatorView: "estimator",
+      contactView: "contact"
+    };
+    if (map[viewId]) updateUrlHash(map[viewId]);
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -569,7 +641,7 @@ function activeOverlay() {
 /* --------------------------------------------------------------------------
    MODAL POPUPS — PRODUCT SPEC SHEET / QUOTE / JOB APPLICATION
    -------------------------------------------------------------------------- */
-function openProductModal(productId) {
+function openProductModal(productId, updateHash = true) {
   const product = PRODUCTS_DATA.find(p => p.id === productId);
   if (!product) return;
 
@@ -595,6 +667,7 @@ function openProductModal(productId) {
   `;
 
   openOverlay(modalOverlay, modalBox.querySelector(".modal-close"));
+  if (updateHash) updateUrlHash("product-" + product.id);
 }
 
 function openQuoteModal(modelCode = "") {
@@ -636,6 +709,19 @@ function openQuoteModal(modelCode = "") {
 function closeModal() {
   const modalOverlay = document.getElementById("modalOverlay");
   if (modalOverlay) closeOverlay(modalOverlay);
+
+  const activeView = document.querySelector(".page-view.active-view");
+  if (activeView && activeView.id) {
+    const map = {
+      homeView: "home",
+      productsView: "products",
+      servicesView: "services",
+      safetyView: "safety",
+      estimatorView: "estimator",
+      contactView: "contact"
+    };
+    if (map[activeView.id]) updateUrlHash(map[activeView.id]);
+  }
 }
 
 function handleQuoteSubmit(e) {
