@@ -1,0 +1,97 @@
+# Bongshai Steel Full Product & Model Dataset (AI Machine-Readable Standard)
+
+## Company Information
+- Name: Bongshai Steel
+- Industry: Pre-Engineered Steel Building (PEB) Manufacturer & Exporter
+- Address: House #18, Road #18, Sector #10, Uttara C/A, Dhaka - 1230, Bangladesh
+- Phone / WhatsApp: +8801789-949060
+- Email: sales@bongshaisteel.com
+- Web: https://www.bongshaisteel.com
+
+## Model Matrix
+No pricing, build times, or per-model specs are published — every model is engineered per project. Fields below reflect what Bongshai Steel actually publishes for each model: model code, name, and description.
+
+### Category 1: Steel Factory Building
+- Model BH-IS-1001: Heavy Industrial Factory Shed — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+- Model BH-IS-1002: Textile & Garments Factory Building — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+- Model BH-IS-1003: Agro-Processing Steel Mill — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+- Model BH-IS-1004: Automotive Assembly Plant — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+- Model BH-IS-1005: Pharmaceutical Manufacturing Facility — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+- Model BH-IS-1006: Steel Fabrication Workshop — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+- Model BH-IS-1007: Electronics Assembly Factory — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+- Model BH-IS-1008: Cement & Building Materials Plant — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+- Model BH-IS-1009: Food Processing Factory Shed — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+- Model BH-IS-1010: Plastic & Packaging Manufacturing Unit — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+- Model BH-IS-1011: Heavy Machinery Production Hall — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+- Model BH-IS-1012: Chemical Processing Steel Plant — Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.
+
+### Category 2: Structural Steel Building
+- Model BH-TSB-101: Urban Steel Apartment Complex — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+- Model BH-TSB-102: Modern Steel Residential Tower — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+- Model BH-TSB-103: Family Steel Apartment Building — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+- Model BH-TSB-104: Riverside Steel Apartment Complex — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+- Model BH-TSB-105: Compact Steel Apartment Block — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+- Model BH-TSB-106: Premium Steel Residential Complex — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+- Model BH-TSB-107: Garden View Steel Apartment Tower — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+- Model BH-TSB-108: Corner Plot Steel Apartment Building — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+- Model BH-TSB-109: Mid-Rise Steel Residential Complex — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+- Model BH-TSB-110: Skyline Steel Apartment Tower — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+- Model BH-TSB-111: Community Steel Apartment Complex — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+- Model BH-TSB-112: Signature Steel Apartment Residence — Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.
+
+### Category 3: Duplex Steel Building
+- Model BH-DV-201: Modern Minimalist Steel Duplex Villa — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+- Model BH-DV-202: Executive RC-Precast Hybrid Duplex — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+- Model BH-DV-203: Contemporary 4-Bedroom Steel Duplex — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+- Model BH-DV-204: Scandinavian Style Steel Duplex Home — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+- Model BH-DV-205: Premium Glass-Facade Steel Duplex — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+- Model BH-DV-206: Classic Bengal Steel Duplex Villa — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+- Model BH-DV-207: Family Garden Steel Duplex House — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+- Model BH-DV-208: Rooftop Terrace Steel Duplex Villa — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+- Model BH-DV-209: Double-Height Living Steel Duplex — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+- Model BH-DV-210: Corner Plot Steel Duplex Residence — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+- Model BH-DV-211: Compact Urban Steel Duplex Home — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+- Model BH-DV-212: Resort-Style Steel Duplex Villa — Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.
+
+### Category 4: Steel Cottage House
+- Model BH-CH-401: Eco Resort Prefab Steel Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-CH-402: Garden View Steel Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-CH-403: Hillside Retreat Steel Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-CH-404: Lakeside Vacation Steel Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-CH-405: Riverside Accent Steel Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-CH-406: Tropical Getaway Steel Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-CH-407: Countryside Steel Farm Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-CH-408: Beachfront Steel Holiday Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-CH-409: Forest Cabin Steel Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-CH-410: Weekend Retreat Steel Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-CH-411: Artist Studio Steel Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-CH-412: Guest House Steel Cottage — Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.
+- Model BH-TH-701: Simplex Lakeview Steel Cottage — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+- Model BH-TH-702: Panoramic View Tiny Steel House — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+- Model BH-TH-703: Compact Studio Steel Tiny Home — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+- Model BH-TH-704: Off-Grid Steel Tiny House — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+- Model BH-TH-705: Minimalist Steel Micro Cottage — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+- Model BH-TH-706: Nomad Steel Tiny House — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+- Model BH-TH-707: Backyard Steel Tiny Guest House — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+- Model BH-TH-708: Mountain View Steel Tiny Cabin — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+- Model BH-TH-709: Urban Steel Micro-Living Unit — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+- Model BH-TH-710: Farmstead Steel Tiny House — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+- Model BH-TH-711: Eco-Friendly Steel Tiny Home — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+- Model BH-TH-712: Deluxe Steel Tiny House — Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.
+
+### Category 5: Steel Container House
+- Model BH-CH-501: 20ft Portable Site Office Container — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+- Model BH-CH-502: 40ft Modern Luxury Container Home — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+- Model BH-CH-503: 20ft Security Guard Cabin Container — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+- Model BH-CH-504: 40ft Two-Bedroom Container House — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+- Model BH-CH-505: 20ft Mobile Sales Kiosk Container — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+- Model BH-CH-506: 40ft Container Café & Restaurant — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+- Model BH-CH-507: 20ft Labor Accommodation Container — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+- Model BH-CH-508: 40ft Container Guest House — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+- Model BH-CH-509: 20ft Portable Toilet & Utility Container — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+- Model BH-CH-510: 40ft Container Office Complex — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+- Model BH-CH-511: 20ft Emergency Relief Container Unit — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+- Model BH-CH-512: 40ft Luxury Container Villa — Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.
+
+## Request a Quote
+Bongshai Steel does not publish fixed pricing. Contact sales@bongshaisteel.com or WhatsApp +8801789-949060 with project location, building dimensions, and requirements for an official quote.

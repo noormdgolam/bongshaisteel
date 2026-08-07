@@ -182,8 +182,8 @@ function buildDuplex() {
     "Corner Plot Steel Duplex Residence", "Compact Urban Steel Duplex Home", "Resort-Style Steel Duplex Villa"
   ];
   const images = [
-    "dv-101.webp", "dv-102.webp", "villa_1_1782293220395.webp", "dv-104.webp",
-    "dv-105.webp", "dv-106.webp", "cottage_2_1782293207157.webp", "dv-108.webp",
+    "dv-101.webp", "dv-102.webp", "dv-103.webp", "dv-104.webp",
+    "dv-105.webp", "dv-106.webp", "dv-107.webp", "dv-108.webp",
     "dv-109.webp", "dv-110.webp", "dv-111.webp", "dv-112.webp"
   ];
 

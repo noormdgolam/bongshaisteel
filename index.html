@@ -79,10 +79,21 @@
             <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="dropdown-menu" role="menu">
-            <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('prefab')">
-              <span class="dropdown-icon-dot"></span>
-              <span>Prefab Buildings</span>
-            </button>
+            <div class="dropdown-item-wrap">
+              <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('prefab')">
+                <span class="dropdown-icon-dot"></span>
+                <span>Prefab Buildings</span>
+                <span class="sub-arrow">▸</span>
+              </button>
+              <div class="nested-dropdown-menu">
+                <button class="dropdown-sublink" type="button" onclick="navigateToCategory('factory')">🏭 Steel Factory Building</button>
+                <button class="dropdown-sublink" type="button" onclick="navigateToCategory('structural')">🏢 Structural Steel Building</button>
+                <button class="dropdown-sublink" type="button" onclick="navigateToCategory('duplex')">🏘️ Duplex Steel Building</button>
+                <button class="dropdown-sublink" type="button" onclick="navigateToCategory('cottage')">🏡 Steel Cottage House</button>
+                <button class="dropdown-sublink" type="button" onclick="navigateToCategory('container')">🚢 Steel Container House</button>
+              </div>
+            </div>
+
             <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('structure')">
               <span class="dropdown-icon-dot"></span>
               <span>Steel Structure</span>
@@ -133,7 +144,16 @@
         <li>
           <button class="mobile-link" type="button" onclick="goToMainCategory('prefab')">Products</button>
           <ul class="mobile-sub-menu">
-            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('prefab')">Prefab Buildings</button></li>
+            <li>
+              <button class="mobile-sub-link" type="button" onclick="goToMainCategory('prefab')">Prefab Buildings ▾</button>
+              <ul class="mobile-nested-menu">
+                <li><button class="mobile-nested-link" type="button" onclick="navigateToCategory('factory')">🏭 Steel Factory Building</button></li>
+                <li><button class="mobile-nested-link" type="button" onclick="navigateToCategory('structural')">🏢 Structural Steel Building</button></li>
+                <li><button class="mobile-nested-link" type="button" onclick="navigateToCategory('duplex')">🏘️ Duplex Steel Building</button></li>
+                <li><button class="mobile-nested-link" type="button" onclick="navigateToCategory('cottage')">🏡 Steel Cottage House</button></li>
+                <li><button class="mobile-nested-link" type="button" onclick="navigateToCategory('container')">🚢 Steel Container House</button></li>
+              </ul>
+            </li>
             <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('structure')">Steel Structure</button></li>
             <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('furniture')">Steel Furniture</button></li>
             <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('doorgate')">Door and Gate</button></li>
