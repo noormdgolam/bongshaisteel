@@ -1,0 +1,26 @@
+# Operating System System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Python & Temporary Cache Files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*.swo
+
+# IDE & Tool Lock Files
+.claude/
+.idea/
+.vscode/
+*.lock
