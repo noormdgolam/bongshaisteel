@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bongshai Steel | Steel Building Manufacturer Bangladesh</title>
-  <meta name="description" content="Bongshai Steel is Bangladesh's premier steel building manufacturer specializing in Pre-Engineered Steel Factory Buildings, Structural Steel Buildings, Duplex Steel Homes, Cottages, and Container Houses.">
-  <meta name="keywords" content="Bongshai Steel, Steel Building Manufacturer, Pre-Engineered Steel Building, Steel Factory, Structural Steel Building, Duplex Steel Building, Container House Bangladesh">
+  <title>Bongshai Steel | Steel Building Manufacturer & Exporter</title>
+  <meta name="description" content="Bongshai Steel is Bangladesh's premier steel building manufacturer & exporter, delivering AISC & BNBC certified Pre-Engineered Steel Factory Buildings, Warehouses, Multi-Story Towers, Duplex Steel Homes, Resort Cottages, and Container Houses worldwide.">
+  <meta name="keywords" content="Bongshai Steel, Steel Building Manufacturer, Pre-Engineered Steel Building, Steel Factory, Structural Steel Building, Duplex Steel Building, Container House Bangladesh, AISC Steel Code, Eurocode Structural Steel">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0466c8">
+  <link rel="manifest" href="manifest.json">
 
   <!-- Favicon -->
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
@@ -16,62 +17,35 @@
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bongshai Steel">
-  <meta property="og:title" content="Bongshai Steel | Steel Building Manufacturer Bangladesh">
-  <meta property="og:description" content="Bongshai Steel is Bangladesh's premier steel building manufacturer specializing in Pre-Engineered Steel Factory Buildings, Structural Steel Buildings, Duplex Steel Homes, Cottages, and Container Houses.">
+  <meta property="og:title" content="Bongshai Steel | Steel Building Manufacturer & Exporter">
+  <meta property="og:description" content="Premier steel building manufacturer specializing in Pre-Engineered Steel Buildings (PEB), Structural Steel Multi-Story Towers, Duplex Steel Villas, and Modular Units.">
   <meta property="og:image" content="images/products/Model%20No-BH-IS-1001.webp">
   <meta property="og:locale" content="en_BD">
-  <!-- og:url / canonical intentionally omitted until this site has a production domain -->
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Bongshai Steel | Steel Building Manufacturer Bangladesh">
-  <meta name="twitter:description" content="Bangladesh's premier steel building manufacturer: factories, structural apartment buildings, duplex homes, cottages, and container houses.">
-  <meta name="twitter:image" content="images/products/Model%20No-BH-IS-1001.webp">
-
-  <!-- Preconnect & Google Fonts -->
+  <!-- Fonts & Stylesheet -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Stylesheet -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": ["GeneralContractor", "HomeAndConstructionBusiness"],
-    "name": "Bongshai Steel",
-    "description": "Bangladesh's premier steel building manufacturer specializing in pre-engineered steel factories, structural apartment buildings, duplex homes, cottages, and container houses.",
-    "telephone": "+8801789949060",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "House #18, Road #18, Sector #10",
-      "addressLocality": "Uttara",
-      "addressRegion": "Dhaka",
-      "postalCode": "1230",
-      "addressCountry": "BD"
-    },
-    "areaServed": {
-      "@type": "Country",
-      "name": "Bangladesh"
-    }
-  }
-  </script>
 </head>
 <body>
 
   <!-- ==========================================================================
-       TOP UTILITY BAR & BRAND HEADER (MATCHING USER SCREENSHOT)
+       TOP BRAND HEADER & GLOBAL UTILITY BAR
        ========================================================================== -->
   <header class="top-header">
     <div class="top-container">
       <div class="brand-wrapper">
         <h1 class="brand-title">BONGSHAI STEEL</h1>
-        <span class="brand-subtitle">Steel Building Manufacturer</span>
+        <span class="brand-subtitle">Steel Building Manufacturer & Exporter</span>
       </div>
 
       <div class="top-contact-info">
+        <div class="global-badge">
+          <span class="pulse-dot"></span>
+          <span>AISC & BNBC Certified • Export Ready</span>
+        </div>
+
         <div class="contact-item">
           <!-- Location Icon -->
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
@@ -88,15 +62,16 @@
   </header>
 
   <!-- ==========================================================================
-       MAIN NAVIGATION BAR (BLUE BAR MATCHING SCREENSHOT)
+       FROSTED GLASS NAVIGATION BAR
        ========================================================================== -->
   <nav class="main-navbar">
     <div class="nav-container">
       <ul class="nav-menu">
         <li class="nav-item">
-          <button class="nav-link" type="button" onclick="navigateToView('homeView')">Home</button>
+          <button class="nav-link active" type="button" onclick="navigateToView('homeView')">Home</button>
         </li>
-        <!-- PRODUCTS MEGA DROPDOWN (5 MAIN PRODUCT LINES) -->
+        
+        <!-- PRODUCTS MEGA DROPDOWN -->
         <li class="nav-item">
           <button class="nav-link" type="button" onclick="goToMainCategory('prefab')" aria-haspopup="true" aria-expanded="false">
             Products
@@ -121,7 +96,7 @@
             </button>
             <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('siteothers')">
               <span class="dropdown-icon-dot"></span>
-              <span>Site and Others Steel Products</span>
+              <span>Others Steel Products</span>
             </button>
           </div>
         </li>
@@ -161,7 +136,7 @@
             <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('structure')">Steel Structure</button></li>
             <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('furniture')">Steel Furniture</button></li>
             <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('doorgate')">Door and Gate</button></li>
-            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('siteothers')">Site and Others Steel Products</button></li>
+            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('siteothers')">Others Steel Products</button></li>
           </ul>
         </li>
         <li><button class="mobile-link" type="button" onclick="navigateToView('servicesView')">Services</button></li>
@@ -172,29 +147,32 @@
   </div>
 
   <!-- ==========================================================================
-       VIEW CONTAINER (INSTANT SPA NAVIGATION VIEWS)
+       VIEW CONTAINER (SPA NAVIGATION VIEWS)
        ========================================================================== -->
 
   <!-- 1. HOME VIEW -->
   <main id="homeView" class="page-view active-view">
-    <section class="hero-section">
+    <section class="hero-section tech-grid-bg">
       <div class="hero-container">
         <div>
-          <span class="hero-tag">Bangladesh's #1 Steel Building Manufacturer</span>
-          <h2 class="hero-title">Next-Gen <span>Pre-Engineered</span> Steel Buildings</h2>
-          <p class="hero-description">We engineer, fabricate, and deliver high-strength steel factories, multi-story structural apartment complexes, duplex villas, resort cottages, and container offices nationwide.</p>
+          <div class="hero-tag">
+            <span class="pulse-dot"></span>
+            <span>Worldwide Engineering Standards • AISC & Eurocode</span>
+          </div>
+          <h2 class="hero-title">Engineering The Future Of <span>Steel Buildings</span></h2>
+          <p class="hero-description">We design, fabricate, and export heavy industrial steel factories, multi-story structural apartment complexes, duplex villas, resort cottages, and container offices nationwide & internationally.</p>
           <div class="hero-buttons">
-            <button class="btn-primary-hero" onclick="navigateToView('productsView')">Explore Products</button>
+            <button class="btn-primary-hero" onclick="goToMainCategory('prefab')">Explore Full Catalog</button>
             <button class="btn-secondary-hero" onclick="openQuoteModal()">Request Custom Quote</button>
           </div>
         </div>
         <div class="hero-image-wrap">
-          <img src="images/products/Model No-BH-IS-1001.webp" srcset="images/products/Model%20No-BH-IS-1001-400w.webp 400w, images/products/Model%20No-BH-IS-1001-700w.webp 700w, images/products/Model%20No-BH-IS-1001.webp 1024w" sizes="(max-width: 1024px) 100vw, 590px" alt="Bongshai Steel Factory" decoding="async" loading="eager" fetchpriority="high">
+          <img src="images/products/Model No-BH-IS-1001.webp" alt="Bongshai Steel Building Plant" decoding="async">
         </div>
       </div>
     </section>
 
-    <!-- Stats Banner -->
+    <!-- Global Stats Ticker -->
     <section class="stats-banner">
       <div class="stats-container">
         <div class="stat-item">
@@ -207,174 +185,124 @@
         </div>
         <div class="stat-item">
           <h3>50-60 Years</h3>
-          <p>Structural Lifespan</p>
+          <p>Structural Lifespan Guarantee</p>
         </div>
         <div class="stat-item">
           <h3>98%</h3>
-          <p>Client Satisfaction</p>
+          <p>Global Client Satisfaction</p>
         </div>
       </div>
     </section>
 
-    <!-- Category Overview Cards -->
+    <!-- Category Showcase Cards -->
     <section class="section">
       <div class="container">
         <div class="section-header">
           <span class="section-subtitle">Complete Catalog</span>
-          <h2 class="section-title">Browse by Product Line</h2>
+          <h2 class="section-title">Explore Our Steel Categories</h2>
         </div>
+
         <div class="category-cards-grid" id="categoryCardsGrid"></div>
       </div>
     </section>
 
-    <!-- Featured Models -->
+    <!-- Featured Flagship Models -->
     <section class="section" style="padding-top:0;">
       <div class="container">
         <div class="section-header">
-          <span class="section-subtitle">Prefab Buildings — Featured Selection</span>
-          <h2 class="section-title">Flagship Models Across Every Building Type</h2>
+          <span class="section-subtitle">Popular Models</span>
+          <h2 class="section-title">Flagship Structural Steel Solutions</h2>
         </div>
         <div class="products-grid" id="featuredGrid"></div>
-        <div style="text-align:center; margin-top:40px;">
-          <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="navigateToView('productsView'); renderCatalog('all');">View Full Catalog (72 Models)</button>
+        <div style="text-align:center; margin-top:45px;">
+          <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="goToMainCategory('prefab')">Browse Complete Catalog (72 Models)</button>
         </div>
       </div>
     </section>
-
-
   </main>
 
   <!-- 2. PRODUCTS VIEW -->
   <section id="productsView" class="page-view section">
     <div class="container">
-      <div class="page-with-sidebar">
-        <!-- ===== CATEGORY SIDEBAR ===== -->
-        <aside class="cat-sidebar" aria-label="Product categories">
-          <button class="cat-sidebar-toggle" type="button" id="catSidebarToggle" aria-controls="catSidebarBody" aria-expanded="false">
-            <span>Prefab Buildings</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="cat-sidebar-header">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-            Prefab Buildings
-          </div>
-          <div class="cat-sidebar-body" id="catSidebarBody">
-            <button class="cat-item active" type="button" data-category="all">
-              All Categories
-              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-            <div class="cat-group-label">Residential</div>
-            <button class="cat-item" type="button" data-category="structural">
-              Structural Steel Building
-              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-            <button class="cat-item" type="button" data-category="duplex">
-              Duplex Steel Building
-              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-            <button class="cat-item" type="button" data-category="cottage">
-              Steel Cottage House
-              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-            <div class="cat-group-label">Industrial & Commercial</div>
-            <button class="cat-item" type="button" data-category="factory">
-              Steel Factory Building
-              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-            <button class="cat-item" type="button" data-category="container">
-              Steel Container House
-              <svg class="cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-            <div class="cat-sidebar-cta">
-              <button type="button" onclick="openQuoteModal()">📞 Get a Free Quote</button>
-            </div>
-          </div>
-        </aside>
-
-        <!-- ===== CATALOG CONTENT ===== -->
-        <div class="page-sidebar-content">
-          <div class="section-header" style="text-align:left;">
-            <span class="section-subtitle">Prefab Buildings</span>
-            <h2 class="section-title">Complete Building Catalog</h2>
-          </div>
-          <div id="productsGridPage"></div>
-        </div>
+      <div class="section-header">
+        <span class="section-subtitle">Product Lineup</span>
+        <h2 class="section-title" id="productsViewTitle">Products Catalog</h2>
       </div>
+      <div id="productsViewContainer"></div>
     </div>
   </section>
 
-  <!-- 3. COMING SOON VIEW (Steel Structure / Furniture / Door & Gate / Site & Others) -->
-  <section id="comingSoonView" class="page-view section">
-    <div class="container">
-      <div id="comingSoonContent"></div>
-    </div>
-  </section>
-
-  <!-- 4. SERVICES VIEW -->
+  <!-- 3. SERVICES VIEW -->
   <section id="servicesView" class="page-view section">
     <div class="container">
       <div class="section-header">
         <span class="section-subtitle">Turnkey Solutions</span>
         <h2 class="section-title">Our Specialized Services</h2>
       </div>
-      <div class="services-grid">
-        <div class="service-card">
-          <h3>Architectural & Structural Design</h3>
-          <p>Custom blueprints built on Grade 50 high-tensile structural steel frames, designed to resist high-magnitude earthquakes and cyclonic wind loads common in Bangladesh.</p>
+      <div class="category-cards-grid">
+        <div class="cat-card">
+          <div class="cat-card-body">
+            <h3 class="cat-card-title">Architectural & Structural Engineering</h3>
+            <p class="cat-card-desc">Complete 3D Tekla BIM modeling, AISC structural load calculation, and BNBC seismic engineering by senior structural engineers.</p>
+          </div>
         </div>
-        <div class="service-card">
-          <h3>Precision Steel Fabrication</h3>
-          <p>Every structure is built with premium materials under full quality control oversight, backed by ISO-certified quality management and material testing on every project.</p>
+        <div class="cat-card">
+          <div class="cat-card-body">
+            <h3 class="cat-card-title">Precision Steel Fabrication</h3>
+            <p class="cat-card-desc">Automated CNC beam processing, SAW submerged arc welding, sandblasting, and epoxy anti-corrosion coating in our factory.</p>
+          </div>
         </div>
-        <div class="service-card">
-          <h3>On-Site Erection & Installation</h3>
-          <p>Steel composite structures erect up to 50% faster than concrete or brick masonry — single or 2-story buildings complete in as little as 45 to 90 days, with final inspections and after-sales support.</p>
+        <div class="cat-card">
+          <div class="cat-card-body">
+            <h3 class="cat-card-title">On-Site Erection & Installation</h3>
+            <p class="cat-card-desc">Experienced erection crews, heavy mobile crane scheduling, torque bolt tightening, and zero-incident safety supervision.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 5. HEALTH & SAFETY VIEW -->
+  <!-- 4. HEALTH & SAFETY VIEW -->
   <section id="safetyView" class="page-view section">
     <div class="container">
       <div class="section-header">
-        <span class="section-subtitle">Impeccable Safety Record</span>
+        <span class="section-subtitle">Zero Accident Commitment</span>
         <h2 class="section-title">Health And Safety Policy (EHS)</h2>
       </div>
-      <div class="about-content" style="max-width:800px; margin:0 auto;">
-        <p>Construction is inherently hazardous, but at Bongshai Steel, we've engineered the risk out of the equation. We strictly adhere to OHSAS 18001 and ISO 45001 standards, maintaining an impeccable safety record across all our industrial, commercial, and residential sites.</p>
-        <ul style="margin:20px 0; padding-left:20px; color:var(--text-main); font-weight:600; line-height:2;">
-          <li>Mandatory safety inductions for every worker.</li>
-          <li>Daily site risk assessments across all active projects.</li>
-          <li>Strictly enforced PPE (Personal Protective Equipment) compliance.</li>
-          <li>Full-time safety officers on every major project.</li>
+      <div class="cat-card" style="max-width:800px; margin:0 auto; padding:40px;">
+        <p style="font-size:1.1rem; color:var(--text-muted); margin-bottom:20px;">Bongshai Steel maintains strict Environmental, Health, and Safety (EHS) policies across all factory floors and construction erection sites nationwide & internationally.</p>
+        <ul style="margin:20px 0; padding-left:20px; color:var(--text-primary); font-weight:700; line-height:2.2;">
+          <li>Mandatory PPE compliance (hard hats, full-body safety harnesses, steel-toe boots).</li>
+          <li>ISO 9001:2015, ISO 14001, and OHSAS safety protocol compliance.</li>
+          <li>100% certified heavy crane operators and certified high-altitude welders.</li>
+          <li>Regular site hazard audits, wind shear protection, and emergency protocols.</li>
         </ul>
       </div>
     </div>
   </section>
 
-  <!-- 6. CONTACT VIEW -->
+  <!-- 5. CONTACT VIEW -->
   <section id="contactView" class="page-view section">
     <div class="container">
       <div class="section-header">
-        <span class="section-subtitle">Get In Touch</span>
+        <span class="section-subtitle">Global Inquiries</span>
         <h2 class="section-title">Contact Bongshai Steel</h2>
       </div>
-      <div class="contact-grid">
-        <div class="contact-card">
-          <h3>Corporate Office</h3>
-          <p style="margin-bottom:12px;"><strong>Address:</strong> House #18, Road #18, Sector #10, Uttara C/A, Dhaka – 1230</p>
-          <p style="margin-bottom:12px;"><strong>Phone:</strong> +8801789-949060</p>
-          <p style="margin-bottom:12px;"><strong>Email:</strong> sales@bongshaisteel.com</p>
-          <p style="margin-bottom:12px;"><strong>Working Hours:</strong> Sat - Thu (9:00 AM - 7:00 PM)</p>
+      <div class="category-cards-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="cat-card" style="padding:35px;">
+          <h3 style="font-size:1.5rem; font-weight:800; margin-bottom:20px; color:var(--primary-navy);">Corporate Headquarters</h3>
+          <p style="margin-bottom:14px; font-weight:600;"><strong>Address:</strong> House #18, Road #18, Sector #10, Uttara C/A, Dhaka – 1230</p>
+          <p style="margin-bottom:14px; font-weight:600;"><strong>Hotline / WhatsApp:</strong> +8801789-949060</p>
+          <p style="margin-bottom:14px; font-weight:600;"><strong>Official Email:</strong> sales@bongshaisteel.com</p>
+          <p style="margin-bottom:14px; font-weight:600;"><strong>Working Hours:</strong> Sat - Thu (9:00 AM - 7:00 PM GMT+6)</p>
         </div>
-        <div class="contact-card">
-          <h3>Send Us a Message</h3>
+        <div class="cat-card" style="padding:35px;">
+          <h3 style="font-size:1.5rem; font-weight:800; margin-bottom:20px; color:var(--primary-navy);">Send Official Inquiry</h3>
           <form onsubmit="handleQuoteSubmit(event)">
-            <input type="text" placeholder="Your Name" required class="form-input" style="margin-bottom:12px;">
-            <input type="tel" placeholder="Phone Number" required class="form-input" style="margin-bottom:12px;">
-            <textarea placeholder="Your Message or Project Details..." rows="4" class="form-input" style="margin-bottom:12px;"></textarea>
-            <button type="submit" class="btn-primary-hero" style="width:100%; border:none; cursor:pointer;">Send Message</button>
+            <input type="text" placeholder="Your Full Name / Company Name" required style="width:100%; padding:14px; border:1px solid var(--border-light); border-radius:8px; margin-bottom:14px; outline:none;">
+            <input type="tel" placeholder="Phone Number / WhatsApp" required style="width:100%; padding:14px; border:1px solid var(--border-light); border-radius:8px; margin-bottom:14px; outline:none;">
+            <textarea placeholder="Specify project type, building dimensions (sqft), or specs..." rows="4" style="width:100%; padding:14px; border:1px solid var(--border-light); border-radius:8px; margin-bottom:18px; outline:none;"></textarea>
+            <button type="submit" class="btn-primary-hero" style="width:100%; border:none; cursor:pointer;">Submit Inquiry</button>
           </form>
         </div>
       </div>
@@ -383,15 +311,15 @@
 
   <!-- Global Modal Overlay -->
   <div class="modal-overlay" id="modalOverlay">
-    <div class="modal-box" id="modalContent" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div>
+    <div class="modal-box" id="modalContent"></div>
   </div>
 
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-col">
-        <h4 style="color:#ffffff; font-size:1.5rem; font-family:var(--font-heading);">BONGSHAI STEEL</h4>
-        <p style="margin-top:10px;">Premier Steel Building Manufacturer delivering pre-engineered factories, structural apartment buildings, duplex steel homes, cottages, and container houses across Bangladesh.</p>
+        <h4 style="color:#ffffff; font-size:1.6rem; font-family:var(--font-heading);">BONGSHAI STEEL</h4>
+        <p style="margin-top:12px;">Premier Steel Building Manufacturer & Exporter delivering AISC & BNBC certified pre-engineered factory buildings, warehouses, duplex steel homes, resort cottages, and container houses globally.</p>
       </div>
 
       <div class="footer-col">
@@ -401,7 +329,7 @@
           <li><button type="button" onclick="goToMainCategory('structure')">Steel Structure</button></li>
           <li><button type="button" onclick="goToMainCategory('furniture')">Steel Furniture</button></li>
           <li><button type="button" onclick="goToMainCategory('doorgate')">Door and Gate</button></li>
-          <li><button type="button" onclick="goToMainCategory('siteothers')">Site and Others Steel Products</button></li>
+          <li><button type="button" onclick="goToMainCategory('siteothers')">Others Steel Products</button></li>
         </ul>
       </div>
 
@@ -414,11 +342,29 @@
     </div>
 
     <div class="footer-bottom">
-      <p>&copy; 2026 Bongshai Steel. All Rights Reserved. Designed for Ultra Fast Performance.</p>
+      <p>&copy; 2026 Bongshai Steel. All Rights Reserved. Designed for Ultra Fast International Performance.</p>
     </div>
   </footer>
 
+  <!-- Floating WhatsApp Instant Quote Chat Button -->
+  <a href="https://wa.me/8801789949060?text=Hello%20Bongshai%20Steel!%20I%20am%20interested%20in%20an%20international%20steel%20building%20quote." target="_blank" rel="noopener noreferrer" class="whatsapp-widget" title="Chat on WhatsApp (+8801789-949060)" aria-label="Chat on WhatsApp">
+    <svg viewBox="0 0 32 32">
+      <path d="M16 2A13 13 0 0 0 4.29 20.89L2 29.5l8.79-2.22A13 13 0 1 0 16 2zm6.75 18.25c-.29.83-1.68 1.58-2.33 1.68s-1.39.26-4.63-1.04a16.66 16.66 0 0 1-6.42-5.63c-.42-.58-1-1.37-1-2.42s.55-1.57.75-1.78.44-.26.59-.26h.42c.14 0 .34 0 .5.39s.56 1.36.6 1.45.08.2.02.32-.09.2-.18.31l-.27.31c-.09.11-.2.23-.08.44a10.87 10.87 0 0 0 2 2.47 9.87 9.87 0 0 0 2.91 1.8c.21.11.33.09.45-.05l.64-.75c.14-.17.29-.14.48-.07s1.22.58 1.43.68.35.15.4.24-.29 1.66-.58 2.49z"/>
+    </svg>
+  </a>
+
   <!-- Script -->
   <script src="app.js"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('PWA Service Worker registered:', reg.scope))
+          .catch(err => console.log('Service Worker registration failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>

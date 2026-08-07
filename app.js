@@ -39,7 +39,7 @@ const MAIN_CATEGORIES = [
   },
   {
     key: "siteothers",
-    name: "Site and Others Steel Products",
+    name: "Others Steel Products",
     icon: "🔧",
     blurb: "Additional steel products and on-site fabrication services.",
     ready: false
@@ -54,7 +54,6 @@ const CATEGORIES = [
     key: "factory",
     name: "Steel Factory Building",
     icon: "🏭",
-    priceLabel: "৳1,200 – ৳1,800 / sqft",
     blurb: "SS400/Q355 heavy portal frame, 10–50 Ton EOT crane ready, PU insulation.",
     image: "images/products/Model No-BH-IS-1006.webp"
   },
@@ -62,15 +61,13 @@ const CATEGORIES = [
     key: "structural",
     name: "Structural Steel Building",
     icon: "🏢",
-    priceLabel: "৳1,800 – ৳3,000 / sqft",
-    blurb: "Multi-story steel apartment towers, composite decking concrete slab, BNBC code compliant.",
+    blurb: "Multi-story steel apartment towers, composite decking concrete slab, engineered to international structural standards.",
     image: "images/products/bh-tsb-109.webp"
   },
   {
     key: "duplex",
     name: "Duplex Steel Building",
     icon: "🏘️",
-    priceLabel: "Starting ৳30 Lakh",
     blurb: "Modern 2-story luxury steel duplexes, 4 Bed/4 Bath, 60-day rapid build.",
     image: "images/products/dv-104.webp"
   },
@@ -78,7 +75,6 @@ const CATEGORIES = [
     key: "cottage",
     name: "Steel Cottage House",
     icon: "🏡",
-    priceLabel: "৳10 Lakh – ৳25 Lakh",
     blurb: "Eco resort prefab cottages, fiber cement cladding, fast on-site setup.",
     image: "images/products/Model No-BH-CH-405.webp"
   },
@@ -86,7 +82,6 @@ const CATEGORIES = [
     key: "container",
     name: "Steel Container House",
     icon: "🚢",
-    priceLabel: "৳4.5 Lakh – ৳12 Lakh",
     blurb: "20ft & 40ft modified container site offices & luxury homes.",
     image: "images/products/bh-ch-502.webp"
   }
@@ -95,18 +90,6 @@ const CATEGORIES = [
 /* --------------------------------------------------------------------------
    HELPERS
    -------------------------------------------------------------------------- */
-function lerp(min, max, i, count) {
-  return count <= 1 ? min : Math.round(min + ((max - min) * i) / (count - 1));
-}
-
-function fmtTaka(n) {
-  return "৳" + Math.round(n).toLocaleString("en-IN");
-}
-
-function fmtLakh(n) {
-  return `${fmtTaka(n)} (৳${(n / 100000).toFixed(1)} Lakh)`;
-}
-
 // Source photos missing a -700w variant on disk (verified against images/products/).
 const NO_700W = new Set([
   "images/products/Model No-BH-TB-101.webp",
@@ -141,16 +124,13 @@ function buildFactory() {
   ];
   return names.map((name, i) => {
     const num = 1001 + i;
-    const price = lerp(1200, 1800, i, names.length);
     return {
       id: `bh-is-${num}`,
       category: "factory",
       categoryName: "Steel Factory Building",
       modelCode: `BH-IS-${num}`,
       name,
-      desc: "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines nationwide.",
-      price: `৳${price.toLocaleString("en-IN")} / sqft`,
-      priceVal: price,
+      desc: "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
       image: `images/products/Model No-BH-IS-${num}.webp`
     };
   });
@@ -178,16 +158,13 @@ function buildStructural() {
 
   return names.map((name, i) => {
     const num = 101 + i;
-    const price = lerp(1800, 3000, i, names.length);
     return {
       id: `bh-tsb-${num}`,
       category: "structural",
       categoryName: "Structural Steel Building",
       modelCode: `BH-TSB-${num}`,
       name,
-      desc: "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and BNBC seismic code compliance.",
-      price: `৳${price.toLocaleString("en-IN")} / sqft`,
-      priceVal: price,
+      desc: "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
       image: `images/products/${images[i]}`
     };
   });
@@ -212,7 +189,6 @@ function buildDuplex() {
 
   return names.map((name, i) => {
     const num = 201 + i;
-    const price = 3000000 + i * 200000;
     return {
       id: `bh-dv-${num}`,
       category: "duplex",
@@ -220,8 +196,6 @@ function buildDuplex() {
       modelCode: `BH-DV-${num}`,
       name,
       desc: "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
-      price: fmtLakh(price),
-      priceVal: price,
       image: `images/products/${images[i]}`
     };
   });
@@ -248,7 +222,6 @@ function buildCottage() {
   const products = [];
 
   chNames.forEach((name, i) => {
-    const price = 1000000 + i * 62000;
     products.push({
       id: `bh-ch-${400 + i + 1}`,
       category: "cottage",
@@ -256,15 +229,12 @@ function buildCottage() {
       modelCode: `BH-CH-${400 + i + 1}`,
       name,
       desc: "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
-      price: fmtLakh(price),
-      priceVal: price,
       image: chImages[i] === "412" ? "images/products/bh-ch-412.webp" : `images/products/Model No-BH-CH-${400 + i + 1}.webp`
     });
   });
 
   thNames.forEach((name, i) => {
     const num = 701 + i;
-    const price = 1620000 + i * 78000;
     products.push({
       id: `bh-th-${num}`,
       category: "cottage",
@@ -272,8 +242,6 @@ function buildCottage() {
       modelCode: `BH-TH-${num}`,
       name,
       desc: "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
-      price: fmtLakh(price),
-      priceVal: price,
       image: `images/products/Model No-BH-TH-${num}.webp`
     });
   });
@@ -293,7 +261,6 @@ function buildContainer() {
   ];
   return names.map((name, i) => {
     const num = 501 + i;
-    const price = lerp(450000, 1200000, i, names.length);
     return {
       id: `bh-ch-${num}`,
       category: "container",
@@ -301,8 +268,6 @@ function buildContainer() {
       modelCode: `BH-CH-${num}`,
       name,
       desc: "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
-      price: fmtLakh(price),
-      priceVal: price,
       image: `images/products/bh-ch-${num}.webp`
     };
   });
@@ -330,7 +295,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderFeatured();
   renderCatalog("all");
   setupEventListeners();
-  setupEstimator();
   setupTheme();
 });
 
@@ -350,8 +314,8 @@ function productCardHTML(p) {
         <p class="product-desc">${p.desc}</p>
 
         <div class="product-footer">
-          <div class="product-price">${p.price}</div>
           <button class="btn-detail" onclick="openProductModal('${p.id}')">View Details</button>
+          <button class="btn-get-quote" onclick="openQuoteModal('${p.modelCode}')">Get Quote</button>
         </div>
       </div>
     </div>
@@ -368,62 +332,55 @@ function renderCategoryCards() {
   container.innerHTML = MAIN_CATEGORIES.map(c => {
     if (c.ready) {
       return `
-        <button type="button" class="glass-card category-card-home" onclick="goToMainCategory('${c.key}')">
-          <div class="cat-home-thumb">
-            <img ${responsiveImgAttrs("images/products/Model No-BH-IS-1006.webp", "(max-width: 640px) 100vw, 320px")} alt="${c.name}" loading="lazy" decoding="async">
+        <button type="button" class="cat-card" onclick="goToMainCategory('${c.key}')">
+          <div class="cat-card-img">
+            <img ${responsiveImgAttrs("images/products/Model No-BH-IS-1006.webp", "(max-width: 640px) 100vw, 360px")} alt="${c.name}" loading="lazy" decoding="async">
           </div>
-          <div class="cat-home-body">
-            <span class="cat-home-icon">${c.icon}</span>
-            <h3>${c.name}</h3>
-            <p>${c.blurb}</p>
-            <div class="cat-home-footer">
-              <span class="cat-home-price">${CATEGORIES.length} Categories</span>
-              <span class="cat-home-count">${PRODUCTS_DATA.length} Models →</span>
-            </div>
+          <div class="cat-card-body">
+            <h3 class="cat-card-title">${c.icon} ${c.name}</h3>
+            <p class="cat-card-desc">${c.blurb}</p>
+            <span class="cat-card-link">${PRODUCTS_DATA.length} Models →</span>
           </div>
         </button>
       `;
     }
     return `
-      <button type="button" class="glass-card category-card-home coming-soon-card" onclick="goToMainCategory('${c.key}')">
-        <div class="cat-home-icon-large">${c.icon}</div>
-        <div class="cat-home-body">
-          <h3>${c.name}</h3>
-          <p>${c.blurb}</p>
-          <div class="cat-home-footer">
-            <span class="coming-soon-badge">Coming Soon</span>
-          </div>
+      <button type="button" class="cat-card" onclick="goToMainCategory('${c.key}')">
+        <div class="cat-card-body" style="padding-top:40px; text-align:center;">
+          <div style="font-size:2.8rem; margin-bottom:16px;">${c.icon}</div>
+          <h3 class="cat-card-title">${c.name}</h3>
+          <p class="cat-card-desc">${c.blurb}</p>
+          <span class="coming-soon-badge">Coming Soon</span>
         </div>
       </button>
     `;
   }).join("");
 }
 
-// Routes a Products-nav / home-card click to either the real Prefab
-// Buildings catalog or the shared "Coming Soon" placeholder view.
+// Routes a Products-nav / home-card click to the shared Products view,
+// rendering either the real Prefab Buildings catalog or an honest
+// "Coming Soon" placeholder for the four product lines with no models yet.
 function goToMainCategory(key) {
   const cat = MAIN_CATEGORIES.find(c => c.key === key);
   if (!cat) return;
+  navigateToView("productsView");
+  const title = document.getElementById("productsViewTitle");
+  if (title) title.textContent = cat.name;
   if (cat.ready) {
-    navigateToView("productsView");
     renderCatalog("all");
   } else {
     renderComingSoon(cat);
-    navigateToView("comingSoonView");
   }
 }
 
 function renderComingSoon(cat) {
-  const container = document.getElementById("comingSoonContent");
+  const container = document.getElementById("productsViewContainer");
   if (!container) return;
   container.innerHTML = `
-    <div class="section-header">
-      <span class="section-subtitle">Coming Soon</span>
-      <h2 class="section-title">${cat.icon} ${cat.name}</h2>
-    </div>
-    <div class="coming-soon-box">
-      <p>${cat.blurb}</p>
-      <p>This product line is launching soon. Contact our team for early access, custom orders, or bulk inquiries.</p>
+    <div class="cat-card" style="max-width:800px; margin:0 auto; padding:40px; text-align:center; cursor:default;">
+      <div style="font-size:3rem; margin-bottom:16px;">${cat.icon}</div>
+      <p style="font-size:1.1rem; color:var(--text-muted); margin-bottom:16px;">${cat.blurb}</p>
+      <p style="color:var(--text-muted); margin-bottom:24px;">This product line is launching soon. Contact our team for early access, custom orders, or bulk inquiries.</p>
       <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="openQuoteModal()">Contact Us</button>
     </div>
   `;
@@ -438,13 +395,8 @@ function renderFeatured() {
 
 // Full catalog (Products view) — grouped by category on "all", flat on a specific category
 function renderCatalog(filterCategory) {
-  const container = document.getElementById("productsGridPage");
+  const container = document.getElementById("productsViewContainer");
   if (!container) return;
-
-  // Sync sidebar category active state
-  document.querySelectorAll(".cat-item").forEach(b => {
-    b.classList.toggle("active", b.getAttribute("data-category") === filterCategory);
-  });
 
   if (filterCategory === "all") {
     container.innerHTML = CATEGORIES.map(c => {
@@ -452,7 +404,7 @@ function renderCatalog(filterCategory) {
       return `
         <div class="catalog-group">
           <div class="catalog-group-header">
-            <h3>${c.icon} ${c.name} <span>(${items.length} Models · ${c.priceLabel})</span></h3>
+            <h3>${c.icon} ${c.name} <span>(${items.length} Models)</span></h3>
           </div>
           <div class="products-grid">${items.map(productCardHTML).join("")}</div>
         </div>
@@ -468,28 +420,6 @@ function renderCatalog(filterCategory) {
    EVENT LISTENERS
    -------------------------------------------------------------------------- */
 function setupEventListeners() {
-  document.querySelectorAll(".cat-item").forEach(btn => {
-    btn.addEventListener("click", () => {
-      renderCatalog(btn.getAttribute("data-category"));
-      const sidebarBody = document.getElementById("catSidebarBody");
-      const sidebarToggle = document.getElementById("catSidebarToggle");
-      if (sidebarBody && sidebarBody.classList.contains("open")) {
-        sidebarBody.classList.remove("open");
-        if (sidebarToggle) sidebarToggle.setAttribute("aria-expanded", "false");
-      }
-    });
-  });
-
-  const sidebarToggle = document.getElementById("catSidebarToggle");
-  const sidebarBody = document.getElementById("catSidebarBody");
-  if (sidebarToggle && sidebarBody) {
-    sidebarToggle.addEventListener("click", () => {
-      const isOpen = sidebarBody.classList.toggle("open");
-      sidebarToggle.classList.toggle("open", isOpen);
-      sidebarToggle.setAttribute("aria-expanded", String(isOpen));
-    });
-  }
-
   const hamburger = document.getElementById("hamburgerBtn");
   const drawer = document.getElementById("mobileDrawer");
   const drawerClose = document.getElementById("drawerClose");
@@ -604,51 +534,6 @@ function navigateToView(viewId) {
 }
 
 /* --------------------------------------------------------------------------
-   INTERACTIVE COST & STEEL WEIGHT ESTIMATOR
-   -------------------------------------------------------------------------- */
-const ESTIMATOR_RATES = {
-  factory:    { rate: 1500, weight: 4.5 },
-  structural: { rate: 2400, weight: 6.5 },
-  duplex:     { rate: 1800, weight: 4.2 },
-  cottage:    { rate: 2200, weight: 3.5 },
-  container:  { rate: 2800, weight: 5.0 }
-};
-
-function setupEstimator() {
-  const lengthInput = document.getElementById("estLength");
-  const widthInput = document.getElementById("estWidth");
-  const heightInput = document.getElementById("estHeight");
-  const typeSelect = document.getElementById("estType");
-
-  if (!lengthInput || !widthInput || !typeSelect) return;
-
-  function calculate() {
-    const l = parseFloat(lengthInput.value) || 0;
-    const w = parseFloat(widthInput.value) || 0;
-    const areaSqft = l * w;
-
-    const config = ESTIMATOR_RATES[typeSelect.value] || ESTIMATOR_RATES.factory;
-    const estimatedCost = Math.round(areaSqft * config.rate);
-    const estimatedWeightTon = ((areaSqft * config.weight) / 1000).toFixed(1);
-
-    const costDisplay = document.getElementById("estCostDisplay");
-    const weightDisplay = document.getElementById("estWeightDisplay");
-
-    if (costDisplay) costDisplay.innerText = areaSqft > 0 ? fmtTaka(estimatedCost) : "৳ 0";
-    if (weightDisplay) weightDisplay.innerText = areaSqft > 0
-      ? `Estimated Steel Weight: ${estimatedWeightTon} Metric Tons`
-      : "Estimated Steel Weight: 0 Tons";
-  }
-
-  lengthInput.addEventListener("input", calculate);
-  widthInput.addEventListener("input", calculate);
-  if (heightInput) heightInput.addEventListener("input", calculate);
-  typeSelect.addEventListener("change", calculate);
-
-  calculate();
-}
-
-/* --------------------------------------------------------------------------
    OVERLAY ACCESSIBILITY — shared by the modal overlay and the mobile drawer:
    focus trap, Escape-to-close, backdrop-click-to-close, focus restore.
    -------------------------------------------------------------------------- */
@@ -703,10 +588,7 @@ function openProductModal(productId) {
       <img ${responsiveImgAttrs(product.image, "(max-width: 650px) 100vw, 650px")} alt="${product.name}" style="width:100%; height:280px; object-fit:cover; border-radius:8px; margin-bottom:20px;">
       <p style="font-size:1.05rem; color:var(--text-muted); margin-bottom:20px;">${product.desc}</p>
 
-      <div class="modal-spec-grid">
-        <div><strong>Category:</strong> ${product.categoryName}</div>
-        <div><strong>Price Estimate:</strong> ${product.price}</div>
-      </div>
+      <p style="margin-bottom:20px;"><strong>Category:</strong> ${product.categoryName}</p>
 
       <button class="btn-modal-cta" onclick="openQuoteModal('${product.modelCode}')">
         Request Official Quote for ${product.modelCode}
@@ -731,21 +613,21 @@ function openQuoteModal(modelCode = "") {
       <form onsubmit="handleQuoteSubmit(event)">
         <div class="form-field">
           <label>Your Full Name</label>
-          <input type="text" required placeholder="e.g. Mr. Kabir Ahmed">
+          <input type="text" required placeholder="Full name">
         </div>
         <div class="form-field">
-          <label>Phone Number</label>
-          <input type="tel" required placeholder="+88017XXXXXXXX">
+          <label>Phone Number (with country code)</label>
+          <input type="tel" required placeholder="e.g. +1 234 567 8900">
         </div>
         <div class="form-field">
-          <label>Project Location</label>
-          <input type="text" placeholder="e.g. Gazipur, Dhaka">
+          <label>Project Location (City, Country)</label>
+          <input type="text" placeholder="e.g. Dubai, UAE">
         </div>
         <div class="form-field">
           <label>Building Dimensions / Requirements</label>
           <textarea rows="3" placeholder="Specify length, width, height or model details..."></textarea>
         </div>
-        <button type="submit" class="btn-modal-submit">Submit Quote Request</button>
+        <button type="submit" class="btn-modal-cta">Submit Quote Request</button>
       </form>
     </div>
   `;
@@ -763,3 +645,4 @@ function handleQuoteSubmit(e) {
   alert("Thank you! Your quote request has been submitted successfully. Our engineering team at Bongshai Steel will contact you shortly.");
   closeModal();
 }
+

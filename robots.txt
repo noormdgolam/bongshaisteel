@@ -1,0 +1,21 @@
+# AI Crawler & Search Engine Discovery Rules
+User-agent: *
+Allow: /
+
+# Explicit AI Agent & Citation Engine Permissions
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://www.bongshaisteel.com/sitemap.xml
