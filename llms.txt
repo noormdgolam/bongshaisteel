@@ -37,4 +37,15 @@ Additional steel products and on-site fabrication services.
 
 ## Primary Links & Resources
 - Full Model List: https://www.bongshaisteel.com/llms-full.txt
+- Sitemap: https://www.bongshaisteel.com/sitemap.xml
+- Agent Permissions: https://www.bongshaisteel.com/agent-permissions.json
 - Instant WhatsApp Quote: https://wa.me/8801789949060
+
+## AI Agent Policy
+- Crawling: Allowed (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended)
+- Quote Form Submissions: Human-only — agents must not submit forms autonomously
+- WebMCP: Not yet implemented
+- Full permissions: https://www.bongshaisteel.com/agent-permissions.json
+
+## Last Updated
+2026-08-08

@@ -113,15 +113,21 @@
   <!-- Machine-Readable AI Discovery Specifications -->
   <url>
     <loc>https://www.bongshaisteel.com/llms.txt</loc>
-    <lastmod>2026-08-07</lastmod>
+    <lastmod>2026-08-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.bongshaisteel.com/llms-full.txt</loc>
-    <lastmod>2026-08-07</lastmod>
+    <lastmod>2026-08-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.bongshaisteel.com/agent-permissions.json</loc>
+    <lastmod>2026-08-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 
   <!-- 1. Steel Factory Buildings (BH-IS-1001 to BH-IS-1012) -->

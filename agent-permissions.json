@@ -1,0 +1,32 @@
+{
+  "site_name": "Bongshai Steel",
+  "site_url": "https://www.bongshaisteel.com/",
+  "last_updated": "2026-08-08",
+  "ai_content_policy": "https://www.bongshaisteel.com/robots.txt",
+  "machine_readable_content": {
+    "llms_txt": "https://www.bongshaisteel.com/llms.txt",
+    "llms_full_txt": "https://www.bongshaisteel.com/llms-full.txt"
+  },
+  "permissions": {
+    "crawling": {
+      "status": "allowed",
+      "allowed_agents": ["GPTBot", "ChatGPT-User", "ClaudeBot", "PerplexityBot", "Google-Extended", "Applebot-Extended"],
+      "disallowed_agents": ["Bytespider"],
+      "note": "AI citation crawlers are explicitly welcome. See robots.txt for full directives."
+    },
+    "web_mcp": {
+      "status": "not_implemented"
+    },
+    "form_submissions": {
+      "quote_request_form": {
+        "status": "human_only",
+        "allowed_for_agents": false,
+        "reason": "Quote requests require engineering review; automated submissions are not accepted. Direct users to fill the form manually or contact via WhatsApp: +8801789-949060."
+      }
+    }
+  },
+  "contact": {
+    "email": "sales@bongshaisteel.com",
+    "whatsapp": "+8801789949060"
+  }
+}

@@ -1,8 +1,10 @@
-# AI Crawler & Search Engine Discovery Rules
+# AI Crawler Access Policy — Last updated: 2026-08-08
+
+# --- All bots: default allow ---
 User-agent: *
 Allow: /
 
-# Explicit AI Agent & Citation Engine Permissions
+# --- AI Search-Augmented Crawlers (allow — these drive AI citations) ---
 User-agent: GPTBot
 Allow: /
 
@@ -20,5 +22,9 @@ Allow: /
 
 User-agent: Applebot-Extended
 Allow: /
+
+# --- Aggressive / Non-Citation Scrapers (block) ---
+User-agent: Bytespider
+Disallow: /
 
 Sitemap: https://www.bongshaisteel.com/sitemap.xml
