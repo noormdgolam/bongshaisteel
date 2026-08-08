@@ -98,3 +98,13 @@ No pricing, build times, or per-model specs are published — every model is eng
 
 ## Request a Quote
 Bongshai Steel does not publish fixed pricing. Contact sales@bongshaisteel.com or WhatsApp +8801789-949060 with project location, building dimensions, and requirements for an official quote.
+
+## AI Agent Policy
+- Machine-readable summary: https://www.bongshaisteel.com/llms.txt
+- Agent permissions: https://www.bongshaisteel.com/agent-permissions.json
+- Crawling: Allowed (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended)
+- Form submissions: Human-only — do not submit quote forms autonomously
+- WebMCP: Not yet implemented
+
+## Last Updated
+2026-08-08
