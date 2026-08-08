@@ -717,23 +717,26 @@ function openQuoteModal(modelCode = "") {
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <form onsubmit="handleQuoteSubmit(event)">
+      <form onsubmit="handleQuoteSubmit(event)"
+            data-mcp-action="request-official-quote"
+            data-mcp-description="Submit a formal quote request for a pre-engineered steel building."
+            data-mcp-params='{"required": ["name", "phone", "destination", "currency", "standard", "dimensions"], "optional": []}'>
         <div class="form-field">
           <label>Your Full Name / Company Name</label>
-          <input type="text" required placeholder="Full name or Company">
+          <input type="text" name="name" data-mcp-param="name" data-mcp-description="Your Full Name or Company Name" required placeholder="Full name or Company">
         </div>
         <div class="form-field">
           <label>Phone Number / WhatsApp (with country code)</label>
-          <input type="tel" required placeholder="e.g. +1 234 567 8900 or +61 400 000 000">
+          <input type="tel" name="phone" data-mcp-param="phone" data-mcp-description="Your Phone Number or WhatsApp" required placeholder="e.g. +1 234 567 8900 or +61 400 000 000">
         </div>
         <div class="form-field">
           <label>Project Destination (City, Country)</label>
-          <input type="text" required placeholder="${isUS ? 'e.g. Houston, TX, USA' : isCA ? 'e.g. Vancouver, BC, Canada' : isAU ? 'e.g. Sydney, NSW, Australia' : 'e.g. Dubai, UAE / Houston, USA / Sydney, AU'}">
+          <input type="text" name="destination" data-mcp-param="destination" data-mcp-description="City and Country where the building will be erected" required placeholder="${isUS ? 'e.g. Houston, TX, USA' : isCA ? 'e.g. Vancouver, BC, Canada' : isAU ? 'e.g. Sydney, NSW, Australia' : 'e.g. Dubai, UAE / Houston, USA / Sydney, AU'}">
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
           <div>
             <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">Preferred Currency</label>
-            <select class="form-select-custom-light" style="padding:10px;">
+            <select name="currency" data-mcp-param="currency" data-mcp-description="Preferred currency for the quote" class="form-select-custom-light" style="padding:10px;">
               <option value="USD" ${isUS || (!isCA && !isAU) ? "selected" : ""}>USD ($ - United States)</option>
               <option value="CAD" ${isCA ? "selected" : ""}>CAD ($ - Canada)</option>
               <option value="AUD" ${isAU ? "selected" : ""}>AUD ($ - Australia)</option>
@@ -744,7 +747,7 @@ function openQuoteModal(modelCode = "") {
           </div>
           <div>
             <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">Building Standard</label>
-            <select class="form-select-custom-light" style="padding:10px;">
+            <select name="standard" data-mcp-param="standard" data-mcp-description="Structural building standard code" class="form-select-custom-light" style="padding:10px;">
               <option value="AISC" ${isUS || (!isCA && !isAU) ? "selected" : ""}>AISC 360 / IBC (USA)</option>
               <option value="CSA" ${isCA ? "selected" : ""}>CSA S16 / NBC (Canada)</option>
               <option value="ASNZS" ${isAU ? "selected" : ""}>AS/NZS 4100 (Australia)</option>
@@ -755,7 +758,7 @@ function openQuoteModal(modelCode = "") {
         </div>
         <div class="form-field">
           <label>Building Dimensions / Specs</label>
-          <textarea rows="3" placeholder="Specify length, width, eave height, insulation or model requirements..."></textarea>
+          <textarea name="dimensions" data-mcp-param="dimensions" data-mcp-description="Building length, width, height, and specifications" rows="3" placeholder="Specify length, width, eave height, insulation or model requirements..."></textarea>
         </div>
         <button type="submit" class="btn-modal-cta">Submit Formal Quote Request</button>
       </form>

@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "site": "https://www.bongshaisteel.com",
+  "actions": [
+    {
+      "id": "send-contact-inquiry",
+      "name": "Send Contact Inquiry",
+      "description": "Send a general business or contact inquiry to Bongshai Steel.",
+      "method": "declarative",
+      "endpoint": "/",
+      "parameters": {
+        "required": ["name", "phone", "message"]
+      }
+    },
+    {
+      "id": "request-official-quote",
+      "name": "Request Official Quote",
+      "description": "Submit a formal quote request for a pre-engineered steel building.",
+      "method": "declarative",
+      "endpoint": "/",
+      "parameters": {
+        "required": ["name", "phone", "destination", "currency", "standard", "dimensions"]
+      }
+    }
+  ]
+}
