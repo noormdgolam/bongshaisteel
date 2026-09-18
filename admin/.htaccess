@@ -1,5 +1,9 @@
 # Bongshai Steel CMS — protect internals
-<FilesMatch "^(config\.php|config\.sample\.php|lib\.php)$">
+# No `Options` directive anywhere in here: hosts that refuse it return 500 for
+# the whole folder, which would take the admin area down.
+DirectoryIndex index.html index.php
+
+<FilesMatch "^(config\.php|config\.sample\.php|lib\.php|README\.md)$">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
@@ -9,13 +13,16 @@
   </IfModule>
 </FilesMatch>
 
-# Never serve backup snapshots
+# Never serve backup snapshots or the sign-in throttle file
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteRule ^backups/ - [F,L]
 </IfModule>
 
-# Keep the admin area out of search results
+# Out of search results, out of frames, no MIME sniffing
 <IfModule mod_headers.c>
-  Header set X-Robots-Tag "noindex, nofollow"
+  Header always set X-Robots-Tag "noindex, nofollow"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "no-referrer"
 </IfModule>

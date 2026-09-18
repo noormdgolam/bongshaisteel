@@ -18,6 +18,8 @@ file on load (via `apply.js`) and falls back to the git-tracked
 
 1. Deploy the repo as usual (cPanel Git auto-pull).
 2. In cPanel **File Manager**, copy `admin/config.sample.php` →  `admin/config.php`.
+   This step arms the installer: `setup.php` answers **409** until `config.php`
+   exists, so a stranger cannot claim the CMS on a freshly deployed site.
 3. Visit `https://bongshaisteel.com/admin/setup.php`, choose a password, submit.
    It writes the password hash into `admin/config.php`.
 4. **Delete `admin/setup.php`.**
@@ -39,6 +41,8 @@ your content:
 /images/uploads/          ← uploaded images
 /admin/config.php         ← password hash
 /admin/backups/           ← auto snapshot before every save (keeps last 15)
+                            also holds .throttle.json (failed sign-in counter)
+/images/uploads/.htaccess ← written on first upload; blocks execution there
 ```
 
 Do **not** enable "Remove untracked files" / `git clean` in the cPanel
@@ -51,6 +55,26 @@ deployment settings — a normal `git pull`/checkout leaves the files above alon
 - **Visual editor** — the "Visual editor ↗" link (opens `/?cms=1`). Click any
   outlined text on the real page to edit it in place; "Replace image" on photos.
   Lists (products, FAQ, stats, categories) are managed in the dashboard only.
+
+## How it is locked down
+
+| Area | Control |
+| --- | --- |
+| Sign-in | One bcrypt password. **8 failed attempts from one IP → 15-minute lockout** (`admin/backups/.throttle.json`). |
+| Session | `HttpOnly`, `SameSite=Lax`, `Secure` over HTTPS; id regenerated on sign-in; expires after 2 h idle or 12 h total. |
+| CSRF | Every `POST` must carry a same-origin `Origin`/`Referer` — on the API, the sign-in form and the installer. |
+| Uploads | JPEG / PNG / WebP / GIF only, ≤ 8 MB and ≤ 40 MP, filename discarded and regenerated. First upload drops an `.htaccess` into `images/uploads/` that strips script handlers, so nothing stored there can execute. |
+| Saves | Auth + same-origin + a 4 MB body cap and a JSON depth cap. |
+| Pasted text | The visual editor strips pasted markup down to plain text plus `<b> <i> <u> <a> <br>`; `javascript:` hrefs are dropped. |
+| Not served | `config.php`, `lib.php`, `README.md`, `backups/` — all denied in `admin/.htaccess`. `noindex`, `nosniff`, `DENY` framing and a CSP on the PHP pages. |
+
+Tuning lives in `admin/config.php`: `max_attempts`, `lockout`, `idle_limit`,
+`session_limit`, `max_upload`, `max_pixels`, `max_body`. Anything you leave out
+falls back to the defaults in `cms_config_defaults()` (`admin/lib.php`).
+
+Locked yourself out? Delete `admin/backups/.throttle.json`. Forgot the
+password? Delete `admin/config.php`, re-copy the sample, and re-upload
+`setup.php`.
 
 ## Not covered (edit by hand in `index.html` if ever needed)
 

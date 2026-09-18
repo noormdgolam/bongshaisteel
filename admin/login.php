@@ -1,9 +1,11 @@
 <?php
 require __DIR__ . '/lib.php';
+cms_security_headers(true);
 
 $cfg     = cms_config_raw();
 $ready   = cms_config_ready($cfg);
 $err     = '';
+$locked  = 0;
 // same-origin path only — reject protocol-relative (//host) and backslash tricks
 $return = './';
 if (isset($_GET['return']) && is_string($_GET['return'])
@@ -17,16 +19,28 @@ if ($ready) {
     cms_session_start();
     if (!empty($_SESSION['cms_ok'])) { header('Location: ' . $return); exit; }
 
+    $locked = cms_throttle_locked();
+
     if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
-        $pw = (string) ($_POST['password'] ?? '');
-        if ($pw !== '' && password_verify($pw, $cfg['password_hash'])) {
-            session_regenerate_id(true);
-            $_SESSION['cms_ok'] = true;
-            header('Location: ' . $return);
-            exit;
+        if ($locked > 0) {
+            $err = 'Too many failed attempts. Try again in ' . (int) ceil($locked / 60) . ' min.';
+        } elseif (!cms_same_origin()) {
+            $err = 'That sign-in did not come from this site. Reload the page and try again.';
+        } else {
+            $pw = (string) ($_POST['password'] ?? '');
+            if ($pw !== '' && password_verify($pw, $cfg['password_hash'])) {
+                cms_throttle_note(false);
+                cms_session_open();
+                header('Location: ' . $return);
+                exit;
+            }
+            cms_throttle_note(true);
+            usleep(700000);
+            $locked = cms_throttle_locked();
+            $err = $locked > 0
+                ? 'Too many failed attempts. Try again in ' . (int) ceil($locked / 60) . ' min.'
+                : 'Incorrect password.';
         }
-        usleep(700000);
-        $err = 'Incorrect password.';
     }
 }
 ?>
@@ -72,8 +86,8 @@ if ($ready) {
     </div>
 <?php else: ?>
     <label for="pw">Password</label>
-    <input id="pw" name="password" type="password" required autofocus>
-    <button type="submit">Sign in</button>
+    <input id="pw" name="password" type="password" required autofocus<?= $locked > 0 ? ' disabled' : '' ?>>
+    <button type="submit"<?= $locked > 0 ? ' disabled' : '' ?>>Sign in</button>
     <?php if ($err): ?><div class="err"><?= htmlspecialchars($err) ?></div><?php endif; ?>
 <?php endif; ?>
   </form>

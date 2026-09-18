@@ -78,7 +78,7 @@
     // data-cms-img      -> <img> src/srcset from content.text[key]
     each("[data-cms-img]", function (el) {
       var v = text[el.getAttribute("data-cms-img")];
-      if (v) applyImg(el, v, d);
+      if (v && typeof v === "string") applyImg(el, v, d);
     });
 
     // data-cms-wa       -> rewrite wa.me/<number> in href from settings
@@ -109,6 +109,12 @@
     return String(s == null ? "" : s)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+
+  /** Only ever emit an href a browser treats as navigation, never javascript:. */
+  function safeURL(u) {
+    u = String(u == null ? "" : u).trim();
+    return /^(https?:\/\/|\/|#|mailto:|tel:)/i.test(u) ? u : "#";
   }
 
   function applyImg(el, path, d) {
@@ -192,7 +198,7 @@
     var c = document.getElementById("footerSister");
     if (!c || !Array.isArray(links) || !links.length) return;
     var a = links.map(function (l) {
-      return '<a href="' + esc(l.url) + '" target="_blank" rel="noopener" style="color:var(--accent-cyan); font-weight:700;">' + esc(l.label) + "</a>";
+      return '<a href="' + esc(safeURL(l.url)) + '" target="_blank" rel="noopener" style="color:var(--accent-cyan); font-weight:700;">' + esc(l.label) + "</a>";
     });
     var joined = a.length > 1
       ? a.slice(0, -1).join(", ") + " &amp; " + a[a.length - 1]

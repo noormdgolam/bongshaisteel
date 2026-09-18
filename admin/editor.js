@@ -88,10 +88,18 @@
             setDirty();
           });
           el.addEventListener("paste", function (e) {
-            if (mode === "html") return;
             e.preventDefault();
-            var t = (e.clipboardData || window.clipboardData).getData("text/plain");
-            document.execCommand("insertText", false, t);
+            var cd = e.clipboardData || window.clipboardData;
+            if (mode !== "html") {
+              document.execCommand("insertText", false, cd.getData("text/plain"));
+              return;
+            }
+            // Word and Docs paste carries fonts, colours and wrapper divs, and
+            // it used to land in content.json verbatim. Keep the words and a
+            // little inline markup; drop the rest.
+            var rich = cd.getData("text/html");
+            document.execCommand("insertHTML", false,
+              rich ? cleanHTML(rich) : escHTML(cd.getData("text/plain")));
           });
         });
       }
@@ -202,7 +210,9 @@
         var p = new URLSearchParams(location.search);
         if (!keepEdit) p.delete("cms");
         var qs = p.toString();
-        window.onbeforeunload = null;
+        // The unload guard is an addEventListener handler, so nulling
+        // window.onbeforeunload never silenced it — clear the flag it reads.
+        dirty = false;
         location.href = location.pathname + (qs ? "?" + qs : "") + location.hash;
       }
 
@@ -227,6 +237,52 @@
   function each(sel, fn) {
     var n = document.querySelectorAll(sel);
     for (var i = 0; i < n.length; i++) fn(n[i]);
+  }
+
+  // Uppercase keys, so nothing here can collide with Object.prototype.
+  var INLINE_OK = { B: 1, STRONG: 1, I: 1, EM: 1, U: 1, BR: 1, A: 1, SMALL: 1, SUP: 1, SUB: 1 };
+
+  // Unwrapping these would leave their source text behind as visible content:
+  // a pasted <script> became the literal words "alert(1)" in the page.
+  var DROP = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEMPLATE: 1, IFRAME: 1, OBJECT: 1,
+               EMBED: 1, APPLET: 1, LINK: 1, META: 1, TITLE: 1, HEAD: 1, BASE: 1, XMP: 1 };
+
+  function escHTML(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /** Strip a pasted fragment down to text plus a few inline tags. */
+  function cleanHTML(src) {
+    var box = document.createElement("div");
+    box.innerHTML = String(src || "");
+    (function walk(parent) {
+      var kids = Array.prototype.slice.call(parent.childNodes);
+      for (var i = 0; i < kids.length; i++) {
+        var n = kids[i];
+        if (n.nodeType === 3) continue;                        // text survives as-is
+        if (n.nodeType !== 1) { parent.removeChild(n); continue; }
+        if (DROP[n.tagName]) { parent.removeChild(n); continue; }  // tag and its text both go
+        walk(n);
+        if (!INLINE_OK[n.tagName]) {                           // unwrap, keep the words
+          while (n.firstChild) parent.insertBefore(n.firstChild, n);
+          parent.removeChild(n);
+          continue;
+        }
+        var attrs = Array.prototype.slice.call(n.attributes);
+        for (var a = 0; a < attrs.length; a++) {
+          if (!(n.tagName === "A" && attrs[a].name.toLowerCase() === "href")) {
+            n.removeAttribute(attrs[a].name);
+          }
+        }
+        if (n.tagName === "A") {
+          var href = n.getAttribute("href") || "";
+          if (!/^(https?:|mailto:|tel:|\/|#)/i.test(href)) n.removeAttribute("href");
+          else { n.setAttribute("rel", "noopener"); n.setAttribute("target", "_blank"); }
+        }
+      }
+    })(box);
+    return box.innerHTML;
   }
   function injectCSS() {
     if (document.getElementById("cms-editor-css")) return;

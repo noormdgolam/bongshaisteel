@@ -1,7 +1,7 @@
 <?php
 /* ==========================================================================
    BONGSHAI STEEL — CMS API
-   GET  ?action=load     public   { content, authed }
+   GET  ?action=load     auth     { content, authed }
    GET  ?action=whoami   public   { authed }
    POST ?action=save     auth     body { content:{...} }  -> { content }
    POST ?action=upload   auth     multipart file          -> { path, widths }
@@ -10,13 +10,19 @@
 require __DIR__ . '/lib.php';
 
 header('Cache-Control: no-store');
+cms_security_headers();
 
 $action = $_GET['action'] ?? '';
 $isPost = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST';
 
+// Second lock on the SameSite=Lax session cookie.
+if ($isPost) cms_require_same_origin();
+
 switch ($action) {
     case 'load':
-        cms_ok(['content' => cms_read_content(), 'authed' => cms_is_authed()]);
+        // Admin-only: the public page reads data/content.json directly.
+        cms_require_auth();
+        cms_ok(['content' => cms_read_content(), 'authed' => true]);
         break;
 
     case 'whoami':
@@ -26,7 +32,12 @@ switch ($action) {
     case 'save':
         cms_require_auth();
         if (!$isPost) cms_fail(405, 'method', 'POST required.');
-        $body = json_decode((string) file_get_contents('php://input'), true);
+        $limit = (int) (cms_config()['max_body'] ?? 4194304);
+        $raw   = (string) file_get_contents('php://input');
+        if (strlen($raw) > $limit) {
+            cms_fail(413, 'body_too_big', 'That payload is over the ' . round($limit / 1048576) . ' MB save limit.');
+        }
+        $body = json_decode($raw, true, 64);
         if (!is_array($body) || !isset($body['content']) || !is_array($body['content'])) {
             cms_fail(400, 'bad_body', 'Expected JSON: { "content": { ... } }');
         }
@@ -40,13 +51,7 @@ switch ($action) {
         break;
 
     case 'logout':
-        cms_session_start();
-        $_SESSION = [];
-        if (ini_get('session.use_cookies')) {
-            $p = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
-        }
-        session_destroy();
+        cms_session_destroy();
         cms_ok();
         break;
 

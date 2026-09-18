@@ -82,7 +82,8 @@
       syncDirty();
     }).catch(function (e) {
       if (e.message === "auth") return;
-      $main.innerHTML = '<div class="loading">Could not load content: ' + e.message + "</div>";
+      clear($main);
+      $main.appendChild(h("div", "loading", "Could not load content: " + e.message));
     });
   }
 
@@ -642,7 +643,12 @@
       if (!file.files || !file.files[0]) { toast("Choose a file first.", "err"); return; }
       btn.disabled = true; btn.textContent = "Uploading…";
       uploadImage(file.files[0]).then(function (p) {
-        out.innerHTML = 'Uploaded: <code>' + p + '</code> — copied to clipboard.';
+        clear(out);
+        out.appendChild(document.createTextNode("Uploaded: "));
+        var codeEl = document.createElement("code");
+        codeEl.textContent = p;
+        out.appendChild(codeEl);
+        out.appendChild(document.createTextNode(" — copied to clipboard."));
         try { navigator.clipboard.writeText(p); } catch (e) {}
         renderMediaGrid(grid);
       }).catch(function (e) { if (e.message !== "auth") toast("Upload failed: " + e.message, "err"); })

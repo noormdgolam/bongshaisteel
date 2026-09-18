@@ -32,4 +32,17 @@ return [
 
     // Session cookie name.
     'session_name'  => 'bs_cms',
+
+    // Sign-in throttle: this many failures from one IP locks it out for
+    // 'lockout' seconds. Locked out by accident? Delete admin/backups/.throttle.json.
+    'max_attempts'  => 8,
+    'lockout'       => 900,      // 15 min
+
+    // Session lifetime.
+    'idle_limit'    => 7200,     // 2 h with no request
+    'session_limit' => 43200,    // 12 h total
+
+    // Request limits.
+    'max_pixels'    => 40000000, // reject decompression-bomb images (40 MP)
+    'max_body'      => 4194304,  // largest accepted save payload (4 MB)
 ];

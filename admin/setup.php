@@ -4,6 +4,7 @@
    Stops working once a real hash exists. Delete this file afterwards.
    ========================================================================== */
 require __DIR__ . '/lib.php';
+cms_security_headers(true);
 
 $cfgPath    = __DIR__ . '/config.php';
 $samplePath = __DIR__ . '/config.sample.php';
@@ -14,11 +15,20 @@ if (cms_config_ready($raw)) {
     exit('Setup already complete. Please delete admin/setup.php.');
 }
 
+// Armed only once the owner has deliberately copied the sample config. Without
+// this, whoever reaches setup.php first on a fresh deploy owns the CMS.
+if (!is_file($cfgPath)) {
+    http_response_code(409);
+    exit('Setup is not armed. Copy admin/config.sample.php to admin/config.php on the server, then reload this page.');
+}
+
 $msg = '';
 $hash = '';
 $wrote = false;
 
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && !cms_same_origin()) {
+    $msg = 'That request did not come from this site. Reload the page and try again.';
+} elseif (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $pw  = (string) ($_POST['password'] ?? '');
     $pw2 = (string) ($_POST['password2'] ?? '');
     if (strlen($pw) < 6) {
