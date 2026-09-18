@@ -7,8 +7,12 @@
    Only "Prefab Buildings" has real catalog data right now; the other four
    are real planned product lines with no models yet — they route to an
    honest "Coming Soon" view rather than showing invented products.
+
+   These DEFAULT_* values are the built-in fallback. apply.js may replace
+   MAIN_CATEGORIES / CATEGORIES / PRODUCTS_DATA / FEATURED_IDS from the CMS
+   content file via ingestCMS() before the first render (see DOMContentLoaded).
    -------------------------------------------------------------------------- */
-const MAIN_CATEGORIES = [
+const DEFAULT_MAIN_CATEGORIES = [
   {
     key: "prefab",
     name: "Prefab Buildings",
@@ -49,7 +53,7 @@ const MAIN_CATEGORIES = [
 /* --------------------------------------------------------------------------
    PREFAB BUILDING CATEGORIES (drives the Prefab Buildings sidebar/catalog)
    -------------------------------------------------------------------------- */
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   {
     key: "factory",
     name: "Steel Factory Building",
@@ -88,9 +92,18 @@ const CATEGORIES = [
 ];
 
 /* --------------------------------------------------------------------------
+   RUNTIME STATE — starts as the built-in defaults, overridden by ingestCMS()
+   -------------------------------------------------------------------------- */
+let MAIN_CATEGORIES = DEFAULT_MAIN_CATEGORIES;
+let CATEGORIES = DEFAULT_CATEGORIES;
+// CMS media map: { "images/....webp": { widths: [400, 700] } }. Populated by ingestCMS().
+let CMS_MEDIA = null;
+
+/* --------------------------------------------------------------------------
    HELPERS
    -------------------------------------------------------------------------- */
 // Source photos missing a -700w variant on disk (verified against images/products/).
+// Fallback only — CMS_MEDIA takes precedence when present.
 const NO_700W = new Set([
   "images/products/Model No-BH-TB-101.webp",
   "images/products/bh-tsb-108.webp",
@@ -106,10 +119,38 @@ const NO_700W = new Set([
 function responsiveImgAttrs(imagePath, sizes) {
   const base = imagePath.replace(/\.webp$/, "");
   const enc = (p) => encodeURI(p);
-  const candidates = [`${enc(base)}-400w.webp 400w`];
-  if (!NO_700W.has(imagePath)) candidates.push(`${enc(base)}-700w.webp 700w`);
+
+  // Which -Nw.webp variants exist for this image?
+  let widths;
+  if (CMS_MEDIA && CMS_MEDIA[imagePath] && Array.isArray(CMS_MEDIA[imagePath].widths)) {
+    widths = CMS_MEDIA[imagePath].widths.filter((w) => w < 1024);
+  } else {
+    widths = NO_700W.has(imagePath) ? [400] : [400, 700];
+  }
+
+  const candidates = widths.map((w) => `${enc(base)}-${w}w.webp ${w}w`);
   candidates.push(`${enc(imagePath)} 1024w`);
-  return `src="${imagePath}" srcset="${candidates.join(", ")}" sizes="${sizes}"`;
+  const srcset = candidates.length > 1 ? ` srcset="${candidates.join(", ")}"` : "";
+  return `src="${imagePath}"${srcset} sizes="${sizes}"`;
+}
+
+// Pulls catalog/category/media data from window.__CMS__ (set by apply.js).
+// Safe to call with no CMS present — leaves the built-in defaults in place.
+function ingestCMS() {
+  try {
+    const c = window.__CMS__;
+    if (!c || typeof c !== "object") return;
+    if (Array.isArray(c.mainCategories) && c.mainCategories.length) MAIN_CATEGORIES = c.mainCategories;
+    if (Array.isArray(c.categories) && c.categories.length) CATEGORIES = c.categories;
+    if (Array.isArray(c.products) && c.products.length) {
+      const ord = (p) => (typeof p.order === "number" ? p.order : 0);
+      PRODUCTS_DATA = c.products.slice().sort((a, b) => ord(a) - ord(b));
+    }
+    if (Array.isArray(c.featuredIds) && c.featuredIds.length) FEATURED_IDS = c.featuredIds;
+    if (c.media && typeof c.media === "object") CMS_MEDIA = c.media;
+  } catch (e) {
+    if (window.console) console.warn("[cms] ingest failed:", e);
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -276,7 +317,8 @@ function buildContainer() {
 /* --------------------------------------------------------------------------
    FULL DATASET
    -------------------------------------------------------------------------- */
-const PRODUCTS_DATA = [
+// Built-in fallback catalog — replaced by ingestCMS() when CMS content loads.
+let PRODUCTS_DATA = [
   ...buildFactory(),
   ...buildStructural(),
   ...buildDuplex(),
@@ -285,7 +327,7 @@ const PRODUCTS_DATA = [
 ];
 
 // One flagship model per category for the homepage teaser
-const FEATURED_IDS = ["bh-is-1006", "bh-tsb-109", "bh-dv-201", "bh-ch-401", "bh-ch-502"];
+let FEATURED_IDS = ["bh-is-1006", "bh-tsb-109", "bh-dv-201", "bh-ch-401", "bh-ch-502"];
 
 /* --------------------------------------------------------------------------
    INIT & SPA HASH ROUTER
@@ -362,17 +404,28 @@ function updateUrlHash(newHash) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  renderCategoryCards();
-  renderFeatured();
-  renderCatalog("all");
-  setupEventListeners();
-  setupTheme();
-  init3dSteelCanvas();
+  // Wait for apply.js to resolve CMS content (or fail) before the first render,
+  // so the catalog / categories reflect any saved edits. Falls back instantly
+  // to the built-in defaults if apply.js is absent or the fetch fails.
+  const cmsReady = window.__cmsReady && typeof window.__cmsReady.then === "function"
+    ? window.__cmsReady
+    : Promise.resolve(null);
 
-  window.addEventListener("hashchange", handleHashRoute);
-  if (window.location.hash) {
-    handleHashRoute();
-  }
+  cmsReady.then(() => {
+    ingestCMS();
+
+    renderCategoryCards();
+    renderFeatured();
+    renderCatalog("all");
+    setupEventListeners();
+    setupTheme();
+    init3dSteelCanvas();
+
+    window.addEventListener("hashchange", handleHashRoute);
+    if (window.location.hash) {
+      handleHashRoute();
+    }
+  });
 });
 
 /* --------------------------------------------------------------------------
@@ -671,6 +724,7 @@ function openProductModal(productId, updateHash = true) {
   if (!modalOverlay || !modalBox) return;
 
   const waMsg = encodeURIComponent(`Hello Bongshai Steel! I would like to inquire about ${product.modelCode} (${product.name}). Please send technical specs and quotation.`);
+  const waNumber = (window.__CMS__ && window.__CMS__.settings && window.__CMS__.settings.whatsappNumber) || "8801789949060";
 
   modalBox.innerHTML = `
     <div class="modal-header">
@@ -691,7 +745,7 @@ function openProductModal(productId, updateHash = true) {
         <button class="btn-modal-cta" style="margin-top:0;" onclick="openQuoteModal('${product.modelCode}')">
           Request Official Quote
         </button>
-        <a href="https://wa.me/8801789949060?text=${waMsg}" target="_blank" rel="noopener noreferrer" class="btn-modal-cta" style="margin-top:0; background:#25D366; text-decoration:none; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px;">
+        <a href="https://wa.me/${waNumber}?text=${waMsg}" target="_blank" rel="noopener noreferrer" class="btn-modal-cta" style="margin-top:0; background:#25D366; text-decoration:none; text-align:center; display:flex; align-items:center; justify-content:center; gap:8px;">
           💬 WhatsApp Inquiry
         </a>
       </div>

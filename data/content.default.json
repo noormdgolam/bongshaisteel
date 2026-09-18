@@ -1,0 +1,992 @@
+{
+  "version": 1,
+  "updated": "2026-09-09T12:50:08.207Z",
+  "settings": {
+    "companyName": "Bongshai Steel",
+    "hotline": "+8801789-949060",
+    "whatsappNumber": "8801789949060",
+    "email": "sales@bongshaisteel.com",
+    "address": "House #18, Road #18, Sector #10, Uttara C/A, Dhaka – 1230",
+    "workingHours": "Sat - Thu (9:00 AM - 7:00 PM GMT+6)",
+    "copyright": "© 2026 Bongshai Steel. All Rights Reserved. Designed for Ultra Fast International Performance.",
+    "footerBlurb": "Premier Steel Building Manufacturer & Exporter delivering AISC & BNBC certified pre-engineered factory buildings, warehouses, duplex steel homes, resort cottages, and container houses globally.",
+    "sisterLinks": [
+      {
+        "label": "Bongshai Housing",
+        "url": "https://noormdgolam.github.io/bongshaihousing/"
+      },
+      {
+        "label": "Bongshai Engineering",
+        "url": "https://noormdgolam.github.io/Bongshaiengineering/"
+      }
+    ]
+  },
+  "seo": {
+    "title": "Bongshai Steel | Steel Building Manufacturer & Exporter",
+    "description": "Bongshai Steel is a Bangladesh-based steel building manufacturer and exporter, delivering AISC & BNBC certified Pre-Engineered Steel Factory Buildings, Structural Steel Towers, Duplex Steel Homes, Resort Cottages, and Container Houses to the Middle East, Africa, South Asia, and worldwide."
+  },
+  "text": {
+    "hero.tag": "Worldwide Engineering Standards • AISC & Eurocode",
+    "hero.title": "What is Bongshai Steel and what kinds of steel buildings do they manufacture?",
+    "hero.description": "Bongshai Steel is a Bangladesh-based manufacturer and exporter of pre-engineered steel buildings — 72 models across factory sheds, duplex villas, cottages, and container houses. All structures are engineered to AISC 360, Eurocode 3, and BNBC 2020 standards.",
+    "hero.btnPrimary": "Explore Full Catalog",
+    "hero.btnSecondary": "Request Custom Quote",
+    "hero.image": "images/products/Model No-BH-IS-1001.webp",
+    "growing.subtitle": "Looking Ahead",
+    "growing.title": "Growing Into New Markets",
+    "growing.body": "Bongshai Steel's established export focus is the Middle East, Africa, and South Asia. As part of our long-term growth, we're also building engineering capability toward North American and Australian structural standards — AISC 360, CSA S16, and AS/NZS 4100 — to eventually serve those markets too.",
+    "growing.btn": "Discuss a Project With Us",
+    "threeD.subtitle": "Interactive 3D WebGL Engine",
+    "threeD.title": "3D Structural Steel Portal Frame Inspector",
+    "threeD.body": "Rotate, zoom, and customize a 3D structural steel portal frame in real time. Inspect columns, I-beams, purlins, roof panels, floor slab, and side walls built to AISC & Eurocode standards.",
+    "categories.subtitle": "Complete Catalog",
+    "categories.title": "Explore Our Steel Categories",
+    "featured.subtitle": "Popular Models",
+    "featured.title": "Flagship Structural Steel Solutions",
+    "productsView.title": "Products Catalog",
+    "services.subtitle": "Turnkey Solutions",
+    "services.title": "Our Specialized Services",
+    "safety.subtitle": "Zero Accident Commitment",
+    "safety.title": "Health And Safety Policy (EHS)",
+    "faq.subtitle": "Got Questions?",
+    "faq.title": "Frequently Asked Questions",
+    "faq.intro": "Everything you need to know about our pre-engineered steel buildings, structural standards, international export logistics, and quote procurement process.",
+    "contact.subtitle": "Global Inquiries",
+    "contact.title": "Contact Bongshai Steel",
+    "contact.hqTitle": "Corporate Headquarters",
+    "contact.formTitle": "Send Official Inquiry"
+  },
+  "html": {
+    "hero.byline": "<time datetime=\"2026-08-08\">Last updated: August 8, 2026</time> · Reviewed &amp; Approved by <strong>SMA Awal, Chief Engineer</strong>, Bongshai Steel",
+    "faqTeaser.title": "Have Questions About Steel Buildings &amp; International Shipping?",
+    "faqTeaser.body": "Read our detailed Frequently Asked Questions covering structural building codes (AISC/CSA/AS), export logistics, custom engineering, and the quotation process."
+  },
+  "sections": {
+    "stats": [
+      {
+        "value": "72 Models",
+        "label": "Delivered to UAE, KSA & Kenya since 2004"
+      },
+      {
+        "value": "20+ Years",
+        "label": "Industry Experience"
+      },
+      {
+        "value": "50-60 Years",
+        "label": "Structural Lifespan Guarantee"
+      },
+      {
+        "value": "Case Study",
+        "label": "3000 sqm Factory Shed Erected in 45 Days"
+      }
+    ],
+    "trustBar": [
+      {
+        "icon": "🌍",
+        "title": "Worldwide Export Ready",
+        "text": "Middle East, Africa, South Asia & Container Shipping"
+      },
+      {
+        "icon": "🏛️",
+        "title": "AISC & Eurocode Standards",
+        "text": "Structural design aligned to <a href=\"https://www.aisc.org/\" target=\"_blank\" rel=\"noopener\">AISC 360</a> and Eurocode 3. Certified to <a href=\"https://www.iso.org/standard/62085.html\" target=\"_blank\" rel=\"noopener\">ISO 9001:2015</a>."
+      },
+      {
+        "icon": "⚡",
+        "title": "50%+ Faster Erection",
+        "text": "Pre-punched bolt connections — zero on-site cutting"
+      },
+      {
+        "icon": "🏗️",
+        "title": "Custom BIM / Tekla Design",
+        "text": "3D Structural modeling tailored to site loads & spans"
+      }
+    ],
+    "services": [
+      {
+        "title": "Architectural & Structural Engineering",
+        "desc": "Complete 3D Tekla BIM modeling, AISC structural load calculation, and BNBC seismic engineering by senior structural engineers."
+      },
+      {
+        "title": "Precision Steel Fabrication",
+        "desc": "Automated CNC beam processing, SAW submerged arc welding, sandblasting, and epoxy anti-corrosion coating in our factory."
+      },
+      {
+        "title": "On-Site Erection & Installation",
+        "desc": "Experienced erection crews, heavy mobile crane scheduling, torque bolt tightening, and zero-incident safety supervision."
+      }
+    ],
+    "safety": {
+      "intro": "Bongshai Steel maintains strict Environmental, Health, and Safety (EHS) policies across all factory floors and construction erection sites nationwide & internationally.",
+      "points": [
+        "Mandatory PPE compliance (hard hats, full-body safety harnesses, steel-toe boots).",
+        "ISO 9001:2015, ISO 14001, and OHSAS safety protocol compliance.",
+        "100% certified heavy crane operators and certified high-altitude welders.",
+        "Regular site hazard audits, wind shear protection, and emergency protocols."
+      ]
+    },
+    "faq": [
+      {
+        "q": "What is a Pre-Engineered Steel Building (PEB)?",
+        "a": "A Pre-Engineered Steel Building (PEB) is a structural steel building system designed and manufactured in a factory, then shipped to the construction site for rapid bolt-together assembly — offering large clear-span spaces, superior structural integrity, and 50%+ faster construction than conventional reinforced concrete methods."
+      },
+      {
+        "q": "Does Bongshai Steel export steel buildings internationally?",
+        "a": "Yes. Bongshai Steel manufactures pre-engineered steel buildings in Bangladesh and exports worldwide, including to the USA (AISC 360), Canada (CSA S16), Australia (AS/NZS 4100), Middle East, Africa, and South Asia. Contact our engineering team to discuss sea freight logistics for your port."
+      },
+      {
+        "q": "What types of steel buildings does Bongshai Steel manufacture?",
+        "a": "Bongshai Steel's Prefab Buildings line covers five core categories: Heavy Steel Factory Buildings, Multi-story Structural Steel Towers, Luxury Duplex Steel Villas, Resort Cottages, and Modified Container Houses — featuring 72 distinct models. Additional lines for Heavy Steel Structure, Steel Furniture, Doors &amp; Gates, and Custom Steel Products are also available."
+      },
+      {
+        "q": "What structural standards does Bongshai Steel build to?",
+        "a": "Our engineering designs comply with <strong>AISC 360</strong> (USA), <strong>CSA S16</strong> (Canada), <strong>AS/NZS 4100</strong> (Australia), <strong>Eurocode 3</strong> (Europe), and <strong>BNBC 2020</strong> structural building codes. Welding and structural quality conform strictly to AWS D1.1 and ISO 9001:2015 standards."
+      },
+      {
+        "q": "How do I request an official quote from Bongshai Steel?",
+        "a": "Click any <strong>\"Get Quote\"</strong> or <strong>\"Get a Quote\"</strong> button on the site to open the quote request form, or WhatsApp us directly at <strong>+8801789-949060</strong>. Bongshai Steel does not publish fixed pricing — every building is custom engineered to the buyer's site dimensions, wind/snow loads, and eave heights. Quotes are provided directly by our engineering team within 24 hours."
+      },
+      {
+        "q": "Where is Bongshai Steel's factory located?",
+        "a": "Bongshai Steel's corporate headquarters and fabrication plant are located at House #18, Road #18, Sector #10, Uttara C/A, Dhaka – 1230, Bangladesh."
+      },
+      {
+        "q": "Is Bongshai Steel related to Bongshai Housing?",
+        "a": "Yes — Bongshai Steel and Bongshai Housing are sister companies within the Bongshai Group. Bongshai Housing focuses on domestic residential real estate within Bangladesh, while Bongshai Steel specializes in industrial steel fabrication and international building exports."
+      },
+      {
+        "q": "What are modified shipping container houses, and are they durable?",
+        "a": "Modified shipping container houses use standard 20ft or 40ft steel containers as the structural core, retrofitted with insulation, wiring, plumbing, and interior finishes for full residential or office use. As all-steel structures they are highly weather-resistant and relocatable. Bongshai Steel's BH-CH-501 to BH-CH-512 container models range from portable site offices to 40ft luxury container homes."
+      },
+      {
+        "q": "How long does it take to erect a pre-engineered steel building?",
+        "a": "Pre-engineered steel buildings from Bongshai Steel erect 50%+ faster than equivalent concrete construction. Factory-bolted connections and pre-punched components eliminate on-site cutting and welding. Typical erection time for an industrial factory shed is 30–60 days depending on span and complexity, once fabrication is complete and components are delivered to site."
+      }
+    ]
+  },
+  "mainCategories": [
+    {
+      "key": "prefab",
+      "name": "Prefab Buildings",
+      "icon": "🏗️",
+      "blurb": "Pre-engineered steel factories, apartment buildings, duplex homes, cottages, and container houses.",
+      "ready": true
+    },
+    {
+      "key": "structure",
+      "name": "Steel Structure",
+      "icon": "🏛️",
+      "blurb": "Structural steel fabrication for industrial and commercial projects.",
+      "ready": false
+    },
+    {
+      "key": "furniture",
+      "name": "Steel Furniture",
+      "icon": "🪑",
+      "blurb": "Durable steel furniture for home, office, and industrial use.",
+      "ready": false
+    },
+    {
+      "key": "doorgate",
+      "name": "Door and Gate",
+      "icon": "🚪",
+      "blurb": "Custom steel doors and gates built to order.",
+      "ready": false
+    },
+    {
+      "key": "siteothers",
+      "name": "Others Steel Products",
+      "icon": "🔧",
+      "blurb": "Additional steel products and on-site fabrication services.",
+      "ready": false
+    }
+  ],
+  "categories": [
+    {
+      "key": "factory",
+      "name": "Steel Factory Building",
+      "icon": "🏭",
+      "blurb": "SS400/Q355 heavy portal frame, 10–50 Ton EOT crane ready, PU insulation.",
+      "image": "images/products/Model No-BH-IS-1006.webp"
+    },
+    {
+      "key": "structural",
+      "name": "Structural Steel Building",
+      "icon": "🏢",
+      "blurb": "Multi-story steel apartment towers, composite decking concrete slab, engineered to international structural standards.",
+      "image": "images/products/bh-tsb-109.webp"
+    },
+    {
+      "key": "duplex",
+      "name": "Duplex Steel Building",
+      "icon": "🏘️",
+      "blurb": "Modern 2-story luxury steel duplexes, 4 Bed/4 Bath, 60-day rapid build.",
+      "image": "images/products/dv-104.webp"
+    },
+    {
+      "key": "cottage",
+      "name": "Steel Cottage House",
+      "icon": "🏡",
+      "blurb": "Eco resort prefab cottages, fiber cement cladding, fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-405.webp"
+    },
+    {
+      "key": "container",
+      "name": "Steel Container House",
+      "icon": "🚢",
+      "blurb": "20ft & 40ft modified container site offices & luxury homes.",
+      "image": "images/products/bh-ch-502.webp"
+    }
+  ],
+  "products": [
+    {
+      "id": "bh-is-1001",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1001",
+      "name": "Heavy Industrial Factory Shed",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1001.webp",
+      "order": 0
+    },
+    {
+      "id": "bh-is-1002",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1002",
+      "name": "Textile & Garments Factory Building",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1002.webp",
+      "order": 1
+    },
+    {
+      "id": "bh-is-1003",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1003",
+      "name": "Agro-Processing Steel Mill",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1003.webp",
+      "order": 2
+    },
+    {
+      "id": "bh-is-1004",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1004",
+      "name": "Automotive Assembly Plant",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1004.webp",
+      "order": 3
+    },
+    {
+      "id": "bh-is-1005",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1005",
+      "name": "Pharmaceutical Manufacturing Facility",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1005.webp",
+      "order": 4
+    },
+    {
+      "id": "bh-is-1006",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1006",
+      "name": "Steel Fabrication Workshop",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1006.webp",
+      "order": 5
+    },
+    {
+      "id": "bh-is-1007",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1007",
+      "name": "Electronics Assembly Factory",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1007.webp",
+      "order": 6
+    },
+    {
+      "id": "bh-is-1008",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1008",
+      "name": "Cement & Building Materials Plant",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1008.webp",
+      "order": 7
+    },
+    {
+      "id": "bh-is-1009",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1009",
+      "name": "Food Processing Factory Shed",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1009.webp",
+      "order": 8
+    },
+    {
+      "id": "bh-is-1010",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1010",
+      "name": "Plastic & Packaging Manufacturing Unit",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1010.webp",
+      "order": 9
+    },
+    {
+      "id": "bh-is-1011",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1011",
+      "name": "Heavy Machinery Production Hall",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1011.webp",
+      "order": 10
+    },
+    {
+      "id": "bh-is-1012",
+      "category": "factory",
+      "categoryName": "Steel Factory Building",
+      "modelCode": "BH-IS-1012",
+      "name": "Chemical Processing Steel Plant",
+      "desc": "Heavy steel portal frame building engineered for manufacturing plants, heavy machinery, and industrial production lines worldwide.",
+      "image": "images/products/Model No-BH-IS-1012.webp",
+      "order": 11
+    },
+    {
+      "id": "bh-tsb-101",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-101",
+      "name": "Urban Steel Apartment Complex",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/Model No-BH-TB-101.webp",
+      "order": 12
+    },
+    {
+      "id": "bh-tsb-102",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-102",
+      "name": "Modern Steel Residential Tower",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/Model No-BH-TB-102.webp",
+      "order": 13
+    },
+    {
+      "id": "bh-tsb-103",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-103",
+      "name": "Family Steel Apartment Building",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/bh-tsb-103.webp",
+      "order": 14
+    },
+    {
+      "id": "bh-tsb-104",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-104",
+      "name": "Riverside Steel Apartment Complex",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/Model No-BH-TB-104.webp",
+      "order": 15
+    },
+    {
+      "id": "bh-tsb-105",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-105",
+      "name": "Compact Steel Apartment Block",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/Model No-BH-TB-104.webp",
+      "order": 16
+    },
+    {
+      "id": "bh-tsb-106",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-106",
+      "name": "Premium Steel Residential Complex",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/bh-tsb-106.webp",
+      "order": 17
+    },
+    {
+      "id": "bh-tsb-107",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-107",
+      "name": "Garden View Steel Apartment Tower",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/dv-107.webp",
+      "order": 18
+    },
+    {
+      "id": "bh-tsb-108",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-108",
+      "name": "Corner Plot Steel Apartment Building",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/bh-tsb-108.webp",
+      "order": 19
+    },
+    {
+      "id": "bh-tsb-109",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-109",
+      "name": "Mid-Rise Steel Residential Complex",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/bh-tsb-109.webp",
+      "order": 20
+    },
+    {
+      "id": "bh-tsb-110",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-110",
+      "name": "Skyline Steel Apartment Tower",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/bh-tsb-110.webp",
+      "order": 21
+    },
+    {
+      "id": "bh-tsb-111",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-111",
+      "name": "Community Steel Apartment Complex",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/bh-tsb-111.webp",
+      "order": 22
+    },
+    {
+      "id": "bh-tsb-112",
+      "category": "structural",
+      "categoryName": "Structural Steel Building",
+      "modelCode": "BH-TSB-112",
+      "name": "Signature Steel Apartment Residence",
+      "desc": "Multi-floor steel frame apartment building with composite decking concrete slabs, rapid dry-construction erection, and engineering to international seismic design standards.",
+      "image": "images/products/bh-tsb-112.webp",
+      "order": 23
+    },
+    {
+      "id": "bh-dv-201",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-201",
+      "name": "Modern Minimalist Steel Duplex Villa",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-101.webp",
+      "order": 24
+    },
+    {
+      "id": "bh-dv-202",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-202",
+      "name": "Executive RC-Precast Hybrid Duplex",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-102.webp",
+      "order": 25
+    },
+    {
+      "id": "bh-dv-203",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-203",
+      "name": "Contemporary 4-Bedroom Steel Duplex",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-103.webp",
+      "order": 26
+    },
+    {
+      "id": "bh-dv-204",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-204",
+      "name": "Scandinavian Style Steel Duplex Home",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-104.webp",
+      "order": 27
+    },
+    {
+      "id": "bh-dv-205",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-205",
+      "name": "Premium Glass-Facade Steel Duplex",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-105.webp",
+      "order": 28
+    },
+    {
+      "id": "bh-dv-206",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-206",
+      "name": "Classic Bengal Steel Duplex Villa",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-106.webp",
+      "order": 29
+    },
+    {
+      "id": "bh-dv-207",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-207",
+      "name": "Family Garden Steel Duplex House",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-107.webp",
+      "order": 30
+    },
+    {
+      "id": "bh-dv-208",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-208",
+      "name": "Rooftop Terrace Steel Duplex Villa",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-108.webp",
+      "order": 31
+    },
+    {
+      "id": "bh-dv-209",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-209",
+      "name": "Double-Height Living Steel Duplex",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-109.webp",
+      "order": 32
+    },
+    {
+      "id": "bh-dv-210",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-210",
+      "name": "Corner Plot Steel Duplex Residence",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-110.webp",
+      "order": 33
+    },
+    {
+      "id": "bh-dv-211",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-211",
+      "name": "Compact Urban Steel Duplex Home",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-111.webp",
+      "order": 34
+    },
+    {
+      "id": "bh-dv-212",
+      "category": "duplex",
+      "categoryName": "Duplex Steel Building",
+      "modelCode": "BH-DV-212",
+      "name": "Resort-Style Steel Duplex Villa",
+      "desc": "Luxury 2-story steel-framed family villa featuring 4 bedrooms, 4 bathrooms, double-height living room, and private balcony.",
+      "image": "images/products/dv-112.webp",
+      "order": 35
+    },
+    {
+      "id": "bh-ch-401",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-401",
+      "name": "Eco Resort Prefab Steel Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-401.webp",
+      "order": 36
+    },
+    {
+      "id": "bh-ch-402",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-402",
+      "name": "Garden View Steel Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-402.webp",
+      "order": 37
+    },
+    {
+      "id": "bh-ch-403",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-403",
+      "name": "Hillside Retreat Steel Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-403.webp",
+      "order": 38
+    },
+    {
+      "id": "bh-ch-404",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-404",
+      "name": "Lakeside Vacation Steel Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-404.webp",
+      "order": 39
+    },
+    {
+      "id": "bh-ch-405",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-405",
+      "name": "Riverside Accent Steel Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-405.webp",
+      "order": 40
+    },
+    {
+      "id": "bh-ch-406",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-406",
+      "name": "Tropical Getaway Steel Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-406.webp",
+      "order": 41
+    },
+    {
+      "id": "bh-ch-407",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-407",
+      "name": "Countryside Steel Farm Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-407.webp",
+      "order": 42
+    },
+    {
+      "id": "bh-ch-408",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-408",
+      "name": "Beachfront Steel Holiday Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-408.webp",
+      "order": 43
+    },
+    {
+      "id": "bh-ch-409",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-409",
+      "name": "Forest Cabin Steel Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-409.webp",
+      "order": 44
+    },
+    {
+      "id": "bh-ch-410",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-410",
+      "name": "Weekend Retreat Steel Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-410.webp",
+      "order": 45
+    },
+    {
+      "id": "bh-ch-411",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-411",
+      "name": "Artist Studio Steel Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/Model No-BH-CH-411.webp",
+      "order": 46
+    },
+    {
+      "id": "bh-ch-412",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-CH-412",
+      "name": "Guest House Steel Cottage",
+      "desc": "Charming vacation cottage framed with light gauge steel, featuring weather-resistant cladding and fast on-site setup.",
+      "image": "images/products/bh-ch-412.webp",
+      "order": 47
+    },
+    {
+      "id": "bh-th-701",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-701",
+      "name": "Simplex Lakeview Steel Cottage",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-701.webp",
+      "order": 48
+    },
+    {
+      "id": "bh-th-702",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-702",
+      "name": "Panoramic View Tiny Steel House",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-702.webp",
+      "order": 49
+    },
+    {
+      "id": "bh-th-703",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-703",
+      "name": "Compact Studio Steel Tiny Home",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-703.webp",
+      "order": 50
+    },
+    {
+      "id": "bh-th-704",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-704",
+      "name": "Off-Grid Steel Tiny House",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-704.webp",
+      "order": 51
+    },
+    {
+      "id": "bh-th-705",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-705",
+      "name": "Minimalist Steel Micro Cottage",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-705.webp",
+      "order": 52
+    },
+    {
+      "id": "bh-th-706",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-706",
+      "name": "Nomad Steel Tiny House",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-706.webp",
+      "order": 53
+    },
+    {
+      "id": "bh-th-707",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-707",
+      "name": "Backyard Steel Tiny Guest House",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-707.webp",
+      "order": 54
+    },
+    {
+      "id": "bh-th-708",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-708",
+      "name": "Mountain View Steel Tiny Cabin",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-708.webp",
+      "order": 55
+    },
+    {
+      "id": "bh-th-709",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-709",
+      "name": "Urban Steel Micro-Living Unit",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-709.webp",
+      "order": 56
+    },
+    {
+      "id": "bh-th-710",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-710",
+      "name": "Farmstead Steel Tiny House",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-710.webp",
+      "order": 57
+    },
+    {
+      "id": "bh-th-711",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-711",
+      "name": "Eco-Friendly Steel Tiny Home",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-711.webp",
+      "order": 58
+    },
+    {
+      "id": "bh-th-712",
+      "category": "cottage",
+      "categoryName": "Steel Cottage House",
+      "modelCode": "BH-TH-712",
+      "name": "Deluxe Steel Tiny House",
+      "desc": "Modern single-story steel framed holiday home with large panoramic windows and a weather-proof composite roof system.",
+      "image": "images/products/Model No-BH-TH-712.webp",
+      "order": 59
+    },
+    {
+      "id": "bh-ch-501",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-501",
+      "name": "20ft Portable Site Office Container",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-501.webp",
+      "order": 60
+    },
+    {
+      "id": "bh-ch-502",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-502",
+      "name": "40ft Modern Luxury Container Home",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-502.webp",
+      "order": 61
+    },
+    {
+      "id": "bh-ch-503",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-503",
+      "name": "20ft Security Guard Cabin Container",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-503.webp",
+      "order": 62
+    },
+    {
+      "id": "bh-ch-504",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-504",
+      "name": "40ft Two-Bedroom Container House",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-504.webp",
+      "order": 63
+    },
+    {
+      "id": "bh-ch-505",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-505",
+      "name": "20ft Mobile Sales Kiosk Container",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-505.webp",
+      "order": 64
+    },
+    {
+      "id": "bh-ch-506",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-506",
+      "name": "40ft Container Café & Restaurant",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-506.webp",
+      "order": 65
+    },
+    {
+      "id": "bh-ch-507",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-507",
+      "name": "20ft Labor Accommodation Container",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-507.webp",
+      "order": 66
+    },
+    {
+      "id": "bh-ch-508",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-508",
+      "name": "40ft Container Guest House",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-508.webp",
+      "order": 67
+    },
+    {
+      "id": "bh-ch-509",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-509",
+      "name": "20ft Portable Toilet & Utility Container",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-509.webp",
+      "order": 68
+    },
+    {
+      "id": "bh-ch-510",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-510",
+      "name": "40ft Container Office Complex",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-510.webp",
+      "order": 69
+    },
+    {
+      "id": "bh-ch-511",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-511",
+      "name": "20ft Emergency Relief Container Unit",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-511.webp",
+      "order": 70
+    },
+    {
+      "id": "bh-ch-512",
+      "category": "container",
+      "categoryName": "Steel Container House",
+      "modelCode": "BH-CH-512",
+      "name": "40ft Luxury Container Villa",
+      "desc": "Heavy-duty modified shipping container unit with insulated interior walls, factory-fitted wiring, and rapid delivery.",
+      "image": "images/products/bh-ch-512.webp",
+      "order": 71
+    }
+  ],
+  "featuredIds": [
+    "bh-is-1006",
+    "bh-tsb-109",
+    "bh-dv-201",
+    "bh-ch-401",
+    "bh-ch-502"
+  ],
+  "media": {
+    "images/products/Model No-BH-TB-101.webp": {
+      "widths": [
+        400
+      ]
+    },
+    "images/products/bh-tsb-108.webp": {
+      "widths": [
+        400
+      ]
+    },
+    "images/products/Model No-BH-TH-708.webp": {
+      "widths": [
+        400
+      ]
+    },
+    "images/products/Model No-BH-TH-711.webp": {
+      "widths": [
+        400
+      ]
+    }
+  }
+}

@@ -1,0 +1,21 @@
+# Bongshai Steel CMS — protect internals
+<FilesMatch "^(config\.php|config\.sample\.php|lib\.php)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Never serve backup snapshots
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^backups/ - [F,L]
+</IfModule>
+
+# Keep the admin area out of search results
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>

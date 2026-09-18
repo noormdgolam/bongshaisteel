@@ -1,0 +1,81 @@
+<?php
+require __DIR__ . '/lib.php';
+
+$cfg     = cms_config_raw();
+$ready   = cms_config_ready($cfg);
+$err     = '';
+// same-origin path only — reject protocol-relative (//host) and backslash tricks
+$return = './';
+if (isset($_GET['return']) && is_string($_GET['return'])
+    && preg_match('#^/[A-Za-z0-9/_.?=&%~-]*$#', $_GET['return'])
+    && strpos($_GET['return'], '//') !== 0
+    && strpos($_GET['return'], '/\\') !== 0) {
+    $return = $_GET['return'];
+}
+
+if ($ready) {
+    cms_session_start();
+    if (!empty($_SESSION['cms_ok'])) { header('Location: ' . $return); exit; }
+
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+        $pw = (string) ($_POST['password'] ?? '');
+        if ($pw !== '' && password_verify($pw, $cfg['password_hash'])) {
+            session_regenerate_id(true);
+            $_SESSION['cms_ok'] = true;
+            header('Location: ' . $return);
+            exit;
+        }
+        usleep(700000);
+        $err = 'Incorrect password.';
+    }
+}
+?>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Sign in · Bongshai Steel CMS</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center;
+         font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+         background: #0f172a; color: #e2e8f0; padding: 24px; }
+  .card { width: 100%; max-width: 360px; background: #1e293b; border: 1px solid #334155;
+          border-radius: 14px; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,.4); }
+  h1 { margin: 0 0 4px; font-size: 1.25rem; }
+  p.sub { margin: 0 0 22px; color: #94a3b8; font-size: .88rem; }
+  label { display: block; font-weight: 600; font-size: .82rem; margin-bottom: 6px; color: #cbd5e1; }
+  input[type=password] { width: 100%; padding: 12px 14px; border-radius: 9px; border: 1px solid #475569;
+          background: #0f172a; color: #f1f5f9; font-size: 1rem; }
+  input[type=password]:focus { outline: 2px solid #38bdf8; outline-offset: 1px; }
+  button { width: 100%; margin-top: 16px; padding: 12px; border: 0; border-radius: 9px; cursor: pointer;
+          background: #0466c8; color: #fff; font-size: 1rem; font-weight: 700; }
+  button:hover { background: #0355a6; }
+  .err { margin-top: 14px; color: #fca5a5; font-size: .86rem; }
+  .warn { margin-top: 14px; padding: 12px; border-radius: 9px; background: #422006; color: #fed7aa;
+          font-size: .84rem; border: 1px solid #9a3412; }
+  a { color: #7dd3fc; }
+</style>
+</head>
+<body>
+  <form class="card" method="post" autocomplete="off">
+    <h1>Bongshai Steel CMS</h1>
+    <p class="sub">Content editor — sign in to continue.</p>
+<?php if (!$ready): ?>
+    <div class="warn">
+      Setup isn't finished. Copy <code>admin/config.sample.php</code> to
+      <code>admin/config.php</code>, then open <a href="setup.php">admin/setup.php</a>
+      to set a password.
+    </div>
+<?php else: ?>
+    <label for="pw">Password</label>
+    <input id="pw" name="password" type="password" required autofocus>
+    <button type="submit">Sign in</button>
+    <?php if ($err): ?><div class="err"><?= htmlspecialchars($err) ?></div><?php endif; ?>
+<?php endif; ?>
+  </form>
+</body>
+</html>

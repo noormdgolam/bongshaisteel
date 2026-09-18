@@ -447,26 +447,26 @@
         <div>
           <div class="hero-tag">
             <span class="pulse-dot"></span>
-            <span>Worldwide Engineering Standards • AISC & Eurocode</span>
+            <span data-cms="hero.tag">Worldwide Engineering Standards • AISC & Eurocode</span>
           </div>
-          <h1 class="hero-title">What is Bongshai Steel and what kinds of steel buildings do they manufacture?</h1>
+          <h1 class="hero-title" data-cms="hero.title">What is Bongshai Steel and what kinds of steel buildings do they manufacture?</h1>
           <!-- AEO: Answer-first opening — direct claim lands in first 2 sentences -->
-          <p class="hero-description">Bongshai Steel is a Bangladesh-based manufacturer and exporter of pre-engineered steel buildings — 72 models across factory sheds, duplex villas, cottages, and container houses. All structures are engineered to AISC 360, Eurocode 3, and BNBC 2020 standards.</p>
-          <p style="font-size: 0.82rem; color: #94a3b8; margin: 0 0 1.5rem 0;"><time datetime="2026-08-08">Last updated: August 8, 2026</time> · Reviewed & Approved by <strong>SMA Awal, Chief Engineer</strong>, Bongshai Steel</p>
+          <p class="hero-description" data-cms="hero.description">Bongshai Steel is a Bangladesh-based manufacturer and exporter of pre-engineered steel buildings — 72 models across factory sheds, duplex villas, cottages, and container houses. All structures are engineered to AISC 360, Eurocode 3, and BNBC 2020 standards.</p>
+          <p style="font-size: 0.82rem; color: #94a3b8; margin: 0 0 1.5rem 0;" data-cms-html="hero.byline"><time datetime="2026-08-08">Last updated: August 8, 2026</time> · Reviewed & Approved by <strong>SMA Awal, Chief Engineer</strong>, Bongshai Steel</p>
           <div class="hero-buttons">
-            <button class="btn-primary-hero" onclick="goToMainCategory('prefab')">Explore Full Catalog</button>
-            <button class="btn-secondary-hero" onclick="openQuoteModal()">Request Custom Quote</button>
+            <button class="btn-primary-hero" onclick="goToMainCategory('prefab')" data-cms="hero.btnPrimary">Explore Full Catalog</button>
+            <button class="btn-secondary-hero" onclick="openQuoteModal()" data-cms="hero.btnSecondary">Request Custom Quote</button>
           </div>
         </div>
         <div class="hero-image-wrap">
-          <img src="images/products/Model No-BH-IS-1001.webp" alt="Bongshai Steel Building Plant" decoding="async">
+          <img src="images/products/Model No-BH-IS-1001.webp" srcset="images/products/Model%20No-BH-IS-1001-400w.webp 400w, images/products/Model%20No-BH-IS-1001-700w.webp 700w, images/products/Model%20No-BH-IS-1001.webp 1024w" sizes="(max-width: 900px) 100vw, 560px" alt="Bongshai Steel Building Plant" decoding="async" data-cms-img="hero.image">
         </div>
       </div>
     </section>
 
     <!-- Global Stats Ticker -->
     <section class="stats-banner">
-      <div class="stats-container">
+      <div class="stats-container" id="statsContainer">
         <div class="stat-item">
           <h3>72 Models</h3>
           <p>Delivered to UAE, KSA & Kenya since 2004</p>
@@ -489,7 +489,7 @@
     <!-- Global Export Destinations & Engineering Certifications Trust Section -->
     <section class="section" style="background:#f8fafc; border-bottom:1px solid var(--border-light); padding:45px 24px;">
       <div class="container">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:24px; text-align:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:24px; text-align:center;" id="trustBarContainer">
           <div style="flex:1; min-width:200px;">
             <span style="font-size:2rem; display:block; margin-bottom:6px;">🌍</span>
             <strong style="font-size:1.05rem; color:var(--primary-navy); display:block;">Worldwide Export Ready</strong>
@@ -518,12 +518,12 @@
     <section class="section" style="background:#ffffff; border-bottom:1px solid var(--border-light); padding:70px 24px;">
       <div class="container">
         <div class="section-header">
-          <span class="section-subtitle" style="color:var(--primary-navy);">Looking Ahead</span>
-          <h2 class="section-title">Growing Into New Markets</h2>
-          <p style="color:var(--text-muted); max-width:720px; margin:12px auto 0 auto;">Bongshai Steel's established export focus is the Middle East, Africa, and South Asia. As part of our long-term growth, we're also building engineering capability toward North American and Australian structural standards — AISC 360, CSA S16, and AS/NZS 4100 — to eventually serve those markets too.</p>
+          <span class="section-subtitle" style="color:var(--primary-navy);" data-cms="growing.subtitle">Looking Ahead</span>
+          <h2 class="section-title" data-cms="growing.title">Growing Into New Markets</h2>
+          <p style="color:var(--text-muted); max-width:720px; margin:12px auto 0 auto;" data-cms="growing.body">Bongshai Steel's established export focus is the Middle East, Africa, and South Asia. As part of our long-term growth, we're also building engineering capability toward North American and Australian structural standards — AISC 360, CSA S16, and AS/NZS 4100 — to eventually serve those markets too.</p>
         </div>
         <div style="text-align:center; margin-top:20px;">
-          <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="openQuoteModal()">Discuss a Project With Us</button>
+          <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="openQuoteModal()" data-cms="growing.btn">Discuss a Project With Us</button>
         </div>
       </div>
     </section>
@@ -534,9 +534,9 @@
     <section class="section tech-grid-bg" style="background-color:#ffffff; color:var(--text-primary); padding:90px 24px; border-bottom:1px solid var(--border-light);">
       <div class="container">
         <div class="section-header">
-          <span class="section-subtitle" style="color:var(--primary-navy);">Interactive 3D WebGL Engine</span>
-          <h2 class="section-title" style="color:var(--text-primary);">3D Structural Steel Portal Frame Inspector</h2>
-          <p style="color:var(--text-muted); max-width:640px; margin:12px auto 0 auto;">Rotate, zoom, and customize a 3D structural steel portal frame in real time. Inspect columns, I-beams, purlins, roof panels, floor slab, and side walls built to AISC & Eurocode standards.</p>
+          <span class="section-subtitle" style="color:var(--primary-navy);" data-cms="threeD.subtitle">Interactive 3D WebGL Engine</span>
+          <h2 class="section-title" style="color:var(--text-primary);" data-cms="threeD.title">3D Structural Steel Portal Frame Inspector</h2>
+          <p style="color:var(--text-muted); max-width:640px; margin:12px auto 0 auto;" data-cms="threeD.body">Rotate, zoom, and customize a 3D structural steel portal frame in real time. Inspect columns, I-beams, purlins, roof panels, floor slab, and side walls built to AISC & Eurocode standards.</p>
         </div>
 
         <div class="frame-customizer-grid" style="display:grid; grid-template-columns: 1fr 340px; gap:30px; align-items:start;">
@@ -610,8 +610,8 @@
     <section class="section">
       <div class="container">
         <div class="section-header">
-          <span class="section-subtitle">Complete Catalog</span>
-          <h2 class="section-title">Explore Our Steel Categories</h2>
+          <span class="section-subtitle" data-cms="categories.subtitle">Complete Catalog</span>
+          <h2 class="section-title" data-cms="categories.title">Explore Our Steel Categories</h2>
         </div>
 
         <div class="category-cards-grid" id="categoryCardsGrid"></div>
@@ -622,8 +622,8 @@
     <section class="section" style="padding-top:0;">
       <div class="container">
         <div class="section-header">
-          <span class="section-subtitle">Popular Models</span>
-          <h2 class="section-title">Flagship Structural Steel Solutions</h2>
+          <span class="section-subtitle" data-cms="featured.subtitle">Popular Models</span>
+          <h2 class="section-title" data-cms="featured.title">Flagship Structural Steel Solutions</h2>
         </div>
         <div class="products-grid" id="featuredGrid"></div>
         <div style="text-align:center; margin-top:45px;">
@@ -636,8 +636,8 @@
     <section class="section" style="padding-top:0;">
       <div class="container">
         <div style="background:#f8fafc; border-radius:var(--radius-lg); padding:40px; border:1px solid var(--border-light); text-align:center;">
-          <h3 style="font-size:1.4rem; font-weight:800; color:var(--primary-navy); margin-bottom:10px;">Have Questions About Steel Buildings & International Shipping?</h3>
-          <p style="color:var(--text-muted); max-width:600px; margin:0 auto 20px auto;">Read our detailed Frequently Asked Questions covering structural building codes (AISC/CSA/AS), export logistics, custom engineering, and the quotation process.</p>
+          <h3 style="font-size:1.4rem; font-weight:800; color:var(--primary-navy); margin-bottom:10px;" data-cms-html="faqTeaser.title">Have Questions About Steel Buildings &amp; International Shipping?</h3>
+          <p style="color:var(--text-muted); max-width:600px; margin:0 auto 20px auto;" data-cms-html="faqTeaser.body">Read our detailed Frequently Asked Questions covering structural building codes (AISC/CSA/AS), export logistics, custom engineering, and the quotation process.</p>
           <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="navigateToView('faqView')">Explore FAQ Page</button>
         </div>
       </div>
@@ -650,7 +650,7 @@
     <div class="container">
       <div class="section-header">
         <span class="section-subtitle">Product Lineup</span>
-        <h2 class="section-title" id="productsViewTitle">Products Catalog</h2>
+        <h2 class="section-title" id="productsViewTitle" data-cms="productsView.title">Products Catalog</h2>
       </div>
 
       <!-- Instant Search & Filter Bar -->
@@ -676,10 +676,10 @@
   <section id="servicesView" class="page-view section">
     <div class="container">
       <div class="section-header">
-        <span class="section-subtitle">Turnkey Solutions</span>
-        <h2 class="section-title">Our Specialized Services</h2>
+        <span class="section-subtitle" data-cms="services.subtitle">Turnkey Solutions</span>
+        <h2 class="section-title" data-cms="services.title">Our Specialized Services</h2>
       </div>
-      <div class="category-cards-grid">
+      <div class="category-cards-grid" id="servicesGrid">
         <div class="cat-card">
           <div class="cat-card-body">
             <h3 class="cat-card-title">Architectural & Structural Engineering</h3>
@@ -706,12 +706,12 @@
   <section id="safetyView" class="page-view section">
     <div class="container">
       <div class="section-header">
-        <span class="section-subtitle">Zero Accident Commitment</span>
-        <h2 class="section-title">Health And Safety Policy (EHS)</h2>
+        <span class="section-subtitle" data-cms="safety.subtitle">Zero Accident Commitment</span>
+        <h2 class="section-title" data-cms="safety.title">Health And Safety Policy (EHS)</h2>
       </div>
       <div class="cat-card" style="max-width:800px; margin:0 auto; padding:40px;">
-        <p style="font-size:1.1rem; color:var(--text-muted); margin-bottom:20px;">Bongshai Steel maintains strict Environmental, Health, and Safety (EHS) policies across all factory floors and construction erection sites nationwide & internationally.</p>
-        <ul style="margin:20px 0; padding-left:20px; color:var(--text-primary); font-weight:700; line-height:2.2;">
+        <p style="font-size:1.1rem; color:var(--text-muted); margin-bottom:20px;" data-cms="safety.intro">Bongshai Steel maintains strict Environmental, Health, and Safety (EHS) policies across all factory floors and construction erection sites nationwide & internationally.</p>
+        <ul style="margin:20px 0; padding-left:20px; color:var(--text-primary); font-weight:700; line-height:2.2;" id="safetyPoints">
           <li>Mandatory PPE compliance (hard hats, full-body safety harnesses, steel-toe boots).</li>
           <li>ISO 9001:2015, ISO 14001, and OHSAS safety protocol compliance.</li>
           <li>100% certified heavy crane operators and certified high-altitude welders.</li>
@@ -725,14 +725,14 @@
   <section id="faqView" class="page-view section">
     <div class="container">
       <div class="section-header">
-        <span class="section-subtitle">Got Questions?</span>
-        <h2 class="section-title">Frequently Asked Questions</h2>
-        <p style="color:var(--text-muted); max-width:720px; margin:12px auto 0 auto;">Everything you need to know about our pre-engineered steel buildings, structural standards, international export logistics, and quote procurement process.</p>
+        <span class="section-subtitle" data-cms="faq.subtitle">Got Questions?</span>
+        <h2 class="section-title" data-cms="faq.title">Frequently Asked Questions</h2>
+        <p style="color:var(--text-muted); max-width:720px; margin:12px auto 0 auto;" data-cms="faq.intro">Everything you need to know about our pre-engineered steel buildings, structural standards, international export logistics, and quote procurement process.</p>
         <!-- AEO Trust Signal: named reviewer + content date (Page Auditor Step 4) -->
         <p style="color:var(--text-muted); font-size:0.82rem; margin-top:8px;">Reviewed by <strong>Bongshai Steel Engineering Team</strong> &bull; Last updated: <time datetime="2026-08-08">August 2026</time></p>
       </div>
 
-      <div style="max-width:850px; margin:0 auto; display:flex; flex-direction:column; gap:20px;">
+      <div style="max-width:850px; margin:0 auto; display:flex; flex-direction:column; gap:20px;" id="faqList">
         <div class="cat-card" style="padding:32px; cursor:default;">
           <h3 class="faq-question" style="font-size:1.2rem; font-weight:800; color:var(--primary-navy); margin-bottom:12px;">What is a Pre-Engineered Steel Building (PEB)?</h3>
           <p class="faq-answer" style="color:var(--text-muted); line-height:1.6;">A Pre-Engineered Steel Building (PEB) is a structural steel building system designed and manufactured in a factory, then shipped to the construction site for rapid bolt-together assembly — offering large clear-span spaces, superior structural integrity, and 50%+ faster construction than conventional reinforced concrete methods.</p>
@@ -781,19 +781,19 @@
   <section id="contactView" class="page-view section">
     <div class="container">
       <div class="section-header">
-        <span class="section-subtitle">Global Inquiries</span>
-        <h2 class="section-title">Contact Bongshai Steel</h2>
+        <span class="section-subtitle" data-cms="contact.subtitle">Global Inquiries</span>
+        <h2 class="section-title" data-cms="contact.title">Contact Bongshai Steel</h2>
       </div>
       <div class="category-cards-grid" style="grid-template-columns:1fr 1fr;">
         <div class="cat-card" style="padding:35px;">
-          <h3 style="font-size:1.5rem; font-weight:800; margin-bottom:20px; color:var(--primary-navy);">Corporate Headquarters</h3>
-          <p style="margin-bottom:14px; font-weight:600;"><strong>Address:</strong> House #18, Road #18, Sector #10, Uttara C/A, Dhaka – 1230</p>
-          <p style="margin-bottom:14px; font-weight:600;"><strong>Hotline / WhatsApp:</strong> +8801789-949060</p>
-          <p style="margin-bottom:14px; font-weight:600;"><strong>Official Email:</strong> sales@bongshaisteel.com</p>
-          <p style="margin-bottom:14px; font-weight:600;"><strong>Working Hours:</strong> Sat - Thu (9:00 AM - 7:00 PM GMT+6)</p>
+          <h3 style="font-size:1.5rem; font-weight:800; margin-bottom:20px; color:var(--primary-navy);" data-cms="contact.hqTitle">Corporate Headquarters</h3>
+          <p style="margin-bottom:14px; font-weight:600;"><strong>Address:</strong> <span data-cms-set="address">House #18, Road #18, Sector #10, Uttara C/A, Dhaka – 1230</span></p>
+          <p style="margin-bottom:14px; font-weight:600;"><strong>Hotline / WhatsApp:</strong> <span data-cms-set="hotline">+8801789-949060</span></p>
+          <p style="margin-bottom:14px; font-weight:600;"><strong>Official Email:</strong> <span data-cms-set="email">sales@bongshaisteel.com</span></p>
+          <p style="margin-bottom:14px; font-weight:600;"><strong>Working Hours:</strong> <span data-cms-set="workingHours">Sat - Thu (9:00 AM - 7:00 PM GMT+6)</span></p>
         </div>
         <div class="cat-card" style="padding:35px;">
-          <h3 style="font-size:1.5rem; font-weight:800; margin-bottom:20px; color:var(--primary-navy);">Send Official Inquiry</h3>
+          <h3 style="font-size:1.5rem; font-weight:800; margin-bottom:20px; color:var(--primary-navy);" data-cms="contact.formTitle">Send Official Inquiry</h3>
           <form onsubmit="handleQuoteSubmit(event)"
                 data-mcp-action="send-contact-inquiry"
                 data-mcp-description="Send a general business or contact inquiry to Bongshai Steel."
@@ -818,7 +818,7 @@
     <div class="footer-container">
       <div class="footer-col">
         <h4 style="color:#ffffff; font-size:1.6rem; font-family:var(--font-heading);">BONGSHAI STEEL</h4>
-        <p style="margin-top:12px;">Premier Steel Building Manufacturer & Exporter delivering AISC & BNBC certified pre-engineered factory buildings, warehouses, duplex steel homes, resort cottages, and container houses globally.</p>
+        <p style="margin-top:12px;" data-cms-set="footerBlurb">Premier Steel Building Manufacturer & Exporter delivering AISC & BNBC certified pre-engineered factory buildings, warehouses, duplex steel homes, resort cottages, and container houses globally.</p>
       </div>
 
       <div class="footer-col">
@@ -844,28 +844,32 @@
 
       <div class="footer-col">
         <h4>Contact Us</h4>
-        <p>📍 House #18, Road #18, Sector #10, Uttara C/A, Dhaka – 1230</p>
-        <p style="margin-top:8px;">📞 +8801789-949060</p>
-        <p style="margin-top:8px;">✉️ sales@bongshaisteel.com</p>
+        <p>📍 <span data-cms-set="address">House #18, Road #18, Sector #10, Uttara C/A, Dhaka – 1230</span></p>
+        <p style="margin-top:8px;">📞 <span data-cms-set="hotline">+8801789-949060</span></p>
+        <p style="margin-top:8px;">✉️ <span data-cms-set="email">sales@bongshaisteel.com</span></p>
       </div>
     </div>
 
     <div class="footer-bottom">
       <div style="font-weight: 600; font-size: 0.9rem; color: var(--accent-cyan); background: rgba(0,0,0,0.2); padding: 0.25rem 0.75rem; border-radius: 4px; margin-bottom: 0.5rem; display: inline-block;">Total Page Views: <span id="page-view-counter" style="color: #fff; font-weight: 800; font-variant-numeric: tabular-nums;">--</span></div>
-      <p>&copy; 2026 Bongshai Steel. All Rights Reserved. Designed for Ultra Fast International Performance.</p>
-      <p style="margin-top:8px;">Part of the Bongshai Group â€“ see also <a href="https://noormdgolam.github.io/bongshaihousing/" target="_blank" rel="noopener" style="color:var(--accent-cyan); font-weight:700;">Bongshai Housing</a> &amp; <a href="https://noormdgolam.github.io/Bongshaiengineering/" target="_blank" rel="noopener" style="color:var(--accent-cyan); font-weight:700;">Bongshai Engineering</a></p>
+      <p data-cms-set="copyright">&copy; 2026 Bongshai Steel. All Rights Reserved. Designed for Ultra Fast International Performance.</p>
+      <p style="margin-top:8px;" id="footerSister">Part of the Bongshai Group – see also <a href="https://noormdgolam.github.io/bongshaihousing/" target="_blank" rel="noopener" style="color:var(--accent-cyan); font-weight:700;">Bongshai Housing</a> &amp; <a href="https://noormdgolam.github.io/Bongshaiengineering/" target="_blank" rel="noopener" style="color:var(--accent-cyan); font-weight:700;">Bongshai Engineering</a></p>
     </div>
   </footer>
 
   <!-- Floating WhatsApp Instant Quote Chat Button -->
-  <a href="https://wa.me/8801789949060?text=Hello%20Bongshai%20Steel!%20I%20am%20interested%20in%20an%20international%20steel%20building%20quote." target="_blank" rel="noopener noreferrer" class="whatsapp-widget" title="Chat on WhatsApp (+8801789-949060)" aria-label="Chat on WhatsApp">
+  <a href="https://wa.me/8801789949060?text=Hello%20Bongshai%20Steel!%20I%20am%20interested%20in%20an%20international%20steel%20building%20quote." target="_blank" rel="noopener noreferrer" class="whatsapp-widget" title="Chat on WhatsApp (+8801789-949060)" aria-label="Chat on WhatsApp" data-cms-wa>
     <svg viewBox="0 0 32 32">
       <path d="M16 2A13 13 0 0 0 4.29 20.89L2 29.5l8.79-2.22A13 13 0 1 0 16 2zm6.75 18.25c-.29.83-1.68 1.58-2.33 1.68s-1.39.26-4.63-1.04a16.66 16.66 0 0 1-6.42-5.63c-.42-.58-1-1.37-1-2.42s.55-1.57.75-1.78.44-.26.59-.26h.42c.14 0 .34 0 .5.39s.56 1.36.6 1.45.08.2.02.32-.09.2-.18.31l-.27.31c-.09.11-.2.23-.08.44a10.87 10.87 0 0 0 2 2.47 9.87 9.87 0 0 0 2.91 1.8c.21.11.33.09.45-.05l.64-.75c.14-.17.29-.14.48-.07s1.22.58 1.43.68.35.15.4.24-.29 1.66-.58 2.49z"/>
     </svg>
   </a>
 
+  <!-- CMS content layer — must load before app.js -->
+  <script src="apply.js"></script>
   <!-- Script -->
   <script src="app.js"></script>
+  <!-- CMS in-place editor — dormant unless ?cms=1 and an admin session cookie is present -->
+  <script src="admin/editor.js" defer></script>
 
   <!-- PWA Service Worker Registration -->
   <script>

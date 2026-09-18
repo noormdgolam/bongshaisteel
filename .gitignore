@@ -24,3 +24,12 @@ __pycache__/
 .idea/
 .vscode/
 *.lock
+
+# CMS — editor-written state. Must NOT be overwritten by cPanel auto-pull.
+/admin/config.php
+/admin/backups/
+/data/content.json
+/images/uploads/
+
+# Page-view counter runtime file
+counter.txt

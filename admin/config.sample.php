@@ -1,0 +1,35 @@
+<?php
+/* ==========================================================================
+   BONGSHAI STEEL — CMS CONFIG (SAMPLE)
+   --------------------------------------------------------------------------
+   1. Copy this file to  admin/config.php
+   2. Set 'password_hash' to a real hash. Two ways:
+        a) open  https://your-site/admin/setup.php  in a browser (easiest), or
+        b) run   php -r "echo password_hash('YOUR-PASSWORD', PASSWORD_DEFAULT);"
+           and paste the output below.
+   3. Delete admin/setup.php once done.
+
+   config.php is git-ignored, so cPanel auto-pull deploys never overwrite it.
+   ========================================================================== */
+
+return [
+    // bcrypt/argon2 hash of the single admin password.
+    // The literal placeholder below never validates against any password.
+    'password_hash' => 'REPLACE_WITH_HASH',
+
+    // Live content store — git-ignored, survives deploys. apply.js reads it.
+    'content_file'  => dirname(__DIR__) . '/data/content.json',
+    'default_file'  => dirname(__DIR__) . '/data/content.default.json',
+
+    // Timestamped snapshots taken before every save.
+    'backup_dir'    => __DIR__ . '/backups',
+    'keep_backups'  => 15,
+
+    // Editor image uploads.
+    'upload_dir'    => dirname(__DIR__) . '/images/uploads',
+    'upload_url'    => 'images/uploads',
+    'max_upload'    => 8 * 1024 * 1024, // 8 MB
+
+    // Session cookie name.
+    'session_name'  => 'bs_cms',
+];

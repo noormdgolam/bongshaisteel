@@ -2,12 +2,14 @@
    BONGSHAI STEEL — PWA SERVICE WORKER (OFFLINE ENGINE)
    ========================================================================== */
 
-const CACHE_NAME = 'bongshai-steel-v1';
+const CACHE_NAME = 'bongshai-steel-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/styles.css',
+  '/apply.js',
   '/app.js',
+  '/data/content.default.json',
   '/manifest.json',
   '/llms.txt'
 ];
@@ -37,6 +39,11 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Only handle GET. Never touch the CMS API or admin area (POST uploads/saves,
+  // session cookies) — let those go straight to the network.
+  if (event.request.method !== 'GET') return;
+  if (event.request.url.indexOf('/admin/') !== -1) return;
+
   // Network first, fallback to cache for offline availability
   event.respondWith(
     fetch(event.request)
