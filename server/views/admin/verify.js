@@ -183,6 +183,123 @@ try {
   assert(formEdit.includes("Delete Product"));
   assert(formEdit.includes("Validation failed"));
 
+  // leads/list.njk
+  const leadsNormal = render("admin/leads/list.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "leads",
+    leads: [{
+      id: 1,
+      kind: "quote",
+      status: "new",
+      name: "Customer A",
+      phone: "+8801712345678",
+      email: "a@example.com",
+      company: "ABC Ltd",
+      model_code: "BH-IS-1001",
+      destination: "Dhaka",
+      created_at: new Date("2026-09-24T10:00:00Z")
+    }],
+    statuses: ["new", "contacted", "quoted", "won", "lost"],
+    counts: { all: 1, new: 1, contacted: 0, quoted: 0, won: 0, lost: 0 },
+    status: "new",
+    kind: "quote",
+    q: "ABC",
+    total: 1
+  });
+  assert(leadsNormal.includes("Customer A"));
+  assert(leadsNormal.includes("BH-IS-1001"));
+
+  const leadsEmpty = render("admin/leads/list.njk", {
+    adminName: "Munna",
+    adminRole: "editor",
+    csrfToken: "csrf-token-123",
+    active: "leads",
+    leads: [],
+    statuses: ["new", "contacted", "quoted", "won", "lost"],
+    counts: { all: 0, new: 0, contacted: 0, quoted: 0, won: 0, lost: 0 },
+    total: 0
+  });
+  assert(leadsEmpty.includes("No messages found matching your criteria."));
+
+  // leads/detail.njk
+  const leadDetailNormal = render("admin/leads/detail.njk", {
+    adminName: "Munna",
+    adminRole: "superadmin",
+    csrfToken: "csrf-token-123",
+    active: "leads",
+    lead: {
+      id: 1,
+      public_id: "lead_123",
+      kind: "quote",
+      status: "new",
+      note: "Called them today.",
+      name: "Customer A",
+      phone: "+8801712345678",
+      email: "a@example.com",
+      company: "ABC Ltd",
+      message: "Hello Bongshai,\nWe need a factory shed.",
+      destination: "Chittagong",
+      currency: "USD",
+      standard: "AISC 360",
+      dimensions: "5000 sqft",
+      model_code: "BH-IS-1001",
+      source: "quote_modal",
+      user_agent: "Mozilla/5.0",
+      created_at: new Date("2026-09-24T10:00:00Z"),
+      updated_at: new Date("2026-09-24T11:00:00Z")
+    },
+    statuses: ["new", "contacted", "quoted", "won", "lost"]
+  });
+  assert(leadDetailNormal.includes("Customer A"));
+  assert(leadDetailNormal.includes("Delete Inquiry"));
+
+  const leadDetailEmpty = render("admin/leads/detail.njk", {
+    adminName: "Munna",
+    adminRole: "sales",
+    csrfToken: "csrf-token-123",
+    active: "leads",
+    lead: { id: 2 },
+    statuses: ["new", "contacted", "quoted", "won", "lost"]
+  });
+  assert(leadDetailEmpty.includes("Inquiry #2"));
+  assert(!leadDetailEmpty.includes("Delete Inquiry"));
+
+  // activity.njk
+  const activityNormal = render("admin/activity.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "activity",
+    activity: [{
+      created_at: new Date("2026-09-24T10:00:00Z"),
+      admin_name: "Munna",
+      action: "login",
+      entity_type: "user",
+      entity_id: 1,
+      summary: "Logged into system"
+    }],
+    actions: ["login", "create_product", "edit_lead"],
+    action: "all",
+    page: 1,
+    pages: 3
+  });
+  assert(activityNormal.includes("Logged into system"));
+
+  const activityEmpty = render("admin/activity.njk", {
+    adminName: "Munna",
+    adminRole: "editor",
+    csrfToken: "csrf-token-123",
+    active: "activity",
+    activity: [],
+    actions: [],
+    action: "all",
+    page: 1,
+    pages: 1
+  });
+  assert(activityEmpty.includes("No activity logs recorded."));
+
   pass("1. Render without throwing", "all templates render normal and empty fixtures");
 } catch (err) {
   fail("1. Render without throwing", err);
@@ -316,6 +433,17 @@ try {
         active: "products",
         product: { id: 7, name: "Item 7", model_code: "BH-7" },
         categories: []
+      })
+    },
+    {
+      name: "admin/leads/detail.njk (update & delete)",
+      html: render("admin/leads/detail.njk", {
+        adminName: "Admin",
+        adminRole: "superadmin",
+        csrfToken: token,
+        active: "leads",
+        lead: { id: 10, name: "Lead 10" },
+        statuses: ["new", "contacted", "quoted", "won", "lost"]
       })
     }
   ];
@@ -658,6 +786,251 @@ try {
   pass("12. Dhaka date filter on dashboard", "UTC date formatted cleanly to '24 Sept 2026, 21:58'");
 } catch (err) {
   fail("12. Dhaka date filter on dashboard", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 13: Hostile lead fields render escaped; message/note keep line breaks
+// ---------------------------------------------------------------------
+try {
+  const hostileScript = "</script><script>alert(1)</script>";
+  const hostileImg = '"><img src=x onerror=alert(1)>';
+  const multilineMsg = "Line 1: Need factory shed\nLine 2: 120ft span\n<script>alert(2)</script>";
+  const multilineNote = "Called client\nDiscussed requirements\n<img src=y onerror=alert(3)>";
+
+  const detailHtml = render("admin/leads/detail.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "leads",
+    lead: {
+      id: 88,
+      name: hostileScript,
+      company: hostileImg,
+      message: multilineMsg,
+      note: multilineNote
+    },
+    statuses: ["new", "contacted"]
+  });
+
+  assert(!detailHtml.includes("<script>alert(1)</script>"), "Hostile name must not render unescaped script");
+  assert(!detailHtml.includes("<img src=x onerror=alert(1)>"), "Hostile company must not render unescaped img");
+  assert(!detailHtml.includes("<script>alert(2)</script>"), "Hostile message must not render unescaped script");
+  assert(!detailHtml.includes("<img src=y onerror=alert(3)>"), "Hostile note must not render unescaped img");
+
+  // Verify line breaks preserved
+  assert(detailHtml.includes("Line 1: Need factory shed\nLine 2: 120ft span"), "Message must preserve literal line breaks");
+  assert(detailHtml.includes("Called client\nDiscussed requirements"), "Note must preserve literal line breaks");
+  assert(detailHtml.includes("white-space:pre-wrap") || detailHtml.includes("white-space: pre-wrap"), "Must have white-space: pre-wrap style");
+
+  pass("13. Hostile lead fields escaped with preserved line breaks", "all XSS vectors safely escaped and pre-wrap applied");
+} catch (err) {
+  fail("13. Hostile lead fields escaped with preserved line breaks", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 14: Phone 'javascript:alert(1)' produces wa.me link with only digits
+// ---------------------------------------------------------------------
+try {
+  const hostilePhone = "javascript:alert(1)";
+
+  // Test leads list
+  const listHtml = render("admin/leads/list.njk", {
+    adminName: "A",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "leads",
+    leads: [{ id: 1, name: "Test", phone: hostilePhone }],
+    statuses: []
+  });
+  const $list = cheerio.load(listHtml);
+  $list('a[href*="wa.me"]').each((i, el) => {
+    const href = $list(el).attr("href");
+    assert(!href.includes("javascript:"), `wa.me link in list must NOT contain javascript:, got: ${href}`);
+    assert.strictEqual(href, "https://wa.me/1", `wa.me link must only contain digits, expected https://wa.me/1, got: ${href}`);
+  });
+
+  // Test leads detail
+  const detailHtml = render("admin/leads/detail.njk", {
+    adminName: "A",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "leads",
+    lead: { id: 1, name: "Test", phone: hostilePhone },
+    statuses: []
+  });
+  const $detail = cheerio.load(detailHtml);
+  $detail('a[href*="wa.me"]').each((i, el) => {
+    const href = $detail(el).attr("href");
+    assert(!href.includes("javascript:"), `wa.me link in detail must NOT contain javascript:, got: ${href}`);
+    assert.strictEqual(href, "https://wa.me/1", `wa.me link must only contain digits, expected https://wa.me/1, got: ${href}`);
+  });
+  $detail('a[href*="tel:"]').each((i, el) => {
+    const href = $detail(el).attr("href");
+    assert(!href.includes("javascript:"), `tel: link in detail must NOT contain javascript:, got: ${href}`);
+    assert.strictEqual(href, "tel:1", `tel: link must only contain digits, expected tel:1, got: ${href}`);
+  });
+
+  pass("14. Phone digits filter & wa.me security", "hostile phone string sanitized to digits only; no javascript: injection possible");
+} catch (err) {
+  fail("14. Phone digits filter & wa.me security", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 15: Leads delete form present for superadmin/admin, absent for editor/sales
+// ---------------------------------------------------------------------
+try {
+  const roles = [
+    { role: "superadmin", shouldHaveDelete: true },
+    { role: "admin", shouldHaveDelete: true },
+    { role: "editor", shouldHaveDelete: false },
+    { role: "sales", shouldHaveDelete: false }
+  ];
+
+  for (const { role, shouldHaveDelete } of roles) {
+    const html = render("admin/leads/detail.njk", {
+      adminName: "A",
+      adminRole: role,
+      csrfToken: "t",
+      active: "leads",
+      lead: { id: 25 },
+      statuses: []
+    });
+    const $ = cheerio.load(html);
+    const deleteForm = $('form[action="/admin/leads/25/delete"]');
+    assert.strictEqual(
+      deleteForm.length > 0,
+      shouldHaveDelete,
+      `Delete form presence for ${role} should be ${shouldHaveDelete}, found ${deleteForm.length}`
+    );
+  }
+
+  pass("15. Role gating on leads delete form", "superadmin/admin have delete form; editor/sales do not");
+} catch (err) {
+  fail("15. Role gating on leads delete form", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 16: Leads CSV link carries status, kind and q, URL-encoded
+// ---------------------------------------------------------------------
+try {
+  const html = render("admin/leads/list.njk", {
+    adminName: "A",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "leads",
+    leads: [],
+    statuses: [],
+    status: "quoted",
+    kind: "quote",
+    q: "Heavy Steel & Tower"
+  });
+
+  const $ = cheerio.load(html);
+  const csvLink = $('a[href*="leads.csv"]').attr("href");
+  assert(csvLink, "Download CSV link must be present");
+  assert(csvLink.includes("status=quoted"), "CSV link must carry status=quoted");
+  assert(csvLink.includes("kind=quote"), "CSV link must carry kind=quote");
+  assert(
+    csvLink.includes("q=Heavy%20Steel%20%26%20Tower") || csvLink.includes("q=Heavy+Steel+%26+Tower"),
+    `CSV link must URL-encode '&' and spaces, got: ${csvLink}`
+  );
+
+  pass("16. Leads CSV link URL-encoding", "status, kind, and q containing '&' and spaces are correctly encoded");
+} catch (err) {
+  fail("16. Leads CSV link URL-encoding", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 17: Activity pagination links absent on first and last pages
+// ---------------------------------------------------------------------
+try {
+  // Page 1 of 3: no previous, has next
+  const page1Html = render("admin/activity.njk", {
+    adminName: "A",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "activity",
+    activity: [{ created_at: new Date(), admin_name: "A", action: "login", summary: "s" }],
+    actions: [],
+    page: 1,
+    pages: 3
+  });
+  const $p1 = cheerio.load(page1Html);
+  assert.strictEqual($p1("#pagination-prev").length, 0, "Page 1 must NOT have prev link");
+  assert.strictEqual($p1("#pagination-next").length, 1, "Page 1 must have next link");
+  assert($p1("#pagination-next").attr("href").includes("page=2"), "Next link on page 1 must target page 2");
+
+  // Page 3 of 3: has previous, no next
+  const page3Html = render("admin/activity.njk", {
+    adminName: "A",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "activity",
+    activity: [{ created_at: new Date(), admin_name: "A", action: "login", summary: "s" }],
+    actions: [],
+    page: 3,
+    pages: 3
+  });
+  const $p3 = cheerio.load(page3Html);
+  assert.strictEqual($p3("#pagination-prev").length, 1, "Page 3 must have prev link");
+  assert.strictEqual($p3("#pagination-next").length, 0, "Page 3 must NOT have next link");
+  assert($p3("#pagination-prev").attr("href").includes("page=2"), "Prev link on page 3 must target page 2");
+
+  // Page 1 of 1: no previous, no next
+  const singlePageHtml = render("admin/activity.njk", {
+    adminName: "A",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "activity",
+    activity: [{ created_at: new Date(), admin_name: "A", action: "login", summary: "s" }],
+    actions: [],
+    page: 1,
+    pages: 1
+  });
+  const $single = cheerio.load(singlePageHtml);
+  assert.strictEqual($single("#pagination-prev").length, 0, "Single page must NOT have prev link");
+  assert.strictEqual($single("#pagination-next").length, 0, "Single page must NOT have next link");
+
+  pass("17. Activity pagination boundaries", "prev absent on page 1, next absent on last page, pagination hidden on single page");
+} catch (err) {
+  fail("17. Activity pagination boundaries", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 18: Phone width card layout for leads and activity
+// ---------------------------------------------------------------------
+try {
+  // Test leads list
+  const leadsHtml = render("admin/leads/list.njk", {
+    adminName: "A",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "leads",
+    leads: [{ id: 1, name: "Lead 1", phone: "123", created_at: new Date() }],
+    statuses: []
+  });
+  const $leads = cheerio.load(leadsHtml);
+  assert($leads(".mobile-card-list").length > 0, "Leads list must contain .mobile-card-list");
+  assert($leads(".mobile-card-list .lead-card").length === 1, "Leads list must contain .lead-card");
+
+  // Test activity
+  const actHtml = render("admin/activity.njk", {
+    adminName: "A",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "activity",
+    activity: [{ created_at: new Date(), admin_name: "A", action: "login", summary: "s" }],
+    actions: [],
+    page: 1,
+    pages: 1
+  });
+  const $act = cheerio.load(actHtml);
+  assert($act(".mobile-card-list").length > 0, "Activity must contain .mobile-card-list");
+  assert($act(".mobile-card-list .activity-card").length === 1, "Activity must contain .activity-card");
+
+  pass("18. Phone card layout for leads & activity", "both templates provide .mobile-card-list reflow for mobile");
+} catch (err) {
+  fail("18. Phone card layout for leads & activity", err);
 }
 
 console.log("\n-------------------------------------------------");

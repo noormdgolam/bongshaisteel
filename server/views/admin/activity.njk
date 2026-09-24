@@ -1,0 +1,141 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Activity Log — Bongshai Steel Admin{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">System Activity Log</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom:16px; padding:12px 16px;">
+  <form method="get" action="/admin/activity" class="toolbar" style="margin:0;">
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; flex:1;">
+      <label for="action-filter" style="font-size:0.88rem; font-weight:600; color:var(--grey-700); margin:0;">
+        Filter by Action:
+      </label>
+      <select id="action-filter" name="action" style="padding:8px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.9rem; background:rgba(255,255,255,0.9);">
+        <option value="all" {% if action == 'all' or not action %}selected{% endif %}>All Actions</option>
+        {% for a in actions %}
+        <option value="{{ a }}" {% if action == a %}selected{% endif %}>{{ a }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+      {% if action and action != 'all' %}
+      <a href="/admin/activity" class="btn btn-sm">Clear</a>
+      {% endif %}
+    </div>
+
+    {% if pages and pages > 1 %}
+    <div style="font-size:0.86rem; color:var(--grey-600); font-weight:600;">
+      Page {{ page or 1 }} of {{ pages }}
+    </div>
+    {% endif %}
+  </form>
+</div>
+
+<div class="card">
+  <!-- Desktop / Tablet Table -->
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:170px;">Date &amp; Time</th>
+          <th style="width:150px;">Admin / Source</th>
+          <th style="width:140px;">Action</th>
+          <th style="width:150px;">Entity</th>
+          <th>Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in activity %}
+        <tr>
+          <td style="white-space:nowrap; font-size:0.85rem; color:var(--grey-600);">
+            {{ item.created_at | dhaka }}
+          </td>
+          <td>
+            <strong style="color:var(--grey-900);">{{ item.admin_name or 'Website' }}</strong>
+          </td>
+          <td>
+            <span class="pill pill-muted">{{ item.action }}</span>
+          </td>
+          <td style="font-size:0.86rem; color:var(--grey-700);">
+            {% if item.entity_type %}
+            <span>{{ item.entity_type }}{% if item.entity_id %} #{{ item.entity_id }}{% endif %}</span>
+            {% else %}
+            <span style="color:var(--grey-500);">—</span>
+            {% endif %}
+          </td>
+          <td style="color:var(--grey-800);">
+            {{ item.summary }}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" style="text-align:center; padding:36px 20px; color:var(--grey-500);">
+            No activity logs recorded.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Card List -->
+  <div class="mobile-card-list">
+    {% for item in activity %}
+    <div class="admin-mobile-card activity-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:8px;">
+        <strong style="color:var(--grey-900); font-size:0.92rem;">{{ item.admin_name or 'Website' }}</strong>
+        <span class="pill pill-muted">{{ item.action }}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--grey-600); margin-bottom:6px;">
+        <span>{{ item.created_at | dhaka }}</span>
+        {% if item.entity_type %}
+        <span>{{ item.entity_type }}{% if item.entity_id %} #{{ item.entity_id }}{% endif %}</span>
+        {% endif %}
+      </div>
+      <div style="font-size:0.88rem; color:var(--grey-800); line-height:1.4;">
+        {{ item.summary }}
+      </div>
+    </div>
+    {% else %}
+    <div class="admin-mobile-card" style="text-align:center; padding:28px 16px; color:var(--grey-500);">
+      No activity logs recorded.
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination Bar -->
+  {% if pages and pages > 1 %}
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:16px; border-top:1px solid var(--grey-200); flex-wrap:wrap; gap:10px;">
+    <div>
+      {% if page and page > 1 %}
+      <a
+        href="/admin/activity?page={{ page - 1 }}&action={{ (action or 'all') | urlencode }}"
+        class="btn btn-sm"
+        id="pagination-prev"
+      >
+        ← Previous
+      </a>
+      {% endif %}
+    </div>
+
+    <div style="font-size:0.88rem; color:var(--grey-600); font-weight:600;">
+      Page {{ page or 1 }} of {{ pages }}
+    </div>
+
+    <div>
+      {% if page and pages and page < pages %}
+      <a
+        href="/admin/activity?page={{ page + 1 }}&action={{ (action or 'all') | urlencode }}"
+        class="btn btn-sm"
+        id="pagination-next"
+      >
+        Next →
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

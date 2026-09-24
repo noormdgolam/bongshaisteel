@@ -1,0 +1,184 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Inquiry #{{ lead.id or lead.public_id }} — Bongshai Steel Admin{% endblock %}
+
+{% block header %}
+<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+  <a href="/admin/leads" class="btn btn-sm">← Back to messages</a>
+  <h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">
+    Inquiry #{{ lead.id or lead.public_id }}
+  </h1>
+  {% if lead.status %}
+  <span class="pill {% if lead.status == 'won' %}pill-success{% elif lead.status == 'lost' %}pill-danger{% elif lead.status == 'new' %}pill-gold{% else %}pill-muted{% endif %}">
+    {{ lead.status | capitalize }}
+  </span>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div style="display:grid; grid-template-columns:2fr 1fr; gap:20px; align-items:flex-start;" class="admin-grid-2col">
+  <!-- Left column: Inquiry Information and Message -->
+  <div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--grey-200); padding-bottom:12px; margin-bottom:16px;">
+        <h2 style="font-size:1.05rem; font-weight:700; margin:0; color:var(--grey-900);">Contact Details</h2>
+        <span style="font-size:0.82rem; color:var(--grey-500);">
+          Received {{ lead.created_at | dhaka }}
+        </span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:16px;">
+        <div>
+          <div style="font-size:0.78rem; text-transform:uppercase; color:var(--grey-500); font-weight:700; margin-bottom:2px;">Contact Name</div>
+          <strong style="font-size:1rem; color:var(--grey-900);">{{ lead.name or '—' }}</strong>
+        </div>
+
+        {% if lead.company %}
+        <div>
+          <div style="font-size:0.78rem; text-transform:uppercase; color:var(--grey-500); font-weight:700; margin-bottom:2px;">Company / Organization</div>
+          <div style="font-size:0.95rem; color:var(--grey-800);">{{ lead.company }}</div>
+        </div>
+        {% endif %}
+
+        {% if lead.email %}
+        <div>
+          <div style="font-size:0.78rem; text-transform:uppercase; color:var(--grey-500); font-weight:700; margin-bottom:2px;">Email Address</div>
+          <div><a href="mailto:{{ lead.email }}">{{ lead.email }}</a></div>
+        </div>
+        {% endif %}
+
+        {% if lead.phone %}
+        <div>
+          <div style="font-size:0.78rem; text-transform:uppercase; color:var(--grey-500); font-weight:700; margin-bottom:2px;">Phone Number</div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span>{{ lead.phone }}</span>
+            {% set cleanDigits = lead.phone | digits %}
+            {% if cleanDigits %}
+            <a href="tel:{{ cleanDigits }}" class="btn btn-sm" style="padding:2px 8px; font-size:0.75rem;">📞 Call</a>
+            <a href="https://wa.me/{{ cleanDigits }}" target="_blank" rel="noopener" class="btn btn-sm" style="padding:2px 8px; font-size:0.75rem; color:#15803d; border-color:rgba(34,197,94,0.3);">💬 WhatsApp</a>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Project Specifications if present -->
+      {% if lead.model_code or lead.destination or lead.dimensions or lead.standard or lead.currency %}
+      <div style="border-top:1px solid var(--grey-200); padding-top:14px; margin-top:14px;">
+        <h3 style="font-size:0.92rem; font-weight:700; text-transform:uppercase; color:var(--grey-600); margin:0 0 12px;">Project Requirements</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+          {% if lead.model_code %}
+          <div>
+            <div style="font-size:0.78rem; color:var(--grey-500); font-weight:600;">Product Model</div>
+            <a href="/products/{{ lead.model_code | urlencode }}" target="_blank" rel="noopener" style="font-weight:700;">
+              <code>{{ lead.model_code }}</code> ↗
+            </a>
+          </div>
+          {% endif %}
+
+          {% if lead.destination %}
+          <div>
+            <div style="font-size:0.78rem; color:var(--grey-500); font-weight:600;">Project Location / Destination</div>
+            <div>{{ lead.destination }}</div>
+          </div>
+          {% endif %}
+
+          {% if lead.dimensions %}
+          <div>
+            <div style="font-size:0.78rem; color:var(--grey-500); font-weight:600;">Dimensions / Area</div>
+            <div>{{ lead.dimensions }}</div>
+          </div>
+          {% endif %}
+
+          {% if lead.standard %}
+          <div>
+            <div style="font-size:0.78rem; color:var(--grey-500); font-weight:600;">Building Standard</div>
+            <div>{{ lead.standard }}</div>
+          </div>
+          {% endif %}
+
+          {% if lead.currency %}
+          <div>
+            <div style="font-size:0.78rem; color:var(--grey-500); font-weight:600;">Preferred Currency</div>
+            <div>{{ lead.currency }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Message Content -->
+      {% if lead.message %}
+      <div style="border-top:1px solid var(--grey-200); padding-top:14px; margin-top:14px;">
+        <div style="font-size:0.78rem; text-transform:uppercase; color:var(--grey-500); font-weight:700; margin-bottom:6px;">Message</div>
+        <div style="white-space:pre-wrap; background:rgba(255,255,255,0.7); border:1px solid var(--grey-200); border-radius:8px; padding:14px; line-height:1.6; font-size:0.92rem; color:var(--grey-900);">{{ lead.message }}</div>
+      </div>
+      {% endif %}
+
+      <!-- Source metadata -->
+      {% if lead.source or lead.user_agent or lead.updated_at %}
+      <div style="border-top:1px solid var(--grey-200); padding-top:10px; margin-top:14px; font-size:0.78rem; color:var(--grey-500);">
+        {% if lead.source %}<span>Source: {{ lead.source }}</span> &bull; {% endif %}
+        {% if lead.updated_at %}<span>Updated: {{ lead.updated_at | dhaka }}</span> &bull; {% endif %}
+        {% if lead.user_agent %}<span style="word-break:break-all;">Agent: {{ lead.user_agent }}</span>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Right column: Update Status & Internal Notes -->
+  <div>
+    <div class="card">
+      <h2 style="font-size:1.05rem; font-weight:700; margin:0 0 16px; color:var(--grey-900);">Update Inquiry</h2>
+
+      <form method="post" action="/admin/leads/{{ lead.id }}">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        <div class="form-row">
+          <label for="status">Lead Status</label>
+          <select id="status" name="status" style="font-weight:600;">
+            {% for s in statuses %}
+            <option value="{{ s }}" {% if lead.status == s %}selected{% endif %}>
+              {{ s | capitalize }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="note">Internal Notes</label>
+          <textarea
+            id="note"
+            name="note"
+            rows="6"
+            placeholder="Add follow-up notes, quote calculations, call logs..."
+            style="white-space:pre-wrap; line-height:1.5;"
+          >{{ lead.note or '' }}</textarea>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button type="submit" class="btn btn-primary" style="width:100%;">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {% if adminRole == 'superadmin' or adminRole == 'admin' %}
+    <div class="card" style="border-top:3px solid var(--danger);">
+      <h3 style="font-size:0.95rem; font-weight:700; color:var(--danger); margin:0 0 6px;">Delete Inquiry</h3>
+      <p style="font-size:0.82rem; color:var(--grey-600); margin:0 0 14px;">
+        Permanently remove this inquiry from the database.
+      </p>
+      <form method="post" action="/admin/leads/{{ lead.id }}/delete" onsubmit="return confirm('Are you sure you want to permanently delete this inquiry?');">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-danger btn-sm" style="width:100%;">
+          Delete Inquiry
+        </button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
