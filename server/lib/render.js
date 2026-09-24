@@ -59,14 +59,11 @@ function setMeta($, sel, attr, value) {
 function show($, id, on) {
   const el = $("#" + id);
   if (!el.length) return;
-  if (on) {
-    // apply.js sets style.display = "" — the browser then drops the property
-    // entirely, so the attribute it leaves behind is an empty style="".
-    const style = (el.attr("style") || "").replace(/display\s*:\s*[^;]*;?\s*/i, "").trim();
-    el.attr("style", style);
-  } else {
-    el.attr("style", (el.attr("style") || "") + "display:none;");
-  }
+  // Idempotent: the markup already ships display:none on these, so strip any
+  // display rule first and only put one back when the section stays hidden.
+  let style = (el.attr("style") || "").replace(/display\s*:\s*[^;]*;?\s*/gi, "").trim();
+  if (!on) style = "display:none;" + (style ? " " + style : "");
+  el.attr("style", style);
 }
 
 function build(d) {
