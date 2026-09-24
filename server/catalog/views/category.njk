@@ -1,0 +1,169 @@
+{% extends "layout.njk" %}
+
+{% block breadcrumb_items %}
+  <a href="/products">Products</a>
+  <span class="separator">/</span>
+  <span>{{ category.name }}</span>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-bottom: 80px;">
+
+  <!-- Answer-First Opening (< 45 words) -->
+  <section class="answer-box">
+    <p>
+      <strong>Bongshai Steel {{ category.name }}s</strong> are pre-engineered structures fabricated in Bangladesh to AISC 360, Eurocode 3, and BNBC standards. This category features {{ products.length }} export-ready models for industrial, residential, and commercial deployment across global markets.
+    </p>
+  </section>
+
+  <!-- Trust Meta Bar -->
+  <div class="trust-meta-bar">
+    <span class="trust-badge-pill">AISC 360 &amp; BNBC 2020</span>
+    <span class="trust-badge-pill">{{ products.length }} Certified Models</span>
+    <span><strong>Category:</strong> {{ category.name }}</span>
+    <span><strong>Author / Fabricator:</strong> Bongshai Steel Ltd.</span>
+    <span><strong>Last Updated:</strong> 2026-09-24</span>
+  </div>
+
+  <!-- Category Title & Blurb -->
+  <div class="section-header" style="text-align: left; margin-bottom: 36px;">
+    <span class="section-subtitle">Certified Steel Building Category</span>
+    <h1 class="section-title" style="font-size: 2.3rem;">
+      <span style="margin-right: 8px;">{{ category.icon }}</span>{{ category.name }}
+    </h1>
+    <p style="font-size: 1.15rem; color: var(--text-muted); max-width: 800px; margin-top: 10px;">
+      {{ category.blurb }}
+    </p>
+  </div>
+
+  <!-- Models Grid -->
+  <div class="products-grid" style="margin-bottom: 60px;">
+    {% for prod in products %}
+    <div class="product-card">
+      <div class="product-thumb">
+        <img src="{{ prod.imageSrc.src }}"
+             {% if prod.imageSrc.srcset %}srcset="{{ prod.imageSrc.srcset }}" sizes="(max-width: 900px) 100vw, 400px"{% endif %}
+             alt="{{ prod.name }} - {{ prod.modelCode }}"
+             loading="lazy">
+        <span class="product-badge">{{ prod.modelCode }}</span>
+      </div>
+      <div class="product-body">
+        <span class="product-category">{{ category.name }}</span>
+        <h2 class="product-name" style="font-size: 1.3rem;">{{ prod.name }}</h2>
+        <p class="product-desc" style="font-size: 0.95rem;">{{ prod.desc }}</p>
+
+        <div class="product-footer">
+          <a href="/products/{{ prod.modelCode }}" class="btn-detail" title="View technical specs for {{ prod.modelCode }}">
+            View Details
+          </a>
+          <a href="/#product-{{ prod.id }}" class="cat-card-link" style="font-size: 0.9rem;" title="Explore 3D model in explorer">
+            3D View &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Category FAQ & Engineering Authority -->
+  <section style="margin-bottom: 60px;">
+    <div class="section-header" style="text-align: left; margin-bottom: 24px;">
+      <span class="section-subtitle">Standards &amp; Compliance</span>
+      <h2 class="section-title" style="font-size: 1.75rem;">What building codes and certifications apply to {{ category.name }}s?</h2>
+    </div>
+
+    <div class="cat-card" style="padding: 28px; margin-bottom: 24px;">
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 12px;">International Code Compliance</h3>
+      <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 16px;">
+        All {{ category.name }} structures fabricated by Bongshai Steel comply with AISC 360 (American Institute of Steel Construction), Eurocode 3 (Design of steel structures), and the Bangladesh National Building Code (BNBC 2020). Steel detailing and computerized fabrication ensure structural integrity under extreme seismic and wind events.
+      </p>
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 12px;">How is on-site erection and global delivery managed?</h3>
+      <p style="color: var(--text-muted); line-height: 1.7; margin: 0;">
+        Components are pre-fabricated, tagged, and packed for containerized ocean freight to ports across the Middle East, Africa, and South Asia. Detailed erection drawings and bolt placement schemes ensure quick erection on site with minimal labor overhead.
+      </p>
+    </div>
+  </section>
+
+  <!-- Quote Request CTA Card -->
+  <section class="quote-action-card">
+    <div class="section-header" style="text-align: left; margin-bottom: 20px;">
+      <span class="section-subtitle">Fast Quotation</span>
+      <h2 class="section-title" style="font-size: 1.75rem;">Request a Custom {{ category.name }} Quote</h2>
+      <p style="color: var(--text-muted);">Contact our engineering desk for custom dimension calculations and official pricing.</p>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+      <a href="https://wa.me/{{ settings.whatsappNumber | default('8801789949060') }}?text={{ ('Hello Bongshai Steel! I would like to request an official quote for ' + category.name + ' projects.') | urlencode }}"
+         target="_blank" rel="noopener noreferrer" class="btn-get-quote" style="background: #25D366; text-decoration: none; padding: 14px 28px; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px;"
+         data-mcp-action="open-whatsapp-inquiry">
+        💬 Chat on WhatsApp with Engineering Team
+      </a>
+      <a href="/#contact" class="btn-primary-hero" style="text-decoration: none; display: inline-block;">
+        Submit Project Specifications Online
+      </a>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block jsonld %}
+<!-- Structured Data: CollectionPage & ItemList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": {{ category.name | dump | safe }},
+  "description": {{ category.blurb | dump | safe }},
+  "url": {{ canonicalUrl | dump | safe }},
+  "publisher": {
+    "@type": "Organization",
+    "name": "Bongshai Steel",
+    "url": "https://www.bongshaisteel.com"
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": {{ (category.name + " Models") | dump | safe }},
+    "numberOfItems": {{ products.length }},
+    "itemListElement": [
+      {% for prod in products %}
+      {
+        "@type": "ListItem",
+        "position": {{ loop.index }},
+        "name": {{ prod.name | dump | safe }},
+        "url": "https://www.bongshaisteel.com/products/{{ prod.modelCode }}"
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+}
+</script>
+
+<!-- Structured Data: BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.bongshaisteel.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Products",
+      "item": "https://www.bongshaisteel.com/products"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": {{ category.name | dump | safe }},
+      "item": {{ canonicalUrl | dump | safe }}
+    }
+  ]
+}
+</script>
+{% endblock %}

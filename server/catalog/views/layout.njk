@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ pageTitle }}</title>
+  <meta name="description" content="{{ pageDescription }}">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0466c8">
+  <link rel="canonical" href="{{ canonicalUrl }}">
+
+  <!-- AEO: AI Engine Discovery Links -->
+  <link rel="llms-txt" href="/llms.txt" title="Machine-readable site summary for AI agents">
+  <link rel="ai-content-policy" href="/agent-permissions.json" title="AI agent permissions and capabilities">
+  <link rel="mcp-actions" href="/mcp-actions.json" title="WebMCP declarative actions for AI agents">
+
+  <!-- Favicon -->
+  <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/images/logo-icon-192.webp">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="{{ ogType | default('website') }}">
+  <meta property="og:site_name" content="Bongshai Steel">
+  <meta property="og:title" content="{{ ogTitle | default(pageTitle) }}">
+  <meta property="og:description" content="{{ ogDescription | default(pageDescription) }}">
+  <meta property="og:url" content="{{ canonicalUrl }}">
+  <meta property="og:image" content="{{ ogImage | default('https://www.bongshaisteel.com/images/products/Model%20No-BH-IS-1001.webp') }}">
+  <meta property="og:locale" content="en_BD">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ ogTitle | default(pageTitle) }}">
+  <meta name="twitter:description" content="{{ ogDescription | default(pageDescription) }}">
+  <meta name="twitter:image" content="{{ ogImage | default('https://www.bongshaisteel.com/images/products/Model%20No-BH-IS-1001.webp') }}">
+
+  <!-- Google Fonts & Stylesheet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+
+  <style>
+    /* Catalog-specific server-rendered styles reusing design tokens */
+    .catalog-breadcrumb {
+      padding: 16px 0;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 28px;
+    }
+    .catalog-breadcrumb a {
+      color: var(--primary-navy);
+      font-weight: 600;
+      transition: color var(--transition-fast);
+    }
+    .catalog-breadcrumb a:hover {
+      color: var(--primary-glow);
+      text-decoration: underline;
+    }
+    .catalog-breadcrumb .separator {
+      margin: 0 8px;
+      color: var(--text-dim);
+    }
+    .answer-box {
+      background: rgba(4, 102, 200, 0.04);
+      border-left: 4px solid var(--primary-navy);
+      padding: 18px 24px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 32px;
+      box-shadow: var(--shadow-sm);
+    }
+    .answer-box p {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .trust-meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 18px;
+      background: #f1f5f9;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .trust-badge-pill {
+      background: rgba(4, 102, 200, 0.1);
+      color: var(--primary-navy);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+    }
+    .quote-action-card {
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+      margin-top: 40px;
+    }
+    .nav-link, .dropdown-link, .dropdown-sublink {
+      text-decoration: none;
+      display: inline-block;
+    }
+  </style>
+
+  {% block head_extra %}{% endblock %}
+
+  <!-- Structured Data Blocks -->
+  {% block jsonld %}{% endblock %}
+</head>
+<body>
+
+  <!-- ==========================================================================
+       TOP BRAND HEADER & GLOBAL UTILITY BAR
+       ========================================================================== -->
+  <header class="top-header">
+    <div class="top-container">
+      <div class="brand-wrapper">
+        <a href="/" style="text-decoration: none; color: inherit;">
+          <div class="brand-title">BONGSHAI STEEL</div>
+          <span class="brand-subtitle">Steel Building Manufacturer &amp; Exporter</span>
+        </a>
+      </div>
+
+      <div class="top-contact-info">
+        <div class="global-badge">
+          <span class="pulse-dot"></span>
+          <span>AISC &amp; BNBC Certified • Export Ready</span>
+        </div>
+
+        <div class="contact-item">
+          <!-- Location Icon -->
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <span>Uttara C/A, Dhaka – 1230</span>
+        </div>
+
+        <div class="contact-item">
+          <!-- Phone Icon -->
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          <a href="tel:{{ settings.hotline | default('+8801789949060') }}">{{ settings.hotline | default('+8801789-949060') }}</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       NAVIGATION BAR
+       ========================================================================== -->
+  <nav class="main-navbar">
+    <div class="nav-container">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="/" class="nav-link">Home</a>
+        </li>
+        <li class="nav-item">
+          <a href="/products" class="nav-link {% if currentNav == 'products' %}active{% endif %}">
+            <span>Products</span>
+            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </a>
+          <div class="dropdown-menu" role="menu">
+            <div class="dropdown-item-wrap">
+              <a href="/products" class="dropdown-link" role="menuitem">
+                <span class="dropdown-icon-dot"></span>
+                <span>Prefab Buildings</span>
+                <span class="sub-arrow">▸</span>
+              </a>
+              <div class="nested-dropdown-menu">
+                <a href="/category/factory" class="dropdown-sublink">🏭 Steel Factory Building</a>
+                <a href="/category/structural" class="dropdown-sublink">🏢 Structural Steel Building</a>
+                <a href="/category/duplex" class="dropdown-sublink">🏘️ Duplex Steel Building</a>
+                <a href="/category/cottage" class="dropdown-sublink">🏡 Steel Cottage House</a>
+                <a href="/category/container" class="dropdown-sublink">🚢 Steel Container House</a>
+              </div>
+            </div>
+            <a href="/#products" class="dropdown-link" role="menuitem">
+              <span class="dropdown-icon-dot"></span>
+              <span>Steel Structure</span>
+            </a>
+            <a href="/#products" class="dropdown-link" role="menuitem">
+              <span class="dropdown-icon-dot"></span>
+              <span>Steel Furniture</span>
+            </a>
+            <a href="/#products" class="dropdown-link" role="menuitem">
+              <span class="dropdown-icon-dot"></span>
+              <span>Door and Gate</span>
+            </a>
+            <a href="/#products" class="dropdown-link" role="menuitem">
+              <span class="dropdown-icon-dot"></span>
+              <span>Others Steel Products</span>
+            </a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a href="/#services" class="nav-link">Services</a>
+        </li>
+        <li class="nav-item">
+          <a href="/#safety" class="nav-link">Health And Safety Policy</a>
+        </li>
+        <li class="nav-item">
+          <a href="/#faq" class="nav-link">FAQ</a>
+        </li>
+        <li class="nav-item">
+          <a href="/#contact" class="nav-link">Contact Us</a>
+        </li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="/#contact" class="btn-quote">Get a Quote</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==========================================================================
+       BREADCRUMB BAR
+       ========================================================================== -->
+  <div class="container">
+    <nav class="catalog-breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="separator">/</span>
+      {% block breadcrumb_items %}
+        <span>Products</span>
+      {% endblock %}
+    </nav>
+  </div>
+
+  <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+  <main class="page-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ==========================================================================
+       FOOTER
+       ========================================================================== -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4 style="color:#ffffff; font-size:1.6rem; font-family:var(--font-heading);">BONGSHAI STEEL</h4>
+        <p style="margin-top:12px;">{{ settings.footerBlurb | default('Premier Steel Building Manufacturer & Exporter delivering AISC & BNBC certified pre-engineered factory buildings, warehouses, duplex steel homes, resort cottages, and container houses globally.') }}</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Products</h4>
+        <ul class="footer-links">
+          <li><a href="/category/factory">Steel Factory Buildings</a></li>
+          <li><a href="/category/structural">Structural Steel Buildings</a></li>
+          <li><a href="/category/duplex">Duplex Steel Buildings</a></li>
+          <li><a href="/category/cottage">Steel Cottage Houses</a></li>
+          <li><a href="/category/container">Steel Container Houses</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Engineering &amp; Services</h4>
+        <ul class="footer-links">
+          <li><a href="/#contact">💬 Request Official Quote</a></li>
+          <li><a href="/#services">📐 Architectural &amp; Structural Engineering</a></li>
+          <li><a href="/#safety">🛡️ Health &amp; Safety Policy</a></li>
+          <li><a href="/#faq">❓ Frequently Asked Questions</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <p>📍 {{ settings.address | default('House #18, Road #18, Sector #10, Uttara C/A, Dhaka – 1230') }}</p>
+        <p style="margin-top:8px;">📞 <a href="tel:{{ settings.hotline | default('+8801789949060') }}" style="color: inherit;">{{ settings.hotline | default('+8801789-949060') }}</a></p>
+        <p style="margin-top:8px;">✉️ <a href="mailto:{{ settings.email | default('sales@bongshaisteel.com') }}" style="color: inherit;">{{ settings.email | default('sales@bongshaisteel.com') }}</a></p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>{{ settings.copyright | default('&copy; 2026 Bongshai Steel. All Rights Reserved. Designed for Ultra Fast International Performance.') | safe }}</p>
+      {% if settings.sisterLinks and settings.sisterLinks.length %}
+        <p style="margin-top:8px;">
+          Part of the Bongshai Group – see also
+          {% for link in settings.sisterLinks %}
+            <a href="{{ link.url }}" target="_blank" rel="noopener" style="color:var(--accent-cyan); font-weight:700;">{{ link.label }}</a>{% if not loop.last %} &amp; {% endif %}
+          {% endfor %}
+        </p>
+      {% else %}
+        <p style="margin-top:8px;">Part of the Bongshai Group – see also <a href="https://noormdgolam.github.io/bongshaihousing/" target="_blank" rel="noopener" style="color:var(--accent-cyan); font-weight:700;">Bongshai Housing</a> &amp; <a href="https://noormdgolam.github.io/Bongshaiengineering/" target="_blank" rel="noopener" style="color:var(--accent-cyan); font-weight:700;">Bongshai Engineering</a></p>
+      {% endif %}
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp Instant Quote Chat Button -->
+  <a href="https://wa.me/{{ settings.whatsappNumber | default('8801789949060') }}?text={{ ('Hello Bongshai Steel! I would like to inquire about steel building models and request an official quote.') | urlencode }}"
+     target="_blank" rel="noopener noreferrer" class="whatsapp-widget" title="Chat on WhatsApp (+8801789-949060)" aria-label="Chat on WhatsApp"
+     data-mcp-action="open-whatsapp-inquiry">
+    <svg viewBox="0 0 32 32">
+      <path d="M16 2A13 13 0 0 0 4.29 20.89L2 29.5l8.79-2.22A13 13 0 1 0 16 2zm6.75 18.25c-.29.83-1.68 1.58-2.33 1.68s-1.39.26-4.63-1.04a16.66 16.66 0 0 1-6.42-5.63c-.42-.58-1-1.37-1-2.42s.55-1.57.75-1.78.44-.26.59-.26h.42c.14 0 .34 0 .5.39s.56 1.36.6 1.45.08.2.02.32-.09.2-.18.31l-.27.31c-.09.11-.2.23-.08.44a10.87 10.87 0 0 0 2 2.47 9.87 9.87 0 0 0 2.91 1.8c.21.11.33.09.45-.05l.64-.75c.14-.17.29-.14.48-.07s1.22.58 1.43.68.35.15.4.24-.29 1.66-.58 2.49z"/>
+    </svg>
+  </a>
+
+</body>
+</html>
