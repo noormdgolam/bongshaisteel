@@ -479,5 +479,12 @@ module.exports = function createAdminRouter({ db, content }) {
     }
   });
 
+  /* ------------------------------------------------------------- content */
+
+  // Its own module — this file is not going the way of Housing's 4620 lines.
+  require("./admin-content")(router, {
+    db, auth, logActivity, contentChanged, view, on, FormError, roles: CONTENT_ROLES,
+  });
+
   return router;
 };
