@@ -1,0 +1,21 @@
+{
+  "name": "bongshai-steel-node-app",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "verify": "node scripts/verify-phase0.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "compression": "^1.7.4",
+    "dotenv": "^16.4.5",
+    "express": "^4.22.3",
+    "helmet": "^7.1.0",
+    "nunjucks": "^3.2.4"
+  }
+}

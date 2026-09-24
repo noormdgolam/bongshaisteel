@@ -34,3 +34,7 @@ __pycache__/
 
 # Page-view counter runtime file
 counter.txt
+
+# Node app dependencies
+/server/node_modules/
+/server/.env
