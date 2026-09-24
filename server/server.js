@@ -24,6 +24,7 @@ const render = require("./lib/render");
 const leads = require("./lib/leads");
 const createCatalogRouter = require("./catalog");
 const catalogSitemap = require("./catalog/sitemap");
+const nunjucks = require("nunjucks");
 
 const PROD = process.env.NODE_ENV === "production";
 const PORT = Number(process.env.PORT) || 3000;
@@ -143,6 +144,21 @@ app.get("/counter.php", (req, res) => {
   }
   res.json({ views: count });
 });
+
+/* Admin panel. Templates in server/views/admin/ (autoescape on); users and
+   sessions live in the database, so without it the panel says so plainly
+   instead of half-working. */
+nunjucks.configure(path.join(__dirname, "views"), { autoescape: true, express: app, noCache: !PROD });
+app.set("view engine", "njk");
+if (content.SOURCE === "db") {
+  app.use(require("./routes/admin")({ db: require("./lib/db"), content }));
+} else {
+  app.all(/^\/admin(?:\/(?!editor\.(?:js|css)$).*)?$/i, (req, res, next) => {
+    if (/\.php$/i.test(req.path)) return next();
+    res.status(503).type("html").send("<!doctype html><title>Admin unavailable</title>" +
+      "<p>The admin panel needs the database. Set CONTENT_SOURCE=db in server/.env.</p>");
+  });
+}
 
 /* Server-rendered catalogue: /products, /products/:modelCode, /category/:key.
    Built in server/catalog/ (Antigravity's lane). Unknown slugs call next(),
