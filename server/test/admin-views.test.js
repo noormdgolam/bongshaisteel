@@ -86,7 +86,7 @@ async function main() {
 
   const app = express();
   app.set("trust proxy", 1);
-  nunjucks.configure(VIEWS, { autoescape: true, express: app, noCache: true });
+  require("../lib/view-filters").register(nunjucks.configure(VIEWS, { autoescape: true, express: app, noCache: true }));
   app.set("view engine", "njk");
   app.use(createAdminRouter({ db, content }));
   app.use((req, res) => res.status(404).send("SITE 404"));

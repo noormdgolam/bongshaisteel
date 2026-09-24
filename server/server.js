@@ -148,7 +148,8 @@ app.get("/counter.php", (req, res) => {
 /* Admin panel. Templates in server/views/admin/ (autoescape on); users and
    sessions live in the database, so without it the panel says so plainly
    instead of half-working. */
-nunjucks.configure(path.join(__dirname, "views"), { autoescape: true, express: app, noCache: !PROD });
+require("./lib/view-filters").register(
+  nunjucks.configure(path.join(__dirname, "views"), { autoescape: true, express: app, noCache: !PROD }));
 app.set("view engine", "njk");
 if (content.SOURCE === "db") {
   app.use(require("./routes/admin")({ db: require("./lib/db"), content }));
