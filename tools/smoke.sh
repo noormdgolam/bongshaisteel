@@ -175,6 +175,70 @@ want "disallowed image type rejected" 415 \
 wantgrep "  as bad_type" "bad_type"
 
 echo
+echo "--- messages (leads) ---"
+rm -f "$PROJ/admin/backups/.leadrate.json" "$PROJ/data/leads.json"
+
+want "lead.php refuses GET" 405 "$(code "$B/lead.php")"
+
+# A filled honeypot is answered as though it worked, but nothing is kept.
+want "honeypot is answered normally" 200 \
+  "$(code -X POST -d 'name=Bot&phone=1&website=http://spam.example' "$B/lead.php")"
+wantgrep "  and nothing is stored" '"stored":false'
+
+want "a message with no phone is refused" 422 "$(code -X POST -d 'name=NoPhone' "$B/lead.php")"
+want "a real contact message is taken" 200 \
+  "$(code -X POST -d 'kind=contact&name=Smoke Tester&phone=%2B8801700000000&message=Need a shed' "$B/lead.php")"
+wantgrep "  and stored" '"stored":true'
+
+want "the inbox needs auth" 403 "$(code "$B/admin/api.php?action=leads")"
+want "  and lists for a signed-in admin" 200 "$(code -b "$JAR" "$B/admin/api.php?action=leads")"
+LEAD="$("$PY" -c "import json,sys;d=json.load(sys.stdin);print(d['leads'][0]['id'] if d['leads'] else 'NONE')" < "$TMP/body.txt")"
+want "  exactly one message is held" 1 \
+  "$("$PY" -c "import json,sys;print(len(json.load(sys.stdin)['leads']))" < "$TMP/body.txt")"
+
+want "status can be set" 200 \
+  "$(code -b "$JAR" -X POST -H "Origin: $B" -H "Content-Type: application/json" \
+     -d "{\"id\":\"$LEAD\",\"status\":\"contacted\",\"note\":\"rang back\"}" "$B/admin/api.php?action=lead-update")"
+wantgrep "  and comes back changed" '"status":"contacted"'
+want "an invented status is refused" 422 \
+  "$(code -b "$JAR" -X POST -H "Origin: $B" -H "Content-Type: application/json" \
+     -d "{\"id\":\"$LEAD\",\"status\":\"vip\"}" "$B/admin/api.php?action=lead-update")"
+
+want "CSV export works" 200 "$(code -b "$JAR" "$B/admin/api.php?action=leads-csv")"
+wantgrep "  with a header row" "id,received,kind,status,note"
+wantgrep "  and the message in it" "Smoke Tester"
+
+want "a message can be deleted" 200 \
+  "$(code -b "$JAR" -X POST -H "Origin: $B" -H "Content-Type: application/json" \
+     -d "{\"id\":\"$LEAD\"}" "$B/admin/api.php?action=lead-delete")"
+want "  and is gone on a second try" 404 \
+  "$(code -b "$JAR" -X POST -H "Origin: $B" -H "Content-Type: application/json" \
+     -d "{\"id\":\"$LEAD\"}" "$B/admin/api.php?action=lead-delete")"
+
+# lead_rate defaults to 5 per window; the 6th from one address is turned away.
+rm -f "$PROJ/admin/backups/.leadrate.json"
+for i in 1 2 3 4 5; do
+  code -X POST -d "kind=contact&name=Flood $i&phone=%2B880170000000$i&message=x" "$B/lead.php" > /dev/null
+done
+want "the 6th message in a row is rate limited" 429 \
+  "$(code -X POST -d 'kind=contact&name=Flood 6&phone=%2B8801700000006&message=x' "$B/lead.php")"
+wantgrep "  as too_many" "too_many"
+rm -f "$PROJ/admin/backups/.leadrate.json"
+
+echo
+echo "--- overview numbers and the activity trail ---"
+want "stats need auth" 403 "$(code "$B/admin/api.php?action=stats")"
+want "  and report for an admin" 200 "$(code -b "$JAR" "$B/admin/api.php?action=stats")"
+wantgrep "  with the catalog size" '"products":'
+wantgrep "  and the unread count" '"leadsNew":'
+
+want "activity needs auth" 403 "$(code "$B/admin/api.php?action=activity")"
+want "  and reads back for an admin" 200 "$(code -b "$JAR" "$B/admin/api.php?action=activity")"
+wantgrep "  with the saves in it" "content.save"
+wantgrep "  and the sign-in" "auth.signin"
+wantgrep "  and the messages" "lead.new"
+
+echo
 echo "--- logout and throttle ---"
 want "logout works" 200 "$(code -b "$JAR" -c "$JAR" -X POST -H "Origin: $B" "$B/admin/api.php?action=logout")"
 want "  session gone" 403 "$(code -b "$JAR" "$B/admin/api.php?action=load")"

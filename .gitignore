@@ -29,6 +29,7 @@ __pycache__/
 /admin/config.php
 /admin/backups/
 /data/content.json
+/data/leads.json
 /images/uploads/
 
 # Page-view counter runtime file

@@ -23,7 +23,12 @@
   },
   "seo": {
     "title": "Bongshai Steel | Steel Building Manufacturer & Exporter",
-    "description": "Bongshai Steel is a Bangladesh-based steel building manufacturer and exporter, delivering AISC & BNBC certified Pre-Engineered Steel Factory Buildings, Structural Steel Towers, Duplex Steel Homes, Resort Cottages, and Container Houses to the Middle East, Africa, South Asia, and worldwide."
+    "description": "Bongshai Steel is a Bangladesh-based steel building manufacturer and exporter, delivering AISC & BNBC certified Pre-Engineered Steel Factory Buildings, Structural Steel Towers, Duplex Steel Homes, Resort Cottages, and Container Houses to the Middle East, Africa, South Asia, and worldwide.",
+    "keywords": "Bongshai Steel, Steel Building Manufacturer, Pre-Engineered Steel Building Exporter, Steel Factory Bangladesh, PEB Middle East, Steel Building Africa, Structural Steel Building, Duplex Steel Building, Container House Manufacturer, AISC Steel Code, Eurocode Structural Steel",
+    "canonical": "https://www.bongshaisteel.com/",
+    "ogTitle": "Bongshai Steel | Steel Building Manufacturer & Exporter",
+    "ogDescription": "Bangladesh-based manufacturer of Pre-Engineered Steel Buildings (PEB), Structural Steel Towers, Duplex Steel Villas, and Container Houses, exporting to the Middle East, Africa, South Asia, and international markets.",
+    "ogImage": "images/products/Model%20No-BH-IS-1001.webp"
   },
   "text": {
     "hero.tag": "Worldwide Engineering Standards • AISC & Eurocode",
@@ -54,7 +59,24 @@
     "contact.subtitle": "Global Inquiries",
     "contact.title": "Contact Bongshai Steel",
     "contact.hqTitle": "Corporate Headquarters",
-    "contact.formTitle": "Send Official Inquiry"
+    "contact.formTitle": "Send Official Inquiry",
+    "nav.home": "Home",
+    "nav.products": "Products",
+    "nav.services": "Services",
+    "nav.safety": "Health And Safety Policy",
+    "nav.faq": "FAQ",
+    "nav.contact": "Contact Us",
+    "nav.quote": "Get a Quote",
+    "nav.cat.prefab": "Prefab Buildings",
+    "nav.cat.structure": "Steel Structure",
+    "nav.cat.furniture": "Steel Furniture",
+    "nav.cat.doorgate": "Door and Gate",
+    "nav.cat.siteothers": "Others Steel Products",
+    "testimonials.subtitle": "Client Feedback",
+    "testimonials.title": "What Our Clients Say",
+    "team.subtitle": "The People Behind It",
+    "team.title": "Our Engineering Team",
+    "serviceAreas.title": "Areas We Serve"
   },
   "html": {
     "hero.byline": "<time datetime=\"2026-08-08\">Last updated: August 8, 2026</time> · Reviewed &amp; Approved by <strong>SMA Awal, Chief Engineer</strong>, Bongshai Steel",
@@ -162,7 +184,10 @@
         "q": "How long does it take to erect a pre-engineered steel building?",
         "a": "Pre-engineered steel buildings from Bongshai Steel erect 50%+ faster than equivalent concrete construction. Factory-bolted connections and pre-punched components eliminate on-site cutting and welding. Typical erection time for an industrial factory shed is 30–60 days depending on span and complexity, once fabrication is complete and components are delivered to site."
       }
-    ]
+    ],
+    "testimonials": [],
+    "team": [],
+    "serviceAreas": []
   },
   "mainCategories": [
     {

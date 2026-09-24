@@ -334,20 +334,20 @@
     <div class="nav-container">
       <ul class="nav-menu">
         <li class="nav-item">
-          <button class="nav-link active" type="button" onclick="navigateToView('homeView')">Home</button>
+          <button class="nav-link active" type="button" onclick="navigateToView('homeView')"><span data-cms="nav.home">Home</span></button>
         </li>
         
         <!-- PRODUCTS MEGA DROPDOWN -->
         <li class="nav-item">
           <button class="nav-link" type="button" onclick="goToMainCategory('prefab')" aria-haspopup="true" aria-expanded="false">
-            Products
+            <span data-cms="nav.products">Products</span>
             <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <div class="dropdown-menu" role="menu">
             <div class="dropdown-item-wrap">
               <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('prefab')">
                 <span class="dropdown-icon-dot"></span>
-                <span>Prefab Buildings</span>
+                <span data-cms="nav.cat.prefab">Prefab Buildings</span>
                 <span class="sub-arrow">▸</span>
               </button>
               <div class="nested-dropdown-menu">
@@ -361,40 +361,40 @@
 
             <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('structure')">
               <span class="dropdown-icon-dot"></span>
-              <span>Steel Structure</span>
+              <span data-cms="nav.cat.structure">Steel Structure</span>
             </button>
             <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('furniture')">
               <span class="dropdown-icon-dot"></span>
-              <span>Steel Furniture</span>
+              <span data-cms="nav.cat.furniture">Steel Furniture</span>
             </button>
             <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('doorgate')">
               <span class="dropdown-icon-dot"></span>
-              <span>Door and Gate</span>
+              <span data-cms="nav.cat.doorgate">Door and Gate</span>
             </button>
             <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('siteothers')">
               <span class="dropdown-icon-dot"></span>
-              <span>Others Steel Products</span>
+              <span data-cms="nav.cat.siteothers">Others Steel Products</span>
             </button>
           </div>
         </li>
 
         <li class="nav-item">
-          <button class="nav-link" type="button" onclick="navigateToView('servicesView')">Services</button>
+          <button class="nav-link" type="button" onclick="navigateToView('servicesView')"><span data-cms="nav.services">Services</span></button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" type="button" onclick="navigateToView('safetyView')">Health And Safety Policy</button>
+          <button class="nav-link" type="button" onclick="navigateToView('safetyView')"><span data-cms="nav.safety">Health And Safety Policy</span></button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" type="button" onclick="navigateToView('faqView')">FAQ</button>
+          <button class="nav-link" type="button" onclick="navigateToView('faqView')"><span data-cms="nav.faq">FAQ</span></button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" type="button" onclick="navigateToView('contactView')">Contact Us</button>
+          <button class="nav-link" type="button" onclick="navigateToView('contactView')"><span data-cms="nav.contact">Contact Us</span></button>
         </li>
       </ul>
 
       <div class="nav-actions">
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
-        <button class="btn-quote" onclick="openQuoteModal()">Get a Quote</button>
+        <button class="btn-quote" onclick="openQuoteModal()"><span data-cms="nav.quote">Get a Quote</span></button>
         <button class="hamburger" id="hamburgerBtn" aria-label="Open Navigation" aria-haspopup="true" aria-expanded="false" aria-controls="mobileDrawer">☰</button>
       </div>
     </div>
@@ -408,7 +408,7 @@
         <button class="drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
       </div>
       <ul class="mobile-menu">
-        <li><button class="mobile-link" type="button" onclick="navigateToView('homeView')">Home</button></li>
+        <li><button class="mobile-link" type="button" onclick="navigateToView('homeView')"><span data-cms="nav.home">Home</span></button></li>
         <li>
           <button class="mobile-link" type="button" onclick="goToMainCategory('prefab')">Products</button>
           <ul class="mobile-sub-menu">
@@ -428,10 +428,10 @@
             <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('siteothers')">Others Steel Products</button></li>
           </ul>
         </li>
-        <li><button class="mobile-link" type="button" onclick="navigateToView('servicesView')">Services</button></li>
+        <li><button class="mobile-link" type="button" onclick="navigateToView('servicesView')"><span data-cms="nav.services">Services</span></button></li>
         <li><button class="mobile-link" type="button" onclick="navigateToView('safetyView')">Health & Safety Policy</button></li>
-        <li><button class="mobile-link" type="button" onclick="navigateToView('faqView')">FAQ</button></li>
-        <li><button class="mobile-link" type="button" onclick="navigateToView('contactView')">Contact Us</button></li>
+        <li><button class="mobile-link" type="button" onclick="navigateToView('faqView')"><span data-cms="nav.faq">FAQ</span></button></li>
+        <li><button class="mobile-link" type="button" onclick="navigateToView('contactView')"><span data-cms="nav.contact">Contact Us</span></button></li>
       </ul>
     </div>
   </div>
@@ -511,6 +511,18 @@
             <span style="font-size:0.85rem; color:var(--text-muted);">3D Structural modeling tailored to site loads & spans</span>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- CLIENT TESTIMONIALS — built by apply.js from the CMS.
+         Stays hidden until there is at least one entry. -->
+    <section class="section" id="testimonialsSection" style="display:none; padding:60px 24px;">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle" data-cms="testimonials.subtitle">Client Feedback</span>
+          <h2 class="section-title" data-cms="testimonials.title">What Our Clients Say</h2>
+        </div>
+        <div class="category-cards-grid" id="testimonialsList"></div>
       </div>
     </section>
 
@@ -699,6 +711,15 @@
           </div>
         </div>
       </div>
+
+      <!-- TEAM — built by apply.js; hidden until there is an entry. -->
+      <div id="teamSection" style="display:none; margin-top:56px;">
+        <div class="section-header">
+          <span class="section-subtitle" data-cms="team.subtitle">The People Behind It</span>
+          <h2 class="section-title" data-cms="team.title">Our Engineering Team</h2>
+        </div>
+        <div class="category-cards-grid" id="teamList"></div>
+      </div>
     </div>
   </section>
 
@@ -791,6 +812,12 @@
           <p style="margin-bottom:14px; font-weight:600;"><strong>Hotline / WhatsApp:</strong> <span data-cms-set="hotline">+8801789-949060</span></p>
           <p style="margin-bottom:14px; font-weight:600;"><strong>Official Email:</strong> <span data-cms-set="email">sales@bongshaisteel.com</span></p>
           <p style="margin-bottom:14px; font-weight:600;"><strong>Working Hours:</strong> <span data-cms-set="workingHours">Sat - Thu (9:00 AM - 7:00 PM GMT+6)</span></p>
+
+          <!-- SERVICE AREAS — built by apply.js; hidden until there is an entry. -->
+          <div id="serviceAreasBlock" style="display:none; margin-top:22px;">
+            <p style="margin-bottom:10px; font-weight:800; color:var(--primary-navy);" data-cms="serviceAreas.title">Areas We Serve</p>
+            <div id="serviceAreasList" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+          </div>
         </div>
         <div class="cat-card" style="padding:35px;">
           <h3 style="font-size:1.5rem; font-weight:800; margin-bottom:20px; color:var(--primary-navy);" data-cms="contact.formTitle">Send Official Inquiry</h3>
@@ -801,6 +828,8 @@
             <input type="text" name="name" data-mcp-param="name" data-mcp-description="Your Full Name or Company Name" placeholder="Your Full Name / Company Name" required style="width:100%; padding:14px; border:1px solid var(--border-light); border-radius:8px; margin-bottom:14px; outline:none;">
             <input type="tel" name="phone" data-mcp-param="phone" data-mcp-description="Your Phone Number or WhatsApp" placeholder="Phone Number / WhatsApp" required style="width:100%; padding:14px; border:1px solid var(--border-light); border-radius:8px; margin-bottom:14px; outline:none;">
             <textarea name="message" data-mcp-param="message" data-mcp-description="Project details and dimensions" placeholder="Specify project type, building dimensions (sqft), or specs..." rows="4" style="width:100%; padding:14px; border:1px solid var(--border-light); border-radius:8px; margin-bottom:18px; outline:none;" required></textarea>
+            <input type="hidden" name="kind" value="contact">
+            <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; width:1px; height:1px;">
             <button type="submit" class="btn-primary-hero" style="width:100%; border:none; cursor:pointer;">Submit Inquiry</button>
           </form>
         </div>

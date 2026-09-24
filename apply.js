@@ -48,13 +48,20 @@
     var settings = d.settings || {};
     var sec = d.sections || {};
 
-    // <head> SEO
+    // <head> SEO — title, meta, Open Graph and Twitter all follow one source
     if (d.seo) {
-      if (d.seo.title) document.title = d.seo.title;
-      if (d.seo.description) {
-        var meta = document.querySelector('meta[name="description"]');
-        if (meta) meta.setAttribute("content", d.seo.description);
-      }
+      var seo = d.seo;
+      if (seo.title) document.title = seo.title;
+      setMeta('meta[name="description"]', "content", seo.description);
+      setMeta('meta[name="keywords"]', "content", seo.keywords);
+      setMeta('link[rel="canonical"]', "href", seo.canonical);
+      setMeta('meta[property="og:title"]', "content", seo.ogTitle || seo.title);
+      setMeta('meta[property="og:description"]', "content", seo.ogDescription || seo.description);
+      setMeta('meta[property="og:image"]', "content", seo.ogImage);
+      setMeta('meta[property="og:url"]', "content", seo.canonical);
+      setMeta('meta[name="twitter:title"]', "content", seo.ogTitle || seo.title);
+      setMeta('meta[name="twitter:description"]', "content", seo.ogDescription || seo.description);
+      setMeta('meta[name="twitter:image"]', "content", seo.ogImage);
     }
 
     // data-cms          -> textContent from content.text[key]
@@ -95,6 +102,9 @@
     renderSafety(sec.safety);
     renderFaq(sec.faq);
     renderFooterSister(settings.sisterLinks);
+    renderTestimonials(sec.testimonials);
+    renderTeam(sec.team);
+    renderServiceAreas(sec.serviceAreas);
   }
 
   /* ----------------------------------------------------------------------
@@ -109,6 +119,17 @@
     return String(s == null ? "" : s)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+
+  function setMeta(sel, attr, value) {
+    if (value == null || value === "") return;
+    var el = document.querySelector(sel);
+    if (el) el.setAttribute(attr, value);
+  }
+
+  /** These sections do not exist on the page until the CMS has content for them. */
+  function show(el, on) {
+    if (el) el.style.display = on ? "" : "none";
   }
 
   /** Only ever emit an href a browser treats as navigation, never javascript:. */
@@ -191,6 +212,61 @@
         '<p class="faq-answer" style="color:var(--text-muted); line-height:1.6;">' + (f.a || "") + "</p>" +
         "</div>"
       );
+    }).join("");
+  }
+
+  function renderTestimonials(list) {
+    var box = document.getElementById("testimonialsList");
+    var wrap = document.getElementById("testimonialsSection");
+    if (!box) return;
+    var items = (Array.isArray(list) ? list : []).filter(function (t) { return t && t.quote; });
+    show(wrap, items.length > 0);
+    box.innerHTML = items.map(function (t) {
+      return (
+        '<div class="cat-card"><div class="cat-card-body">' +
+        '<p style="font-style:italic; color:var(--text-muted); line-height:1.7; margin-bottom:16px;">\u201C' +
+        esc(t.quote) + '\u201D</p>' +
+        '<strong style="color:var(--primary-navy); display:block;">' + esc(t.author) + "</strong>" +
+        (t.role ? '<span style="font-size:0.85rem; color:var(--text-muted);">' + esc(t.role) + "</span>" : "") +
+        "</div></div>"
+      );
+    }).join("");
+  }
+
+  function renderTeam(list) {
+    var box = document.getElementById("teamList");
+    var wrap = document.getElementById("teamSection");
+    if (!box) return;
+    var items = (Array.isArray(list) ? list : []).filter(function (m) { return m && m.name; });
+    show(wrap, items.length > 0);
+    box.innerHTML = items.map(function (m) {
+      var photo = m.photo
+        ? '<img src="' + esc(encodeURI(String(m.photo))) + '" alt="' + esc(m.name) +
+          '" loading="lazy" style="width:100%; height:220px; object-fit:cover; display:block;">'
+        : "";
+      return (
+        '<div class="cat-card">' + photo + '<div class="cat-card-body">' +
+        '<h3 class="cat-card-title">' + esc(m.name) + "</h3>" +
+        (m.role ? '<p class="cat-card-desc" style="font-weight:700; color:var(--primary-navy);">' + esc(m.role) + "</p>" : "") +
+        (m.bio ? '<p class="cat-card-desc">' + esc(m.bio) + "</p>" : "") +
+        "</div></div>"
+      );
+    }).join("");
+  }
+
+  function renderServiceAreas(list) {
+    var box = document.getElementById("serviceAreasList");
+    var wrap = document.getElementById("serviceAreasBlock");
+    if (!box) return;
+    var items = (Array.isArray(list) ? list : [])
+      .map(function (a) { return typeof a === "string" ? { name: a } : a; })
+      .filter(function (a) { return a && a.name; });
+    show(wrap, items.length > 0);
+    box.innerHTML = items.map(function (a) {
+      return '<span style="background:rgba(4,102,200,.08); color:var(--primary-navy); ' +
+        'border:1px solid var(--border-light); border-radius:20px; padding:6px 14px; ' +
+        'font-size:0.85rem; font-weight:700;"' +
+        (a.note ? ' title="' + esc(a.note) + '"' : "") + ">" + esc(a.name) + "</span>";
     }).join("");
   }
 

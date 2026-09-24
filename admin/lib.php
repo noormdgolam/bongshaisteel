@@ -5,6 +5,23 @@
    ========================================================================== */
 declare(strict_types=1);
 
+/** Every field lead.php will accept, and the length it is cut to. */
+const CMS_LEAD_FIELDS = [
+    'name'        => 120,
+    'phone'       => 60,
+    'email'       => 160,
+    'company'     => 160,
+    'message'     => 4000,
+    'destination' => 200,
+    'currency'    => 20,
+    'standard'    => 60,
+    'dimensions'  => 200,
+    'modelCode'   => 60,
+    'source'      => 120,
+];
+
+const CMS_LEAD_STATUSES = ['new', 'contacted', 'quoted', 'won', 'lost'];
+
 /* --------------------------------------------------------------------------
    CONFIG
    -------------------------------------------------------------------------- */
@@ -62,6 +79,19 @@ function cms_config_defaults(): array
         // Request limits.
         'max_pixels'   => 40000000, // reject decompression-bomb images
         'max_body'     => 4194304,  // largest accepted save payload
+
+        // Lead intake (lead.php).
+        'leads_file'   => dirname(__DIR__) . '/data/leads.json',
+        'max_leads'    => 2000,     // oldest are dropped past this
+        'lead_rate'    => 5,        // messages one connection may send...
+        'lead_window'  => 600,      // ...within this many seconds
+
+        // Where the page-view counter keeps its total.
+        'counter_file' => dirname(__DIR__) . '/counter.txt',
+
+        // Activity trail.
+        'activity_file' => __DIR__ . '/backups/activity.log',
+        'max_activity'  => 4000,    // lines kept
     ];
 }
 
@@ -386,6 +416,7 @@ function cms_handle_upload(): void
             $widths[] = $tw;
         }
         imagedestroy($src);
+        cms_activity('media.upload', $relFull);
         cms_ok(['path' => $relFull, 'widths' => $widths, 'variants' => true]);
     }
 
@@ -395,6 +426,7 @@ function cms_handle_upload(): void
     if (!move_uploaded_file($f['tmp_name'], $dir . '/' . $stem . '.' . $ext)) {
         cms_fail(500, 'move_failed', 'Could not store the uploaded file.');
     }
+    cms_activity('media.upload', $relFull . ' (no variants)');
     cms_ok(['path' => $relFull, 'widths' => [], 'variants' => false,
             'note' => 'Server has no GD/WebP support — stored full-size only, no responsive variants.']);
 }
@@ -459,4 +491,179 @@ function cms_restore_backup(string $id): array
     $j = json_decode((string) file_get_contents($path), true);
     if (!is_array($j)) cms_fail(422, 'bad_backup', 'That snapshot is not readable JSON.');
     return cms_write_content($j);   // snapshots the current content first
+}
+
+/* --------------------------------------------------------------------------
+   LEADS
+   -------------------------------------------------------------------------- */
+function cms_leads_read(): array
+{
+    $cfg = cms_config();
+    if (!is_file($cfg['leads_file'])) return [];
+    $j = json_decode((string) @file_get_contents($cfg['leads_file']), true);
+    return is_array($j) ? $j : [];
+}
+
+function cms_leads_write(array $leads): void
+{
+    $cfg = cms_config();
+    $dir = dirname($cfg['leads_file']);
+    if (!is_dir($dir)) @mkdir($dir, 0775, true);
+    if (!is_dir($dir) || !is_writable($dir)) {
+        cms_fail(500, 'not_writable', "Cannot write to $dir — set its permissions to 775.");
+    }
+    $max = max(1, (int) $cfg['max_leads']);
+    if (count($leads) > $max) $leads = array_slice($leads, 0, $max);
+
+    $tmp = $cfg['leads_file'] . '.tmp';
+    $json = json_encode(array_values($leads), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    if ($json === false || file_put_contents($tmp, $json, LOCK_EX) === false || !@rename($tmp, $cfg['leads_file'])) {
+        @unlink($tmp);
+        cms_fail(500, 'write_failed', 'Could not write data/leads.json.');
+    }
+}
+
+/** Newest first, so the dashboard and the cap both read naturally. */
+function cms_leads_append(array $lead): void
+{
+    $all = cms_leads_read();
+    array_unshift($all, $lead);
+    cms_leads_write($all);
+}
+
+function cms_lead_rate_file(): string
+{
+    $cfg = (cms_config_raw() ?: []) + cms_config_defaults();
+    $dir = $cfg['backup_dir'];
+    if (!is_dir($dir)) @mkdir($dir, 0775, true);
+    if (is_dir($dir) && !is_file($dir . '/.htaccess')) {
+        @file_put_contents($dir . '/.htaccess', "Require all denied\n");
+    }
+    return $dir . '/.leadrate.json';
+}
+
+/** Seconds until this connection may send again, or 0 when it may now. */
+function cms_lead_rate_left(): int
+{
+    $cfg = (cms_config_raw() ?: []) + cms_config_defaults();
+    $f = cms_lead_rate_file();
+    if (!is_file($f)) return 0;
+    $all = json_decode((string) @file_get_contents($f), true);
+    $rec = is_array($all) ? ($all[cms_throttle_key()] ?? null) : null;
+    if (!is_array($rec)) return 0;
+
+    $window = max(60, (int) $cfg['lead_window']);
+    $age    = time() - (int) ($rec['first'] ?? 0);
+    if ($age >= $window) return 0;                       // window has rolled over
+    if ((int) ($rec['n'] ?? 0) < max(1, (int) $cfg['lead_rate'])) return 0;
+    return $window - $age;
+}
+
+function cms_lead_rate_note(): void
+{
+    $cfg    = (cms_config_raw() ?: []) + cms_config_defaults();
+    $window = max(60, (int) $cfg['lead_window']);
+    $now    = time();
+    $key    = cms_throttle_key();
+    $f      = cms_lead_rate_file();
+
+    $all = json_decode((string) @file_get_contents($f), true);
+    if (!is_array($all)) $all = [];
+    foreach ($all as $k => $v) {
+        if (!is_array($v) || ($now - (int) ($v['first'] ?? 0)) > $window) unset($all[$k]);
+    }
+    $rec = $all[$key] ?? null;
+    $all[$key] = is_array($rec)
+        ? ['n' => (int) $rec['n'] + 1, 'first' => (int) $rec['first']]
+        : ['n' => 1, 'first' => $now];
+    @file_put_contents($f, json_encode($all), LOCK_EX);
+}
+
+/* --------------------------------------------------------------------------
+   ACTIVITY TRAIL  (one JSON object per line, newest appended)
+   -------------------------------------------------------------------------- */
+function cms_activity(string $event, string $detail = ''): void
+{
+    $cfg = (cms_config_raw() ?: []) + cms_config_defaults();
+    $f   = $cfg['activity_file'];
+    $dir = dirname($f);
+    if (!is_dir($dir)) @mkdir($dir, 0775, true);
+    if (is_dir($dir) && !is_file($dir . '/.htaccess')) {
+        @file_put_contents($dir . '/.htaccess', "Require all denied\n");
+    }
+
+    $line = json_encode([
+        'at'     => gmdate('c'),
+        'event'  => substr($event, 0, 40),
+        'detail' => substr($detail, 0, 300),
+        'from'   => cms_throttle_key(),
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    if ($line === false) return;
+    @file_put_contents($f, $line . "\n", FILE_APPEND | LOCK_EX);
+
+    // Trim occasionally rather than on every write.
+    $max = max(100, (int) $cfg['max_activity']);
+    if (@filesize($f) > $max * 200) {
+        $lines = @file($f, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+        if (count($lines) > $max) {
+            @file_put_contents($f, implode("\n", array_slice($lines, -$max)) . "\n", LOCK_EX);
+        }
+    }
+}
+
+/** Newest first. */
+function cms_activity_read(int $limit = 200): array
+{
+    $cfg = (cms_config_raw() ?: []) + cms_config_defaults();
+    $f   = $cfg['activity_file'];
+    if (!is_file($f)) return [];
+    $lines = @file($f, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+    $lines = array_slice($lines, -max(1, $limit));
+    $out = [];
+    foreach (array_reverse($lines) as $l) {
+        $j = json_decode($l, true);
+        if (is_array($j)) $out[] = $j;
+    }
+    return $out;
+}
+
+/* --------------------------------------------------------------------------
+   OVERVIEW NUMBERS
+   -------------------------------------------------------------------------- */
+function cms_stats(): array
+{
+    $cfg     = cms_config();
+    $content = cms_read_content();
+    $leads   = cms_leads_read();
+
+    $new = 0;
+    foreach ($leads as $l) {
+        if (($l['status'] ?? 'new') === 'new') $new++;
+    }
+
+    $sections = is_array($content['sections'] ?? null) ? $content['sections'] : [];
+    $count = function ($v) { return is_array($v) ? count($v) : 0; };
+
+    return [
+        'products'     => $count($content['products'] ?? null),
+        'categories'   => $count($content['categories'] ?? null),
+        'featured'     => $count($content['featuredIds'] ?? null),
+        'faq'          => $count($sections['faq'] ?? null),
+        'services'     => $count($sections['services'] ?? null),
+        'testimonials' => $count($sections['testimonials'] ?? null),
+        'team'         => $count($sections['team'] ?? null),
+        'serviceAreas' => $count($sections['serviceAreas'] ?? null),
+        'leads'        => count($leads),
+        'leadsNew'     => $new,
+        'views'        => is_file($cfg['counter_file'])
+            ? (int) trim((string) @file_get_contents($cfg['counter_file'])) : null,
+        'updated'      => $content['updated'] ?? null,
+        'backups'      => count(cms_backups_list()),
+        'engine'       => [
+            'php'    => PHP_VERSION,
+            'gd'     => function_exists('imagewebp'),
+            'live'   => is_file($cfg['content_file']),
+            'server' => substr((string) ($_SERVER['SERVER_SOFTWARE'] ?? 'unknown'), 0, 60),
+        ],
+    ];
 }

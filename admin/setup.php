@@ -58,6 +58,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && !cms_same_origin()) {
 
         if (@file_put_contents($cfgPath, $out) !== false) {
             $wrote = true;
+            cms_activity('setup.complete');
             $msg = 'config.php written. You can sign in now — then DELETE admin/setup.php.';
         } else {
             $msg = 'Could not write admin/config.php (folder not writable). '

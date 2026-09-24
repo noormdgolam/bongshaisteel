@@ -775,6 +775,9 @@ function openQuoteModal(modelCode = "") {
             data-mcp-action="request-official-quote"
             data-mcp-description="Submit a formal quote request for a pre-engineered steel building."
             data-mcp-params='{"required": ["name", "phone", "destination", "currency", "standard", "dimensions"], "optional": []}'>
+        <input type="hidden" name="kind" value="quote">
+        <input type="hidden" name="modelCode" value="${modelCode}">
+        <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; width:1px; height:1px;">
         <div class="form-field">
           <label>Your Full Name / Company Name</label>
           <input type="text" name="name" data-mcp-param="name" data-mcp-description="Your Full Name or Company Name" required placeholder="Full name or Company">
@@ -842,8 +845,49 @@ function closeModal() {
 
 function handleQuoteSubmit(e) {
   e.preventDefault();
-  alert("Thank you! Your quote request has been submitted successfully. Our engineering team at Bongshai Steel will contact you shortly.");
-  closeModal();
+  const form = e.target;
+  const btn = form.querySelector('button[type="submit"]');
+  const label = btn ? btn.textContent : "";
+
+  const data = new FormData(form);
+  if (!data.get("kind")) {
+    data.set("kind", form.getAttribute("data-mcp-action") === "request-official-quote" ? "quote" : "contact");
+  }
+  data.set("source", location.pathname + location.hash);
+
+  if (btn) { btn.disabled = true; btn.textContent = "Sending\u2026"; }
+  showFormNote(form, "", null);
+
+  fetch("lead.php", { method: "POST", body: new URLSearchParams(data) })
+    .then((r) => r.json().then((j) => ({ ok: r.ok, j })))
+    .then(({ ok, j }) => {
+      if (!ok || !j || !j.ok) throw new Error((j && j.message) || "Could not send that just now.");
+      form.reset();
+      showFormNote(form, "Thank you. Your inquiry has reached Bongshai Steel \u2014 our engineering team will contact you shortly.", true);
+      const overlay = document.getElementById("modalOverlay");
+      if (overlay && overlay.classList.contains("active")) setTimeout(closeModal, 2400);
+    })
+    .catch((err) => {
+      showFormNote(form, err.message + " Please call the hotline instead.", false);
+    })
+    .then(() => {
+      if (btn) { btn.disabled = false; btn.textContent = label; }
+    });
+}
+
+/** One status line per form, created on first use and reused after that. */
+function showFormNote(form, text, ok) {
+  let note = form.querySelector(".form-note");
+  if (!note) {
+    note = document.createElement("p");
+    note.className = "form-note";
+    note.setAttribute("role", "status");
+    note.style.cssText = "margin-top:14px; font-weight:700; line-height:1.5; font-size:0.92rem;";
+    form.appendChild(note);
+  }
+  note.textContent = text || "";
+  note.style.display = text ? "" : "none";
+  note.style.color = ok ? "#15803d" : "#b91c1c";
 }
 
 /* ==========================================================================

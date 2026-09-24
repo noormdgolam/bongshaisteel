@@ -31,10 +31,12 @@ if ($ready) {
             if ($pw !== '' && password_verify($pw, $cfg['password_hash'])) {
                 cms_throttle_note(false);
                 cms_session_open();
+                cms_activity('auth.signin');
                 header('Location: ' . $return);
                 exit;
             }
             cms_throttle_note(true);
+            cms_activity('auth.failed');
             usleep(700000);
             $locked = cms_throttle_locked();
             $err = $locked > 0

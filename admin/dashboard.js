@@ -69,7 +69,8 @@
       if (!Array.isArray(content[k])) content[k] = [];
     });
     var s = content.sections;
-    ["stats", "trustBar", "services", "faq"].forEach(function (k) { if (!Array.isArray(s[k])) s[k] = []; });
+    ["stats", "trustBar", "services", "faq", "testimonials", "team", "serviceAreas"]
+      .forEach(function (k) { if (!Array.isArray(s[k])) s[k] = []; });
     if (typeof s.safety !== "object" || !s.safety) s.safety = { intro: "", points: [] };
     if (!Array.isArray(s.safety.points)) s.safety.points = [];
     if (!Array.isArray(content.settings.sisterLinks)) content.settings.sisterLinks = [];
@@ -245,6 +246,10 @@
         it.appendChild(ta);
       } else {
         spec.forEach(function (f) {
+          if (f.type === "image") {
+            it.appendChild(imagePicker(item, f.key, { label: f.label, sub: f.sub }));
+            return;
+          }
           var fw = fieldWrap(f.label, f.sub);
           var input = f.type === "textarea" ? document.createElement("textarea") : document.createElement("input");
           if (f.type !== "textarea") input.type = "text";
@@ -296,14 +301,21 @@
   /*  TABS                                                                 */
   /* ==================================================================== */
   var TABS = [
+    { id: "overview", label: "Overview", render: renderOverview },
+    { id: "leads", label: "Messages", render: renderLeads },
     { id: "site", label: "Site & SEO", render: renderSite },
+    { id: "nav", label: "Navigation", render: renderNav },
     { id: "home", label: "Home page", render: renderHome },
     { id: "services", label: "Services", render: renderServices },
     { id: "safety", label: "Safety (EHS)", render: renderSafety },
     { id: "faq", label: "FAQ", render: renderFaq },
     { id: "products", label: "Products", render: renderProducts },
     { id: "categories", label: "Categories", render: renderCategories },
+    { id: "testimonials", label: "Testimonials", render: renderTestimonials },
+    { id: "team", label: "Team", render: renderTeam },
+    { id: "areas", label: "Service areas", render: renderAreas },
     { id: "media", label: "Media", render: renderMedia },
+    { id: "activity", label: "Activity", render: renderActivity },
     { id: "backups", label: "Backups & export", render: renderBackups }
   ];
 
@@ -362,7 +374,16 @@
     var g3 = group("Search / SEO");
     g3.appendChild(seoField("title", "Browser tab title", { sub: "Applied to <title> and used by search engines." }));
     g3.appendChild(seoField("description", "Meta description", { area: true }));
+    g3.appendChild(seoField("keywords", "Meta keywords", { area: true, sub: "Comma separated. Minor ranking value these days, harmless to keep." }));
+    g3.appendChild(seoField("canonical", "Canonical URL", { sub: "The one address this page should be indexed under. Also fills og:url." }));
     root.appendChild(g3);
+
+    var g4 = group("Social sharing card");
+    g4.appendChild(h("p", "sub", "What Facebook, WhatsApp, LinkedIn and X show when someone pastes the link. Left empty, each falls back to the SEO title and description above."));
+    g4.appendChild(seoField("ogTitle", "Share title"));
+    g4.appendChild(seoField("ogDescription", "Share description", { area: true }));
+    g4.appendChild(imagePicker(content.seo, "ogImage", { label: "Share image", sub: "Shown at roughly 1200x630. Wide images survive cropping best." }));
+    root.appendChild(g4);
   }
 
   /* ---------- HOME -------------------------------------------------- */
@@ -690,6 +711,396 @@
       it.appendChild(head);
       grid.appendChild(it);
     });
+  }
+
+
+  /* ---------- shared bits for the new tabs --------------------------- */
+  function when(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return String(iso);
+    var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    var p2 = function (n) { return (n < 10 ? "0" : "") + n; };
+    return d.getDate() + " " + MON[d.getMonth()] + " " + d.getFullYear() +
+      ", " + p2(d.getHours()) + ":" + p2(d.getMinutes());
+  }
+
+  function statCard(label, value, sub) {
+    var c = h("div", "item");
+    c.style.padding = "14px 16px";
+    var v = h("div", null, value == null ? "\u2014" : String(value));
+    v.style.cssText = "font-size:1.7rem; font-weight:800; line-height:1.1; color:var(--accent);";
+    c.appendChild(v);
+    c.appendChild(h("div", null, label));
+    if (sub) c.appendChild(h("div", "sub", sub));
+    return c;
+  }
+
+  function loadingBox(text) {
+    var b = h("div", "card-list");
+    b.appendChild(h("p", "sub", text || "Loading\u2026"));
+    return b;
+  }
+
+  function failBox(box, e) {
+    if (e.message === "auth") return;
+    clear(box);
+    box.appendChild(h("p", "sub", "Could not load that: " + e.message));
+  }
+
+  /* ---------- OVERVIEW ----------------------------------------------- */
+  function renderOverview(root) {
+    root.appendChild(h("h1", null, "Overview"));
+    root.appendChild(h("p", "hint", "What the site is serving right now."));
+
+    var g1 = group(null);
+    var grid = loadingBox();
+    g1.appendChild(grid);
+    root.appendChild(g1);
+
+    var g2 = group("Engine");
+    var engine = h("p", "sub", "\u2026");
+    g2.appendChild(engine);
+    root.appendChild(g2);
+
+    var g3 = group("Latest activity");
+    var log = loadingBox();
+    g3.appendChild(log);
+    root.appendChild(g3);
+
+    api("stats").then(function (j) {
+      var s = j.stats || {};
+      clear(grid);
+      grid.style.cssText = "display:grid; grid-template-columns:repeat(auto-fill, minmax(155px, 1fr)); gap:12px;";
+      [
+        ["Unread messages", s.leadsNew, (s.leads || 0) + " kept in total"],
+        ["Page views", s.views, "since the counter started"],
+        ["Products", s.products, (s.featured || 0) + " starred for the homepage"],
+        ["Categories", s.categories, null],
+        ["Services", s.services, null],
+        ["FAQ entries", s.faq, null],
+        ["Testimonials", s.testimonials, null],
+        ["Team members", s.team, null],
+        ["Service areas", s.serviceAreas, null],
+        ["Snapshots", s.backups, "on the server"]
+      ].forEach(function (c) { grid.appendChild(statCard(c[0], c[1], c[2])); });
+
+      var e = s.engine || {};
+      engine.textContent =
+        "PHP " + (e.php || "?") +
+        " \u00b7 " + (e.gd ? "GD/WebP available" : "no GD \u2014 uploads keep their original size") +
+        " \u00b7 " + (e.live ? "serving data/content.json" : "serving the built-in seed") +
+        (s.updated ? " \u00b7 last saved " + when(s.updated) : "") +
+        (e.server ? " \u00b7 " + e.server : "");
+    }).catch(function (e) { failBox(grid, e); });
+
+    api("activity").then(function (j) {
+      clear(log);
+      var rows = (j.activity || []).slice(0, 12);
+      if (!rows.length) { log.appendChild(h("p", "sub", "Nothing logged yet.")); return; }
+      rows.forEach(function (a) { log.appendChild(activityRow(a)); });
+    }).catch(function (e) { failBox(log, e); });
+  }
+
+  /* ---------- ACTIVITY ------------------------------------------------ */
+  var EVENT_LABEL = {
+    "content.save": "Content saved",
+    "content.restore": "Snapshot restored",
+    "media.upload": "Image uploaded",
+    "lead.new": "New message",
+    "lead.update": "Message updated",
+    "lead.delete": "Message deleted",
+    "auth.signin": "Signed in",
+    "auth.failed": "Failed sign-in",
+    "auth.logout": "Signed out",
+    "setup.complete": "Installer finished"
+  };
+
+  function activityRow(a) {
+    var it = h("div", "item");
+    it.style.padding = "10px 14px";
+    var head = h("div", "item-head");
+    var left = h("div");
+    left.style.flex = "1";
+    left.appendChild(h("div", null, EVENT_LABEL[a.event] || a.event));
+    if (a.detail) left.appendChild(h("div", "sub", a.detail));
+    head.appendChild(left);
+    head.appendChild(h("span", "sub", when(a.at)));
+    it.appendChild(head);
+    return it;
+  }
+
+  function renderActivity(root) {
+    root.appendChild(h("h1", null, "Activity"));
+    root.appendChild(h("p", "hint", "Every save, restore, upload, message and sign-in. Kept on the server, never served to visitors."));
+    var g = group(null);
+    var list = loadingBox();
+    g.appendChild(list);
+    root.appendChild(g);
+
+    api("activity").then(function (j) {
+      clear(list);
+      var rows = j.activity || [];
+      if (!rows.length) { list.appendChild(h("p", "sub", "Nothing logged yet.")); return; }
+      rows.forEach(function (a) { list.appendChild(activityRow(a)); });
+    }).catch(function (e) { failBox(list, e); });
+  }
+
+  /* ---------- MESSAGES / LEADS ---------------------------------------- */
+  var LEAD_LABEL = {
+    name: "Name", phone: "Phone", email: "Email", company: "Company",
+    message: "Message", destination: "Destination", currency: "Currency",
+    standard: "Standard", dimensions: "Dimensions", modelCode: "Model",
+    source: "Came from"
+  };
+
+  function renderLeads(root) {
+    root.appendChild(h("h1", null, "Messages"));
+    root.appendChild(h("p", "hint", "Quote requests and contact enquiries sent from the site. These are not part of the page content, so they save the moment you change them \u2014 no Save needed."));
+
+    var bar = group(null);
+    bar.style.display = "flex";
+    bar.style.alignItems = "center";
+    bar.style.gap = "10px";
+
+    var filter = document.createElement("select");
+    ["all", "new", "contacted", "quoted", "won", "lost"].forEach(function (v) {
+      var o = document.createElement("option");
+      o.value = v;
+      o.textContent = v === "all" ? "All messages" : v.charAt(0).toUpperCase() + v.slice(1);
+      filter.appendChild(o);
+    });
+    bar.appendChild(filter);
+
+    var csv = h("a", "btn", "Download CSV");
+    csv.href = "api.php?action=leads-csv";
+    csv.style.textDecoration = "none";
+    bar.appendChild(csv);
+
+    var refresh = h("button", "ghost", "Refresh");
+    refresh.type = "button";
+    bar.appendChild(refresh);
+    root.appendChild(bar);
+
+    var g = group(null);
+    var list = loadingBox();
+    g.appendChild(list);
+    root.appendChild(g);
+
+    var all = [];
+    function paint() {
+      clear(list);
+      var want = filter.value;
+      var rows = all.filter(function (l) { return want === "all" || (l.status || "new") === want; });
+      if (!rows.length) {
+        list.appendChild(h("p", "sub", all.length ? "Nothing with that status." : "No messages yet."));
+        return;
+      }
+      rows.forEach(function (l) { list.appendChild(leadRow(l, reload)); });
+    }
+    function reload() {
+      api("leads").then(function (j) {
+        all = j.leads || [];
+        paint();
+      }).catch(function (e) { failBox(list, e); });
+    }
+    filter.addEventListener("change", paint);
+    refresh.addEventListener("click", reload);
+    reload();
+  }
+
+  function leadRow(l, reload) {
+    var it = h("div", "item");
+    var head = h("div", "item-head");
+
+    var who = h("div");
+    who.style.flex = "1";
+    var title = h("strong", null, (l.fields && l.fields.name) || "(no name)");
+    who.appendChild(title);
+    who.appendChild(h("div", "sub",
+      (l.kind === "quote" ? "Quote request" : "Contact enquiry") + " \u00b7 " + when(l.at) +
+      ((l.fields && l.fields.phone) ? " \u00b7 " + l.fields.phone : "")));
+    head.appendChild(who);
+
+    var status = document.createElement("select");
+    ["new", "contacted", "quoted", "won", "lost"].forEach(function (v) {
+      var o = document.createElement("option");
+      o.value = v;
+      o.textContent = v.charAt(0).toUpperCase() + v.slice(1);
+      status.appendChild(o);
+    });
+    status.value = l.status || "new";
+    status.addEventListener("change", function () {
+      saveLead(l.id, { status: status.value }, function () {
+        l.status = status.value;
+        toast("Marked " + status.value + ".", "ok");
+      });
+    });
+    head.appendChild(status);
+
+    var del = h("button", "danger", "Delete");
+    del.type = "button";
+    del.addEventListener("click", function () {
+      if (!confirm("Delete this message for good?")) return;
+      api("lead-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: l.id })
+      }).then(function () { toast("Deleted.", "ok"); reload(); })
+        .catch(function (e) { if (e.message !== "auth") toast("Could not delete: " + e.message, "err"); });
+    });
+    head.appendChild(del);
+    it.appendChild(head);
+
+    Object.keys(LEAD_LABEL).forEach(function (k) {
+      var v = l.fields && l.fields[k];
+      if (!v || k === "name" || k === "phone") return;
+      var row = h("div", "sub");
+      row.style.margin = "2px 0";
+      row.appendChild(h("strong", null, LEAD_LABEL[k] + ": "));
+      row.appendChild(document.createTextNode(String(v)));
+      it.appendChild(row);
+    });
+    if (l.fields && l.fields.phone) {
+      var wa = h("a", null, "Reply on WhatsApp \u2197");
+      wa.href = "https://wa.me/" + String(l.fields.phone).replace(/[^0-9]/g, "");
+      wa.target = "_blank";
+      wa.rel = "noopener";
+      // The admin CSS never styles bare links, and the browser default is
+      // unreadable on this background.
+      wa.style.cssText = "display:inline-block; margin:8px 0 4px; color:var(--accent); " +
+        "font-size:.85rem; font-weight:700; text-decoration:none;";
+      it.appendChild(wa);
+    }
+
+    var noteWrap = fieldWrap("Your note");
+    var note = document.createElement("textarea");
+    note.value = l.note || "";
+    note.rows = 2;
+    note.addEventListener("blur", function () {
+      if (note.value === (l.note || "")) return;
+      saveLead(l.id, { note: note.value }, function () {
+        l.note = note.value;
+        toast("Note saved.", "ok");
+      });
+    });
+    noteWrap.appendChild(note);
+    it.appendChild(noteWrap);
+    return it;
+  }
+
+  function saveLead(id, patch, done) {
+    patch.id = id;
+    api("lead-update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch)
+    }).then(done).catch(function (e) {
+      if (e.message !== "auth") toast("Could not save: " + e.message, "err");
+    });
+  }
+
+  /* ---------- NAVIGATION ---------------------------------------------- */
+  function renderNav(root) {
+    root.appendChild(h("h1", null, "Navigation"));
+    root.appendChild(h("p", "hint", "The wording in the top bar and the mobile menu. What each button does is fixed \u2014 only the label changes here."));
+
+    var g1 = group("Menu bar");
+    var r1 = rowGrid();
+    r1.appendChild(tField("nav.home", "Home"));
+    r1.appendChild(tField("nav.products", "Products"));
+    g1.appendChild(r1);
+    var r2 = rowGrid();
+    r2.appendChild(tField("nav.services", "Services"));
+    r2.appendChild(tField("nav.safety", "Safety policy"));
+    g1.appendChild(r2);
+    var r3 = rowGrid();
+    r3.appendChild(tField("nav.faq", "FAQ"));
+    r3.appendChild(tField("nav.contact", "Contact"));
+    g1.appendChild(r3);
+    g1.appendChild(tField("nav.quote", "Quote button", { sub: "The blue button on the right of the bar." }));
+    root.appendChild(g1);
+
+    var g2 = group("Products dropdown");
+    g2.appendChild(h("p", "sub", "Top level of the mega menu. The model names underneath come from the Categories tab."));
+    var r4 = rowGrid();
+    r4.appendChild(tField("nav.cat.prefab", "Prefab buildings"));
+    r4.appendChild(tField("nav.cat.structure", "Steel structure"));
+    g2.appendChild(r4);
+    var r5 = rowGrid();
+    r5.appendChild(tField("nav.cat.furniture", "Steel furniture"));
+    r5.appendChild(tField("nav.cat.doorgate", "Door and gate"));
+    g2.appendChild(r5);
+    g2.appendChild(tField("nav.cat.siteothers", "Other products"));
+    root.appendChild(g2);
+  }
+
+  /* ---------- TESTIMONIALS -------------------------------------------- */
+  function renderTestimonials(root) {
+    root.appendChild(h("h1", null, "Testimonials"));
+    root.appendChild(h("p", "hint", "Shown on the home page under the trust bar. The whole block stays hidden while this list is empty."));
+
+    var g1 = group("Headings");
+    g1.appendChild(tField("testimonials.subtitle", "Subtitle"));
+    g1.appendChild(tField("testimonials.title", "Title"));
+    root.appendChild(g1);
+
+    var g2 = group("Quotes");
+    g2.appendChild(arrayEditor(content.sections.testimonials, [
+      { key: "quote", label: "What they said", type: "textarea" },
+      { key: "author", label: "Name" },
+      { key: "role", label: "Role / company", sub: "Optional." }
+    ], {
+      addLabel: "+ Add testimonial",
+      blank: function () { return { quote: "", author: "", role: "" }; },
+      title: function (it) { return it.author || "Testimonial"; }
+    }));
+    root.appendChild(g2);
+  }
+
+  /* ---------- TEAM ----------------------------------------------------- */
+  function renderTeam(root) {
+    root.appendChild(h("h1", null, "Team"));
+    root.appendChild(h("p", "hint", "Shown at the bottom of the Services page. Hidden while the list is empty."));
+
+    var g1 = group("Headings");
+    g1.appendChild(tField("team.subtitle", "Subtitle"));
+    g1.appendChild(tField("team.title", "Title"));
+    root.appendChild(g1);
+
+    var g2 = group("People");
+    g2.appendChild(arrayEditor(content.sections.team, [
+      { key: "name", label: "Name" },
+      { key: "role", label: "Role" },
+      { key: "bio", label: "Short bio", type: "textarea", sub: "Optional \u2014 one or two lines." },
+      { key: "photo", label: "Photo", type: "image" }
+    ], {
+      addLabel: "+ Add person",
+      blank: function () { return { name: "", role: "", bio: "", photo: "" }; },
+      title: function (it) { return it.name || "Team member"; }
+    }));
+    root.appendChild(g2);
+  }
+
+  /* ---------- SERVICE AREAS -------------------------------------------- */
+  function renderAreas(root) {
+    root.appendChild(h("h1", null, "Service areas"));
+    root.appendChild(h("p", "hint", "Listed as tags in the contact card. Hidden while the list is empty."));
+
+    var g1 = group("Heading");
+    g1.appendChild(tField("serviceAreas.title", "Title"));
+    root.appendChild(g1);
+
+    var g2 = group("Places");
+    g2.appendChild(arrayEditor(content.sections.serviceAreas, [
+      { key: "name", label: "Place" },
+      { key: "note", label: "Tooltip", sub: "Optional \u2014 shown on hover." }
+    ], {
+      addLabel: "+ Add area",
+      blank: function () { return { name: "", note: "" }; },
+      title: function (it) { return it.name || "Area"; }
+    }));
+    root.appendChild(g2);
   }
 
   /* ---------- BACKUPS & EXPORT -------------------------------------- */

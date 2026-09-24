@@ -11,9 +11,18 @@ site.
 ## What it edits
 
 Everything visible on the one-page site: hero, stats, trust bar, section
-headings, services, safety policy, the FAQ list, contact details, footer, the
-5 product lines, the 5 prefab categories, and the full ~72-model catalog
-(add / edit / delete / reorder / set homepage flagships), plus image uploads.
+headings, navigation labels, services, safety policy, the FAQ list, contact
+details, footer, the 5 product lines, the 5 prefab categories, and the full
+~72-model catalog (add / edit / delete / reorder / set homepage flagships),
+plus image uploads.
+
+Three sections are new and start empty — **testimonials**, **team** and
+**service areas**. Each stays completely hidden on the site until you add the
+first entry, so nothing changes until you want it to.
+
+The `<head>` is editable too: title, meta description, keywords, canonical
+URL, and the Open Graph / Twitter card that WhatsApp, Facebook and LinkedIn
+show when someone shares the link.
 
 All edits are written to **`/data/content.json`**. The public site reads that
 file on load (via `apply.js`) and falls back to the git-tracked
@@ -45,8 +54,9 @@ your content:
 /data/content.json        ← all text/catalog edits
 /images/uploads/          ← uploaded images
 /admin/config.php         ← password hash
+/data/leads.json          ← quote requests and contact messages
 /admin/backups/           ← auto snapshot before every save (keeps last 15)
-                            also holds .throttle.json (failed sign-in counter)
+                            also .throttle.json, .leadrate.json, activity.log
 /images/uploads/.htaccess ← written on first upload; blocks execution there
 ```
 
@@ -64,6 +74,52 @@ deployment settings — a normal `git pull`/checkout leaves the files above alon
   as a `content.default.json` seed, import a JSON file into the editor, and
   restore any of the server snapshots with one click.
 
+### The tabs
+
+| Tab | What it is for |
+| --- | --- |
+| Overview | Catalog size, unread messages, page views, when the site was last saved, and the latest activity. |
+| Messages | The inbox (below). |
+| Site & SEO | Contact details, footer, `<head>` meta and the social share card. |
+| Navigation | The wording in the top bar and the mobile menu. |
+| Home page · Services · Safety · FAQ | Section headings and their lists. |
+| Products · Categories | The catalog. |
+| Testimonials · Team · Service areas | The three new sections. |
+| Media | Upload images and copy their paths. |
+| Activity | Every save, restore, upload, message and sign-in. |
+| Backups & export | Snapshots, download, import. |
+
+Everything except **Messages** is page content and is only written when you
+press **Save changes**. Messages are separate records and save immediately.
+
+## Messages (quote requests and contact enquiries)
+
+The quote modal and the contact form used to pop up an alert and throw the
+enquiry away. They now post to `lead.php`, which appends to
+`data/leads.json`, and the **Messages** tab is the inbox: filter by status,
+set a status (new / contacted / quoted / won / lost), keep a private note,
+open WhatsApp on the sender's number, delete, or export the lot as CSV
+(UTF-8 with a BOM, so Excel reads Bangla correctly).
+
+`lead.php` is the only thing on the site an anonymous visitor can write to,
+so it is deliberately narrow:
+
+- a fixed list of accepted fields, each cut to a maximum length, with control
+  characters stripped
+- a honeypot field no real person ever sees; anything that fills it gets a
+  normal-looking answer and is dropped
+- name and phone are required
+- at most 5 messages per connection per 10 minutes, then HTTP 429
+- 16 KB body cap, and the file is capped at 2000 messages (oldest dropped)
+- the sender's IP is never stored — only a salted hash, enough to spot one
+  abusive source
+
+Locked out a real customer by accident? Delete
+`admin/backups/.leadrate.json`.
+
+**Messages are not backed up by the snapshot system** — those cover page
+content only. Export the CSV now and then if the enquiries matter to you.
+
 ## How it is locked down
 
 | Area | Control |
@@ -73,12 +129,14 @@ deployment settings — a normal `git pull`/checkout leaves the files above alon
 | CSRF | Every `POST` is checked against `Sec-Fetch-Site`, falling back to `Origin`/`Referer` on browsers that lack it — on the API, the sign-in form and the installer. |
 | Uploads | JPEG / PNG / WebP / GIF only, ≤ 8 MB and ≤ 40 MP, filename discarded and regenerated. First upload drops an `.htaccess` into `images/uploads/` that strips script handlers, so nothing stored there can execute. |
 | Saves | Auth + same-origin + a 4 MB body cap and a JSON depth cap. |
+| Lead intake | The one public write endpoint: fixed fields, length caps, honeypot, 5 per 10 min per IP, 16 KB cap. No IP stored, only a salted hash. |
 | Restores | Auth + same-origin; the snapshot id must match `content-YYYYMMDD-HHMMSS.json` exactly, so no path can be traversed out of the backup folder. |
 | Pasted text | The visual editor strips pasted markup down to plain text plus `<b> <i> <u> <a> <br>`; `javascript:` hrefs are dropped. |
 | Not served | `config.php`, `lib.php`, `README.md`, `backups/` — all denied in `admin/.htaccess`. `noindex`, `nosniff`, `DENY` framing and a CSP on the PHP pages. |
 
 Tuning lives in `admin/config.php`: `max_attempts`, `lockout`, `idle_limit`,
-`session_limit`, `max_upload`, `max_pixels`, `max_body`. Anything you leave out
+`session_limit`, `max_upload`, `max_pixels`, `max_body`, `lead_rate`,
+`lead_window`, `max_leads`, `max_activity`. Anything you leave out
 falls back to the defaults in `cms_config_defaults()` (`admin/lib.php`).
 
 Locked yourself out? Delete `admin/backups/.throttle.json`. Forgot the
@@ -87,8 +145,7 @@ password? Delete `admin/config.php`, re-copy the sample, and re-upload
 
 ## Not covered (edit by hand in `index.html` if ever needed)
 
-- `<head>` Open Graph / Twitter / keywords meta, `canonical`, `manifest.json`,
-  `sitemap.xml`.
+- `manifest.json`, `sitemap.xml`, `robots.txt`.
 - The three JSON-LD blocks in `<head>` (Organization / **FAQPage** / HowTo).
   The head FAQPage schema is a deliberately-curated 5-entry set and is **not**
   the same list as the visible FAQ — leave it as is unless intentionally updating.
