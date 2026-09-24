@@ -342,5 +342,142 @@ module.exports = function createAdminRouter({ db, content }) {
     }
   });
 
+  /* ------------------------------------------------------------- messages */
+
+  const STATUSES = ["new", "contacted", "quoted", "won", "lost"];
+  const LEAD_LIST_CAP = 500;
+
+  /** The inbox filters, shared by the page and the CSV export. */
+  function leadFilters(query) {
+    const status = STATUSES.includes(query.status) ? query.status : "all";
+    const kind = query.kind === "quote" || query.kind === "contact" ? query.kind : "all";
+    const q = typeof query.q === "string" ? query.q.trim().slice(0, 100) : "";
+    return { status, kind, q };
+  }
+
+  function applyLeadFilters(qb, { status, kind, q }) {
+    if (status !== "all") qb.where("status", status);
+    if (kind !== "all") qb.where("kind", kind);
+    if (q) {
+      const like = "%" + q.replace(/[\\%_]/g, (m) => "\\" + m) + "%";
+      qb.where((b) => {
+        for (const col of ["name", "phone", "email", "company", "model_code", "message", "destination"]) {
+          b.orWhere(col, "like", like);
+        }
+      });
+    }
+    return qb;
+  }
+
+  router.get("/admin/leads", async (req, res, next) => {
+    try {
+      const f = leadFilters(req.query);
+      const [leads, byStatus] = await Promise.all([
+        applyLeadFilters(db("leads"), f).orderBy("created_at", "desc").orderBy("id", "desc").limit(LEAD_LIST_CAP)
+          .select("id", "kind", "status", "name", "phone", "email", "company", "model_code", "destination", "created_at"),
+        db("leads").select("status").count({ n: "*" }).groupBy("status"),
+      ]);
+      const counts = { all: 0, new: 0, contacted: 0, quoted: 0, won: 0, lost: 0 };
+      for (const r of byStatus) { counts[r.status] = Number(r.n); counts.all += Number(r.n); }
+      res.render("admin/leads/list.njk", view(req, "leads", {
+        leads, statuses: STATUSES, counts, total: leads.length, ...f,
+      }));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  /* A cell a spreadsheet would read as a formula (=, +, -, @, tab, CR) is
+     prefixed with an apostrophe. Leads are typed by the public, and a name like
+     =HYPERLINK("http://evil","click") would otherwise run in Excel. */
+  function csvCell(v) {
+    let s = v == null ? "" : v instanceof Date ? v.toISOString() : String(v);
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  router.get("/admin/leads.csv", async (req, res, next) => {
+    try {
+      const f = leadFilters(req.query);
+      const rows = await applyLeadFilters(db("leads"), f).orderBy("created_at", "desc").orderBy("id", "desc");
+      const cols = ["id", "public_id", "created_at", "kind", "status", "name", "phone", "email", "company",
+        "model_code", "destination", "currency", "standard", "dimensions", "message", "note", "source"];
+      const lines = [cols.join(",")].concat(rows.map((r) => cols.map((c) => csvCell(r[c])).join(",")));
+      await logActivity(req, "lead.export", "lead", null, "exported " + rows.length + " message(s) as CSV");
+      res.set("Content-Type", "text/csv; charset=utf-8");
+      res.set("Content-Disposition", 'attachment; filename="bongshai-messages-' + new Date().toISOString().slice(0, 10) + '.csv"');
+      // BOM so Excel reads the Bangla correctly.
+      res.send("﻿" + lines.join("\r\n") + "\r\n");
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  async function findLead(id) {
+    const n = parseInt(id, 10);
+    return n ? db("leads").where({ id: n }).first() : null;
+  }
+
+  router.get("/admin/leads/:id", async (req, res, next) => {
+    try {
+      const lead = await findLead(req.params.id);
+      if (!lead) return next();
+      res.render("admin/leads/detail.njk", view(req, "leads", { lead, statuses: STATUSES }));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post("/admin/leads/:id", async (req, res, next) => {
+    try {
+      const lead = await findLead(req.params.id);
+      if (!lead) return next();
+      const status = String(req.body.status || "");
+      if (!STATUSES.includes(status)) {
+        return res.redirect("/admin/leads/" + lead.id + "?error=" + encodeURIComponent("Unknown status."));
+      }
+      const note = String(req.body.note == null ? "" : req.body.note).slice(0, 2000);
+      await db("leads").where({ id: lead.id }).update({ status, note: note || null, updated_at: db.fn.now() });
+      await logActivity(req, "lead.update", "lead", lead.id,
+        lead.name + ": " + lead.status + (status !== lead.status ? " → " + status : "") + (note !== (lead.note || "") ? ", note edited" : ""));
+      res.redirect("/admin/leads/" + lead.id + "?notice=" + encodeURIComponent("Saved."));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Deleting a customer's message is for owners, not the sales desk.
+  router.post("/admin/leads/:id/delete", auth.requireRole("superadmin", "admin"), async (req, res, next) => {
+    try {
+      const lead = await findLead(req.params.id);
+      if (!lead) return next();
+      await db("leads").where({ id: lead.id }).del();
+      await logActivity(req, "lead.delete", "lead", lead.id, "deleted the message from " + lead.name);
+      res.redirect("/admin/leads?notice=" + encodeURIComponent("Deleted the message from " + lead.name + "."));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  /* ------------------------------------------------------------- activity */
+
+  const ACTIVITY_PAGE = 50;
+
+  router.get("/admin/activity", async (req, res, next) => {
+    try {
+      const actions = await db("activity_log").distinct("action").orderBy("action").pluck("action");
+      const action = actions.includes(req.query.action) ? req.query.action : "all";
+      const scoped = () => (action === "all" ? db("activity_log") : db("activity_log").where({ action }));
+      const total = Number((await scoped().count({ n: "*" }))[0].n);
+      const pages = Math.max(1, Math.ceil(total / ACTIVITY_PAGE));
+      const page = Math.min(pages, Math.max(1, parseInt(req.query.page, 10) || 1));
+      const activity = await scoped().orderBy("id", "desc").limit(ACTIVITY_PAGE).offset((page - 1) * ACTIVITY_PAGE)
+        .select("created_at", "admin_name", "action", "entity_type", "entity_id", "summary");
+      res.render("admin/activity.njk", view(req, "activity", { activity, actions, action, page, pages, total }));
+    } catch (err) {
+      next(err);
+    }
+  });
+
   return router;
 };

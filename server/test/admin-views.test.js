@@ -163,6 +163,46 @@ async function main() {
     r = await go("POST", del.action, del.fields);
     check(r.status === 302 && !(await db("products").where({ id: row.id }).first()), "the delete form deletes", r.status);
 
+    /* messages inbox, detail and activity (T-002) */
+    const [leadId] = await db("leads").insert({
+      public_id: "zz-view-lead", kind: "quote", status: "new", name: HOSTILE, company: HOSTILE,
+      phone: "javascript:alert(1)//+880 1711-000000", message: "first line\n" + HOSTILE + "\nlast line",
+      model_code: "BH-IS-1001",
+    });
+    r = await go("GET", "/admin/leads?q=" + encodeURIComponent("javascript:alert"));
+    const $l = cheerio.load(r.html);
+    check(r.status === 200 && !/RENDER ERROR/.test(r.html) && !injected(r.html), "inbox renders the hostile lead escaped", r.status + " " + r.html.slice(0, 120));
+    const was = $l('a[href*="wa.me"]').map((_, e) => $l(e).attr("href")).get();
+    check(was.length > 0 && was.every((h) => /^https:\/\/wa\.me\/\d+$/.test(h)), "  WhatsApp links carry digits only", was.join(" | "));
+    check($l('a[href^="javascript:"]').length === 0, "  and no javascript: link exists anywhere");
+    r = await go("GET", "/admin/leads?status=new&kind=quote&q=" + encodeURIComponent("a&b c"));
+    const csvHref = cheerio.load(r.html)('a[href^="/admin/leads.csv"]').attr("href") || "";
+    const cu = new URL(csvHref, "http://x");
+    check(cu.searchParams.get("status") === "new" && cu.searchParams.get("kind") === "quote" && cu.searchParams.get("q") === "a&b c",
+      "  the CSV link carries the current filters, encoded", csvHref);
+
+    r = await go("GET", "/admin/leads/" + leadId);
+    check(r.status === 200 && !injected(r.html), "message detail renders the hostile lead escaped", r.status);
+    check(/pre-wrap/.test(r.html), "  the message keeps its line breaks (pre-wrap)");
+    let lf = forms(r.html);
+    const upd = lf.find((x) => x.action === "/admin/leads/" + leadId);
+    const ldel = lf.find((x) => x.action === "/admin/leads/" + leadId + "/delete");
+    check(upd && upd.csrfCount === 1 && upd.fields.status === "new" && "note" in upd.fields, "  update form: current status selected, note field, one _csrf", JSON.stringify(upd));
+    check(ldel && ldel.csrfCount === 1, "  an admin gets the delete form");
+    r = await go("POST", upd.action, { ...upd.fields, status: "quoted", note: "rang " + HOSTILE });
+    const lrow = await db("leads").where({ id: leadId }).first();
+    check(r.status === 302 && lrow.status === "quoted" && lrow.note === "rang " + HOSTILE, "submitting it saves status and note", r.status + " " + lrow.status);
+    r = await go("GET", "/admin/leads/" + leadId);
+    check(!injected(r.html) && forms(r.html).find((x) => x.action === upd.action).fields.status === "quoted", "  the saved note shows escaped and the new status is selected");
+
+    r = await go("GET", "/admin/activity");
+    check(r.status === 200 && !/RENDER ERROR/.test(r.html) && !injected(r.html), "activity log renders, the hostile name in summaries escaped", r.status);
+    r = await go("GET", "/admin/activity?page=1&action=lead.update");
+    check(r.status === 200 && !cheerio.load(r.html)('a[href*="page=0"]').length, "  no link to a page before the first");
+
+    r = await go("POST", ldel.action, ldel.fields);
+    check(r.status === 302 && !(await db("leads").where({ id: leadId }).first()), "the delete form deletes the message", r.status);
+
     /* sign out through the rendered sign-out form */
     r = await go("GET", "/admin");
     const out = forms(r.html).find((x) => x.action === "/admin/logout");
@@ -172,6 +212,7 @@ async function main() {
   } finally {
     server.close();
     await db("products").where({ model_code: CODE }).del();
+    await db("leads").where({ public_id: "zz-view-lead" }).del();
     const ids = await db("admin_users").where({ username: USER }).pluck("id");
     if (ids.length) await db("activity_log").whereIn("admin_user_id", ids).del();
     await db("activity_log").where("summary", "like", "%" + CODE + "%").del();

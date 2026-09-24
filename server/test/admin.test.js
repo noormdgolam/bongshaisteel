@@ -33,12 +33,13 @@ function check(ok, label, detail) {
 
 /* ---------------------------------------------------------- stub templates */
 const VIEWS = fs.mkdtempSync(path.join(os.tmpdir(), "bs-admin-views-"));
-for (const v of ["admin/login.njk", "admin/dashboard.njk", "admin/products/list.njk", "admin/products/form.njk"]) {
+for (const v of ["admin/login.njk", "admin/dashboard.njk", "admin/products/list.njk", "admin/products/form.njk",
+  "admin/leads/list.njk", "admin/leads/detail.njk", "admin/activity.njk"]) {
   fs.mkdirSync(path.join(VIEWS, path.dirname(v)), { recursive: true });
   fs.writeFileSync(path.join(VIEWS, v), "");
 }
 const KEYS = ["active", "notice", "error", "csrfToken", "adminName", "adminRole", "stats", "q", "category",
-  "total", "username", "lockedMinutes"];
+  "total", "username", "lockedMinutes", "status", "kind", "counts", "statuses", "page", "pages", "action", "actions"];
 function stubEngine(file, opts, cb) {
   const out = { view: path.relative(VIEWS, file).replace(/\\/g, "/") };
   for (const k of KEYS) if (opts[k] !== undefined) out[k] = opts[k];
@@ -46,6 +47,9 @@ function stubEngine(file, opts, cb) {
   if (opts.categories) out.categories = opts.categories.length;
   if (opts.recentActivity) out.recentActivity = opts.recentActivity.length;
   if (opts.product) out.product = opts.product;
+  if (opts.leads) out.leads = opts.leads.map((l) => l.name);
+  if (opts.lead) out.lead = { id: opts.lead.id, name: opts.lead.name, status: opts.lead.status, note: opts.lead.note, message: opts.lead.message };
+  if (opts.activity) out.activity = opts.activity.length;
   cb(null, "<pre>" + JSON.stringify(out) + "</pre>");
 }
 
@@ -67,7 +71,9 @@ function client(base) {
         const k = pair.slice(0, i), v = pair.slice(i + 1);
         if (/expires=Thu, 01 Jan 1970/i.test(c) || v === "") jar.delete(k); else jar.set(k, v);
       }
-      const text = await r.text();
+      // Decode by hand: Response.text() strips a leading BOM, which would hide
+      // whether the CSV actually carries one.
+      const text = Buffer.from(await r.arrayBuffer()).toString("utf8");
       let data = null;
       const m = text.match(/^<pre>([\s\S]*)<\/pre>$/);
       if (m) try { data = JSON.parse(m[1]); } catch { /* not a stub page */ }
@@ -89,6 +95,8 @@ async function cleanup() {
   if (ids.length) await db("activity_log").whereIn("admin_user_id", ids).del();
   await db("activity_log").where("summary", "like", "%zz_test_%").orWhere("summary", "like", "%" + CODE + "%").del();
   await db("products").where({ model_code: CODE }).del();
+  await db("leads").where("public_id", "like", "zz-test-%").del();
+  await db("activity_log").where("summary", "like", "%ZZ Lead%").del();
   await db("admin_users").whereIn("username", Object.values(USERS)).del();
   await content.bumpRev();
   await content.refresh();
@@ -156,6 +164,55 @@ async function main() {
     check(r.data.adminRole === "admin" && r.data.adminName === "Test admin", "  and adminName/adminRole", r.data.adminName + "/" + r.data.adminRole);
     csrf = r.data.csrfToken;
 
+    /* --- messages */
+    const FORMULA = '=HYPERLINK("http://evil.example","click")';
+    const leadIds = [];
+    for (const [i, l] of [
+      { kind: "quote", status: "new", name: "ZZ Lead Quote", phone: "+8801700000001", model_code: "BH-IS-1001",
+        message: "line one\nline two", company: FORMULA },
+      { kind: "contact", status: "contacted", name: "ZZ Lead Contact", phone: "01700 000002", message: "hello & <b>" },
+    ].entries()) {
+      const [id] = await db("leads").insert({ ...l, public_id: "zz-test-" + i });
+      leadIds.push(id);
+    }
+    r = await a.req("GET", "/admin/leads?q=ZZ+Lead");
+    check(r.status === 200 && r.data.view === "admin/leads/list.njk" && r.data.active === "leads" && r.data.total === 2,
+      "messages inbox lists and searches", r.status + " " + JSON.stringify(r.data).slice(0, 160));
+    check(r.data.counts && r.data.counts.all >= 2 && r.data.counts.contacted >= 1 && r.data.statuses.length === 5,
+      "  with per-status counts and the status list", JSON.stringify(r.data.counts));
+    r = await a.req("GET", "/admin/leads?q=ZZ+Lead&status=contacted");
+    check(r.data.total === 1 && r.data.status === "contacted" && r.data.leads[0] === "ZZ Lead Contact", "  filter by status", JSON.stringify(r.data.leads));
+    r = await a.req("GET", "/admin/leads?q=ZZ+Lead&kind=quote");
+    check(r.data.total === 1 && r.data.kind === "quote", "  filter by kind", r.data.total);
+    r = await a.req("GET", "/admin/leads?status=bogus&kind=bogus");
+    check(r.data.status === "all" && r.data.kind === "all", "  unknown filter values fall back to all");
+
+    r = await a.req("GET", "/admin/leads.csv?q=ZZ+Lead&kind=quote");
+    const csvLines = r.text.trim().split(/\r\n/);
+    check(r.status === 200 && r.text.charCodeAt(0) === 0xfeff && csvLines.length === 2, "CSV export honours the filters, with a BOM", r.status + " lines=" + csvLines.length);
+    check(r.text.includes("'=HYPERLINK") && !/(^|,)"?=HYPERLINK/m.test(r.text), "  a formula typed by the public is neutralised in the CSV", csvLines[1] && csvLines[1].slice(0, 160));
+    check(r.text.includes('"line one\nline two"') || r.text.includes('"line one\r\nline two"'), "  multi-line messages stay in one quoted cell");
+
+    r = await a.req("GET", "/admin/leads/" + leadIds[0]);
+    check(r.status === 200 && r.data.view === "admin/leads/detail.njk" && r.data.lead.name === "ZZ Lead Quote" && r.data.statuses.length === 5,
+      "message detail renders", r.status);
+    r = await a.req("GET", "/admin/leads/99999999");
+    check(r.status === 404, "a missing message is a 404", r.status);
+    r = await a.req("POST", "/admin/leads/" + leadIds[0], { form: { status: "quoted", note: "called back", _csrf: csrf } });
+    let lrow = await db("leads").where({ id: leadIds[0] }).first();
+    check(r.status === 302 && /notice=/.test(r.location) && lrow.status === "quoted" && lrow.note === "called back", "status and note save", r.status + " " + lrow.status);
+    r = await a.req("POST", "/admin/leads/" + leadIds[0], { form: { status: "vip", note: "x", _csrf: csrf } });
+    lrow = await db("leads").where({ id: leadIds[0] }).first();
+    check(r.status === 302 && /error=/.test(r.location) && lrow.status === "quoted" && lrow.note === "called back", "an invented status is refused and nothing changes", r.location);
+
+    r = await a.req("GET", "/admin/activity");
+    check(r.status === 200 && r.data.view === "admin/activity.njk" && r.data.page === 1 && r.data.pages >= 1 && r.data.actions.includes("lead.update"),
+      "activity log renders with its action list", r.status + " " + JSON.stringify({ p: r.data.page, ps: r.data.pages }));
+    r = await a.req("GET", "/admin/activity?action=lead.update&page=999");
+    check(r.data.action === "lead.update" && r.data.page === r.data.pages, "  filtered, and an out-of-range page clamps to the last", JSON.stringify({ a: r.data.action, p: r.data.page, ps: r.data.pages }));
+    r = await a.req("GET", "/admin/activity?action=%3Cscript%3E");
+    check(r.data.action === "all", "  an unknown action filter falls back to all", r.data.action);
+
     /* --- product list */
     r = await a.req("GET", "/admin/products");
     check(r.status === 200 && r.data.total >= 72 && r.data.categories === 5 && r.data.category === "all", "product list: all products, 5 categories", JSON.stringify({ t: r.data.total, c: r.data.categories }));
@@ -215,6 +272,16 @@ async function main() {
     t = r.status === 403 ? (await s.req("GET", "/admin")).data.csrfToken : t;
     r = await s.req("POST", "/admin/products/" + row.id + "/delete", { form: { _csrf: t } });
     check(r.status === 403 && (await db("products").where({ id: row.id }).first()), "a sales user cannot delete a product", r.status);
+
+    r = await s.req("GET", "/admin/leads");
+    check(r.status === 200, "a sales user works the messages inbox", r.status);
+    t = r.data.csrfToken;
+    r = await s.req("POST", "/admin/leads/" + leadIds[1], { form: { status: "won", note: "", _csrf: t } });
+    check(r.status === 302 && (await db("leads").where({ id: leadIds[1] }).first()).status === "won", "  and can update a message", r.status);
+    r = await s.req("POST", "/admin/leads/" + leadIds[1] + "/delete", { form: { _csrf: t } });
+    check(r.status === 403 && (await db("leads").where({ id: leadIds[1] }).first()), "  but cannot delete one", r.status);
+    r = await a.req("POST", "/admin/leads/" + leadIds[1] + "/delete", { form: { _csrf: csrf } });
+    check(r.status === 302 && !(await db("leads").where({ id: leadIds[1] }).first()), "an admin can delete a message", r.status);
 
     /* --- deactivation takes effect mid-session */
     await db("admin_users").where({ username: USERS.sales }).update({ active: false });

@@ -260,6 +260,16 @@ app.use((err, req, res, next) => {
       message: big ? "That message is too long." : "That request could not be read.",
     });
   }
+  // The database being out of reach is not a bug in the page, and saying so
+  // tells whoever is looking to wait a minute rather than report a fault.
+  if (err && ["ETIMEDOUT", "ECONNREFUSED", "ECONNRESET", "PROTOCOL_CONNECTION_LOST",
+    "ER_CON_COUNT_ERROR", "EHOSTUNREACH"].includes(err.code) || /Knex: Timeout acquiring/.test(err && err.message)) {
+    console.error("database unreachable:", err.code || err.message);
+    res.set("Retry-After", "60");
+    return res.status(503).type("html").send("<!doctype html><meta name=viewport content='width=device-width'>" +
+      "<title>Database busy</title><h1>The database is not answering right now</h1>" +
+      "<p>Nothing has been lost. Wait a minute and reload this page.</p>");
+  }
   console.error("error:", err);
   res.status(500).type("html").send("<!doctype html><title>Error</title><h1>Something went wrong</h1>");
 });
