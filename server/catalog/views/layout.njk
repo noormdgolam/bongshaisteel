@@ -24,14 +24,14 @@
   <meta property="og:title" content="{{ ogTitle | default(pageTitle) }}">
   <meta property="og:description" content="{{ ogDescription | default(pageDescription) }}">
   <meta property="og:url" content="{{ canonicalUrl }}">
-  <meta property="og:image" content="{{ ogImage | default('https://www.bongshaisteel.com/images/products/Model%20No-BH-IS-1001.webp') }}">
+  <meta property="og:image" content="{{ ogImage | default('{{ siteOrigin }}/images/products/Model%20No-BH-IS-1001.webp') }}">
   <meta property="og:locale" content="en_BD">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ ogTitle | default(pageTitle) }}">
   <meta name="twitter:description" content="{{ ogDescription | default(pageDescription) }}">
-  <meta name="twitter:image" content="{{ ogImage | default('https://www.bongshaisteel.com/images/products/Model%20No-BH-IS-1001.webp') }}">
+  <meta name="twitter:image" content="{{ ogImage | default('{{ siteOrigin }}/images/products/Model%20No-BH-IS-1001.webp') }}">
 
   <!-- Google Fonts & Stylesheet -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -275,7 +275,7 @@
     </div>
 
     <div class="footer-bottom">
-      <p>{{ settings.copyright | default('&copy; 2026 Bongshai Steel. All Rights Reserved. Designed for Ultra Fast International Performance.') | safe }}</p>
+      <p>{{ settings.copyright | default('© 2026 Bongshai Steel. All Rights Reserved.') }}</p>
       {% if settings.sisterLinks and settings.sisterLinks.length %}
         <p style="margin-top:8px;">
           Part of the Bongshai Group – see also

@@ -46,7 +46,7 @@
         <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 6px;">{{ group.category.blurb }}</p>
       </div>
       <div>
-        <a href="/category/{{ group.category.key }}" class="cat-card-link" style="font-size: 0.95rem; font-weight: 700;">
+        <a href="/category/{{ group.category.key | urlencode }}" class="cat-card-link" style="font-size: 0.95rem; font-weight: 700;">
           View All {{ group.category.name }}s &rarr;
         </a>
       </div>
@@ -69,7 +69,7 @@
           <p class="product-desc" style="font-size: 0.9rem;">{{ prod.desc }}</p>
 
           <div class="product-footer">
-            <a href="/products/{{ prod.modelCode }}" class="btn-detail" title="View technical specs for {{ prod.modelCode }}">
+            <a href="/products/{{ prod.modelCode | urlencode }}" class="btn-detail" title="View technical specs for {{ prod.modelCode }}">
               View Specs
             </a>
             <a href="/#product-{{ prod.id }}" class="cat-card-link" style="font-size: 0.88rem;" title="View interactive 3D model in explorer">
@@ -133,11 +133,11 @@
   "@type": "CollectionPage",
   "name": "Bongshai Steel Pre-Engineered Building Product Catalogue",
   "description": "Comprehensive catalogue of 72 certified pre-engineered steel buildings, structural towers, duplex villas, cottages, and container houses.",
-  "url": "https://www.bongshaisteel.com/products",
+  "url": "{{ siteOrigin }}/products",
   "publisher": {
     "@type": "Organization",
     "name": "Bongshai Steel",
-    "url": "https://www.bongshaisteel.com"
+    "url": "{{ siteOrigin }}"
   },
   "mainEntity": {
     "@type": "ItemList",
@@ -150,7 +150,7 @@
         "position": {{ loop.index }},
         "name": {{ group.category.name | dump | safe }},
         "description": {{ group.category.blurb | dump | safe }},
-        "url": "https://www.bongshaisteel.com/category/{{ group.category.key }}"
+        "url": "{{ siteOrigin }}/category/{{ group.category.key | urlencode }}"
       }{% if not loop.last %},{% endif %}
       {% endfor %}
     ]
@@ -168,13 +168,13 @@
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://www.bongshaisteel.com/"
+      "item": "{{ siteOrigin }}/"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Products",
-      "item": "https://www.bongshaisteel.com/products"
+      "item": "{{ siteOrigin }}/products"
     }
   ]
 }

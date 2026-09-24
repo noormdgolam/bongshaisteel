@@ -127,8 +127,12 @@ async function runVerification() {
       const title = $("title").text().trim();
       const canonical = $('link[rel="canonical"]').attr("href");
       const hasThree = res.html.includes("three.min.js");
-      const hasModel = res.html.includes(prod.modelCode);
-      const hasName = res.html.includes(prod.name);
+      // Compare against decoded text: "Textile & Garments" is correctly served
+      // as "&amp;", so a raw-string search only passed while the JSON-LD left
+      // "&" unescaped - which is the same gap that let "</script>" through.
+      const pageText = $.root().text();
+      const hasModel = pageText.includes(prod.modelCode);
+      const hasName = pageText.includes(prod.name);
 
       // Check JSON-LD
       let productBlocks = 0;

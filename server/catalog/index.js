@@ -15,7 +15,27 @@ const env = new nunjucks.Environment(
 
 // Filters
 env.addFilter("urlencode", (str) => encodeURIComponent(String(str || "")));
-env.addFilter("dump", (obj) => JSON.stringify(obj));
+
+/* Replaces nunjucks' own dump for use inside <script type="application/ld+json">.
+   Plain JSON.stringify leaves "</script>" intact, so a product name containing
+   it closed the block and injected markup. "<", ">", "&" and the two JS line
+   separators are escaped, so no string can leave the script element. */
+env.addFilter("dump", (value) =>
+  (JSON.stringify(value === undefined ? null : value) || "null")
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029"));
+
+/** The public origin, taken from the CMS canonical rather than hardcoded. */
+function siteOrigin(content) {
+  try {
+    return new URL(content && content.seo && content.seo.canonical).origin;
+  } catch {
+    return "https://www.bongshaisteel.com";
+  }
+}
 
 /**
  * Creates and returns an Express Router for server-rendered catalog pages.
@@ -43,6 +63,7 @@ module.exports = function createCatalogRouter(options = {}) {
   router.get("/products", (req, res, next) => {
     try {
       const content = getContent();
+      const origin = siteOrigin(content);
       const categories = Array.isArray(content.categories) ? content.categories : [];
       const allProducts = Array.isArray(content.products) ? content.products : [];
 
@@ -62,11 +83,12 @@ module.exports = function createCatalogRouter(options = {}) {
 
       const context = {
         pageTitle: "Steel Building Products Catalogue | Bongshai Steel",
-        pageDescription: "Browse all 72 pre-engineered steel building models by Bongshai Steel: factory sheds, structural buildings, duplex villas, cottages, and container houses.",
-        canonicalUrl: "https://www.bongshaisteel.com/products",
+        pageDescription: `Browse all ${allProducts.length} pre-engineered steel building models by Bongshai Steel: factory sheds, structural buildings, duplex villas, cottages, and container houses.`,
+        canonicalUrl: `${origin}/products`,
         ogTitle: "Steel Building Products Catalogue | Bongshai Steel",
-        ogDescription: "Browse all 72 pre-engineered steel building models by Bongshai Steel: factory sheds, structural buildings, duplex villas, cottages, and container houses.",
-        ogImage: "https://www.bongshaisteel.com/images/products/Model%20No-BH-IS-1001.webp",
+        ogDescription: `Browse all ${allProducts.length} pre-engineered steel building models by Bongshai Steel: factory sheds, structural buildings, duplex villas, cottages, and container houses.`,
+        ogImage: `${origin}/images/products/Model%20No-BH-IS-1001.webp`,
+        siteOrigin: origin,
         categoryGroups,
         settings: content.settings || {},
         currentNav: "products"
@@ -86,9 +108,13 @@ module.exports = function createCatalogRouter(options = {}) {
       const categories = Array.isArray(content.categories) ? content.categories : [];
       const category = categories.find((c) => (c.key || "").toLowerCase() === rawKey.toLowerCase());
 
-      if (!category) {
-        return res.status(404).send("Category not found");
+      // "Not mine": the app's own HTML 404 answers.
+      if (!category) return next();
+      // One URL per category; any other spelling redirects to it.
+      if (rawKey !== category.key) {
+        return res.redirect(301, "/category/" + encodeURIComponent(category.key));
       }
+      const origin = siteOrigin(content);
 
       const allProducts = Array.isArray(content.products) ? content.products : [];
       const categoryProducts = allProducts
@@ -98,9 +124,9 @@ module.exports = function createCatalogRouter(options = {}) {
           imageSrc: buildSrcset(p.image, content.media)
         }));
 
-      const canonicalUrl = `https://www.bongshaisteel.com/category/${encodeURIComponent(category.key)}`;
+      const canonicalUrl = `${origin}/category/${encodeURIComponent(category.key)}`;
       const cleanImg = (category.image || "").replace(/^\//, "");
-      const ogImage = cleanImg ? `https://www.bongshaisteel.com/${encodeURI(cleanImg)}` : undefined;
+      const ogImage = cleanImg ? `${origin}/${encodeURI(cleanImg)}` : undefined;
 
       const context = {
         category,
@@ -111,6 +137,7 @@ module.exports = function createCatalogRouter(options = {}) {
         ogTitle: `${category.name} | Bongshai Steel`,
         ogDescription: category.blurb || `Certified ${category.name} models manufactured by Bongshai Steel.`,
         ogImage,
+        siteOrigin: origin,
         settings: content.settings || {},
         currentNav: "products"
       };
@@ -128,19 +155,24 @@ module.exports = function createCatalogRouter(options = {}) {
       const rawCode = req.params.modelCode || "";
       const allProducts = Array.isArray(content.products) ? content.products : [];
 
+      // Model code only: also matching the internal id gave every product a
+      // second live URL.
       const product = allProducts.find(
-        (p) =>
-          (p.modelCode || "").toLowerCase() === rawCode.toLowerCase() ||
-          (p.id || "").toLowerCase() === rawCode.toLowerCase()
+        (p) => (p.modelCode || "").toLowerCase() === rawCode.toLowerCase()
       );
 
-      if (!product) {
-        return res.status(404).send("Product not found");
+      // "Not mine": the app's own HTML 404 answers.
+      if (!product) return next();
+      // One URL per product: BH-IS-1001, never bh-is-1001 as well.
+      if (rawCode !== product.modelCode) {
+        return res.redirect(301, "/products/" + encodeURIComponent(product.modelCode));
       }
 
-      const canonicalUrl = `https://www.bongshaisteel.com/products/${encodeURIComponent(product.modelCode)}`;
+      const origin = siteOrigin(content);
+      const canonicalUrl = `${origin}/products/${encodeURIComponent(product.modelCode)}`;
+      const categoryUrl = `${origin}/category/${encodeURIComponent(product.category || "")}`;
       const cleanImg = (product.image || "").replace(/^\//, "");
-      const fullImageUrl = `https://www.bongshaisteel.com/${encodeURI(cleanImg)}`;
+      const fullImageUrl = `${origin}/${encodeURI(cleanImg)}`;
 
       const waMsg = `Hello Bongshai Steel! I would like to inquire about ${product.modelCode} (${product.name}). Please send technical specs and quotation.`;
       const waLink = buildWhatsAppLink(content.settings && content.settings.whatsappNumber, waMsg);
@@ -166,6 +198,8 @@ module.exports = function createCatalogRouter(options = {}) {
         ogTitle: `${product.name} (${product.modelCode}) | Bongshai Steel`,
         ogDescription: product.desc,
         ogImage: fullImageUrl,
+        categoryUrl,
+        siteOrigin: origin,
         settings: content.settings || {},
         currentNav: "products"
       };

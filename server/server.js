@@ -19,8 +19,11 @@ const helmet = require("helmet");
 const compression = require("compression");
 
 const { ROOT } = require("./lib/paths");
+const content = require("./lib/content");
 const render = require("./lib/render");
 const leads = require("./lib/leads");
+const createCatalogRouter = require("./catalog");
+const catalogSitemap = require("./catalog/sitemap");
 
 const PROD = process.env.NODE_ENV === "production";
 const PORT = Number(process.env.PORT) || 3000;
@@ -128,6 +131,47 @@ app.get("/counter.php", (req, res) => {
     res.cookie("bs_seen", "1", { httpOnly: true, sameSite: "lax", secure: req.secure });
   }
   res.json({ views: count });
+});
+
+/* Server-rendered catalogue: /products, /products/:modelCode, /category/:key.
+   Built in server/catalog/ (Antigravity's lane). Unknown slugs call next(),
+   so they fall through to the HTML 404 below. */
+app.use(createCatalogRouter({ getContent: content.load }));
+
+/* Sitemap: the home page plus every catalogue URL, generated from the same
+   content the pages render from, so it can never list a page that 404s.
+   On the host the static sitemap.xml on disk answers first — it has to be
+   removed at cutover for this route to take over. */
+function xmlEscape(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+app.get("/sitemap.xml", (req, res, next) => {
+  try {
+    const data = content.load();
+    let origin = "https://www.bongshaisteel.com";
+    try { origin = new URL(data.seo && data.seo.canonical).origin; } catch { /* keep default */ }
+    const today = new Date().toISOString().slice(0, 10);
+    const homeMod = typeof data.updated === "string" ? data.updated.slice(0, 10) : today;
+
+    const entries = [
+      { loc: origin + "/", lastmod: homeMod, changefreq: "weekly", priority: "1.0" },
+      ...catalogSitemap({ baseUrl: origin, getContent: () => data }),
+    ];
+    const body = entries.map((e) =>
+      "  <url>\n" +
+      "    <loc>" + xmlEscape(e.loc) + "</loc>\n" +
+      (e.lastmod ? "    <lastmod>" + xmlEscape(e.lastmod) + "</lastmod>\n" : "") +
+      (e.changefreq ? "    <changefreq>" + e.changefreq + "</changefreq>\n" : "") +
+      (e.priority ? "    <priority>" + e.priority + "</priority>\n" : "") +
+      "  </url>").join("\n");
+
+    res.set("Cache-Control", "public, max-age=3600");
+    res.type("application/xml").send(
+      '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + body + "\n</urlset>\n");
+  } catch (err) {
+    next(err);
+  }
 });
 
 /* ---------------------------------------------------------------- static */
