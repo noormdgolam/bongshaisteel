@@ -103,5 +103,47 @@
       </tbody>
     </table>
   </div>
+
+  <div class="mobile-card-list">
+    {% for p in products %}
+    <div class="admin-mobile-card product-card">
+      <div style="display:flex; gap:12px; align-items:flex-start;">
+        {% if p.image %}
+        <img
+          src="{% for part in p.image.split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}"
+          alt="{{ p.name }}"
+          class="product-thumb"
+          loading="lazy"
+        >
+        {% else %}
+        <div class="product-thumb placeholder-thumb">No img</div>
+        {% endif %}
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:8px;">
+            <code style="font-size:0.88rem; font-weight:700; color:var(--primary);">{{ p.model_code }}</code>
+            <a href="/admin/products/{{ p.id }}/edit" class="btn btn-sm">Edit</a>
+          </div>
+          <strong style="color:var(--grey-900); font-size:0.95rem; display:block; margin-bottom:6px; word-break:break-word;">{{ p.name }}</strong>
+          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; font-size:0.8rem;">
+            <span class="pill pill-muted">{{ p.category_name or 'General' }}</span>
+            <span style="font-family:monospace; color:var(--grey-600); font-weight:600;">#{{ p.sort_order if p.sort_order is defined and p.sort_order !== null else 0 }}</span>
+            {% if p.featured %}
+            <span class="pill pill-gold">Featured</span>
+            {% endif %}
+            {% if p.published %}
+            <span class="pill pill-success">Live</span>
+            {% else %}
+            <span class="pill pill-danger">Draft</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="admin-mobile-card" style="text-align:center; padding:32px 16px; color:var(--grey-500);">
+      No products found matching your search. <a href="/admin/products/new">Add a new product</a>
+    </div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

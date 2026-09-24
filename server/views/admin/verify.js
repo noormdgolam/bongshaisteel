@@ -11,6 +11,7 @@ const ADMIN_DIR = __dirname;
 
 // Configure Nunjucks exactly as specified in TASKS.md
 const env = nunjucks.configure(VIEWS_DIR, { autoescape: true });
+require("../../lib/view-filters").register(env);
 
 let passedChecks = 0;
 let failedChecks = 0;
@@ -583,6 +584,80 @@ try {
   pass("10. Security robots meta tag", "both layout and login enforce noindex, nofollow");
 } catch (err) {
   fail("10. Security robots meta tag", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 11: Phone width card layout (no squeezed tables below 640px)
+// ---------------------------------------------------------------------
+try {
+  // Test product list
+  const listHtml = render("admin/products/list.njk", {
+    adminName: "A",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "products",
+    products: [
+      { id: 1, model_code: "BH-M1", name: "Model 1", category_name: "Sheds", image: "img.webp", featured: 1, published: 1, sort_order: 1 }
+    ],
+    categories: []
+  });
+  const $list = cheerio.load(listHtml);
+  assert($list(".mobile-card-list").length > 0, "Products list must contain .mobile-card-list");
+  assert($list(".mobile-card-list .product-card").length === 1, "Products list must contain .product-card");
+
+  // Test dashboard
+  const dashHtml = render("admin/dashboard.njk", {
+    adminName: "A",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "dashboard",
+    stats: {},
+    recentActivity: [
+      { created_at: new Date("2026-09-24T12:00:00Z"), admin_name: "Admin", action: "edit", summary: "Summary" }
+    ]
+  });
+  const $dash = cheerio.load(dashHtml);
+  assert($dash(".mobile-card-list").length > 0, "Dashboard must contain .mobile-card-list");
+  assert($dash(".mobile-card-list .activity-card").length === 1, "Dashboard must contain .activity-card");
+
+  // Verify CSS media query in layout hides table-responsive
+  const layoutContent = fs.readFileSync(path.join(ADMIN_DIR, "layout.njk"), "utf8");
+  assert(
+    /@media\s*\(\s*max-width:\s*640px\s*\)[^{]*\{[^}]*\.table-responsive\s*\{[^}]*display:\s*none/s.test(layoutContent),
+    "Layout CSS must hide .table-responsive below 640px"
+  );
+
+  pass("11. Phone card layout below 640px", "product list & dashboard render card markup with media query hiding table");
+} catch (err) {
+  fail("11. Phone card layout below 640px", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 12: Dates on dashboard formatted through dhaka filter
+// ---------------------------------------------------------------------
+try {
+  const utcDate = new Date("2026-09-24T15:58:00.000Z"); // 21:58 in Asia/Dhaka (+06:00)
+  const dashHtml = render("admin/dashboard.njk", {
+    adminName: "A",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "dashboard",
+    stats: {},
+    recentActivity: [
+      { created_at: utcDate, admin_name: "Admin", action: "edit", summary: "Summary" }
+    ]
+  });
+
+  assert(
+    dashHtml.includes("24 Sept 2026, 21:58"),
+    `Dashboard must display date formatted in Asia/Dhaka ("24 Sept 2026, 21:58"), but was not found in rendered HTML`
+  );
+  assert(!dashHtml.includes("2026-09-24T15:58:00.000Z"), "Raw ISO string must not appear unformatted");
+  assert(!dashHtml.includes("Thu Sep 24"), "Default JS Date string must not appear unformatted");
+
+  pass("12. Dhaka date filter on dashboard", "UTC date formatted cleanly to '24 Sept 2026, 21:58'");
+} catch (err) {
+  fail("12. Dhaka date filter on dashboard", err);
 }
 
 console.log("\n-------------------------------------------------");

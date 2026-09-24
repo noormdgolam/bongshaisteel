@@ -174,6 +174,21 @@
   .admin-scrim { display: none; }
   .product-thumb { width: 52px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid var(--grey-200); background: #ffffff; }
   .placeholder-thumb { display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: var(--grey-500); background: var(--grey-100); }
+  .mobile-card-list { display: none; }
+  .admin-mobile-card {
+    background: var(--glass);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+  }
+
+  @media (max-width: 640px) {
+    .table-responsive { display: none !important; }
+    .mobile-card-list { display: flex !important; flex-direction: column; gap: 12px; }
+  }
 
   @media (max-width: 900px) {
     .admin-mobilebar {
