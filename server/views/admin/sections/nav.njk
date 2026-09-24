@@ -1,0 +1,18 @@
+{% if sections and sections.length %}
+<div class="card" style="margin-bottom:18px; padding:10px 14px; overflow-x:auto;">
+  <div style="display:flex; gap:8px; align-items:center; flex-wrap:nowrap; min-width:max-content;">
+    {% for s in sections %}
+    <a
+      href="{% if s.key == 'site' %}/admin/content/site{% else %}/admin/content/{{ s.key }}{% endif %}"
+      class="btn btn-sm {% if currentSectionKey == s.key %}btn-primary{% endif %}"
+      style="white-space:nowrap;"
+    >
+      {{ s.title }}
+      {% if s.count !== null and s.count is defined %}
+      <span style="font-size:0.76rem; opacity:0.85; margin-left:2px;">({{ s.count }})</span>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

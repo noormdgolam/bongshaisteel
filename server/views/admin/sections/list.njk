@@ -1,0 +1,197 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}{{ section.title }} — Content Management{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">{{ section.title }}</h1>
+{% endblock %}
+
+{% block content %}
+{% set currentSectionKey = section.key %}
+{% include "admin/sections/nav.njk" %}
+
+<div class="card">
+  <div class="toolbar" style="margin-bottom:16px;">
+    <div>
+      <div style="font-size:0.88rem; color:var(--grey-600); font-weight:500;">
+        {{ section.description or ('Manage entries for ' + section.title) }}
+      </div>
+      <div style="font-size:0.82rem; color:var(--grey-500); margin-top:2px;">
+        Total: {{ rows.length if rows else 0 }} item(s)
+      </div>
+    </div>
+    <div>
+      <a href="/admin/content/{{ section.key }}/new" class="btn btn-primary">
+        ➕ Add {{ section.title }}
+      </a>
+    </div>
+  </div>
+
+  {% set f0 = section.fields[0] if section.fields and section.fields.length > 0 else null %}
+  {% set f1 = section.fields[1] if section.fields and section.fields.length > 1 else null %}
+
+  <!-- Desktop Table -->
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          {% if section.orderable %}
+          <th style="width:75px;">Order</th>
+          {% endif %}
+          <th>Content Summary</th>
+          <th style="width:110px;">Status</th>
+          <th style="width:90px; text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          {% if section.orderable %}
+          <td style="white-space:nowrap;">
+            <div style="display:flex; gap:3px; align-items:center;">
+              {% if not loop.first %}
+              <form method="post" action="/admin/content/{{ section.key }}/{{ row.id }}/move" style="display:inline; margin:0;">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <input type="hidden" name="direction" value="up">
+                <button type="submit" class="btn btn-sm" title="Move Up" aria-label="Move Up" style="padding:2px 7px; font-size:0.75rem;">↑</button>
+              </form>
+              {% endif %}
+              {% if not loop.last %}
+              <form method="post" action="/admin/content/{{ section.key }}/{{ row.id }}/move" style="display:inline; margin:0;">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <input type="hidden" name="direction" value="down">
+                <button type="submit" class="btn btn-sm" title="Move Down" aria-label="Move Down" style="padding:2px 7px; font-size:0.75rem;">↓</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+          {% endif %}
+
+          <td>
+            <div style="display:flex; align-items:center; gap:10px;">
+              {% if f0 and f0.type == 'image' and row[f0.name] %}
+              <img
+                src="{% for part in row[f0.name].split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}"
+                alt="Thumbnail"
+                class="product-thumb"
+                style="width:40px; height:40px;"
+                loading="lazy"
+              >
+              {% elif f1 and f1.type == 'image' and row[f1.name] %}
+              <img
+                src="{% for part in row[f1.name].split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}"
+                alt="Thumbnail"
+                class="product-thumb"
+                style="width:40px; height:40px;"
+                loading="lazy"
+              >
+              {% endif %}
+
+              <div style="flex:1; min-width:0;">
+                {% if f0 and f0.type != 'image' and row[f0.name] %}
+                <strong style="color:var(--grey-900); font-size:0.92rem; display:block;">
+                  {{ row[f0.name] | truncate(120) }}
+                </strong>
+                {% endif %}
+
+                {% if f1 and f1.type != 'image' and f1.name != 'published' and row[f1.name] %}
+                <div style="font-size:0.82rem; color:var(--grey-600); margin-top:2px;">
+                  {{ row[f1.name] | truncate(120) }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+
+          <td>
+            {% for f in section.fields %}
+              {% if f.name == 'published' %}
+                {% if row.published %}
+                <span class="pill pill-success">Live</span>
+                {% else %}
+                <span class="pill pill-danger">Draft</span>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </td>
+
+          <td style="text-align:right; white-space:nowrap;">
+            <a href="/admin/content/{{ section.key }}/{{ row.id }}/edit" class="btn btn-sm">Edit</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="{% if section.orderable %}4{% else %}3{% endif %}" style="text-align:center; padding:36px 20px; color:var(--grey-500);">
+            No entries in this section yet. <a href="/admin/content/{{ section.key }}/new">Add the first one</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Card List -->
+  <div class="mobile-card-list">
+    {% for row in rows %}
+    <div class="admin-mobile-card section-row-card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap:8px;">
+        <div style="flex:1; min-width:0;">
+          {% if f0 and f0.type != 'image' and row[f0.name] %}
+          <strong style="color:var(--grey-900); font-size:0.95rem; display:block; word-break:break-word;">
+            {{ row[f0.name] | truncate(120) }}
+          </strong>
+          {% endif %}
+
+          {% if f1 and f1.type != 'image' and f1.name != 'published' and row[f1.name] %}
+          <div style="font-size:0.84rem; color:var(--grey-600); margin-top:3px; word-break:break-word;">
+            {{ row[f1.name] | truncate(120) }}
+          </div>
+          {% endif %}
+        </div>
+
+        <a href="/admin/content/{{ section.key }}/{{ row.id }}/edit" class="btn btn-sm" style="flex-shrink:0;">
+          Edit
+        </a>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; flex-wrap:wrap; gap:8px;">
+        <div>
+          {% for f in section.fields %}
+            {% if f.name == 'published' %}
+              {% if row.published %}
+              <span class="pill pill-success">Live</span>
+              {% else %}
+              <span class="pill pill-danger">Draft</span>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        {% if section.orderable %}
+        <div style="display:flex; gap:4px; align-items:center;">
+          {% if not loop.first %}
+          <form method="post" action="/admin/content/{{ section.key }}/{{ row.id }}/move" style="display:inline; margin:0;">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <input type="hidden" name="direction" value="up">
+            <button type="submit" class="btn btn-sm" title="Move Up" aria-label="Move Up" style="padding:2px 8px; font-size:0.75rem;">↑</button>
+          </form>
+          {% endif %}
+          {% if not loop.last %}
+          <form method="post" action="/admin/content/{{ section.key }}/{{ row.id }}/move" style="display:inline; margin:0;">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <input type="hidden" name="direction" value="down">
+            <button type="submit" class="btn btn-sm" title="Move Down" aria-label="Move Down" style="padding:2px 8px; font-size:0.75rem;">↓</button>
+          </form>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div class="admin-mobile-card" style="text-align:center; padding:32px 16px; color:var(--grey-500);">
+      No entries in this section yet. <a href="/admin/content/{{ section.key }}/new">Add the first one</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
