@@ -1,0 +1,161 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}
+{% if row.id %}Edit {{ section.title }} #{{ row.id }}{% else %}New {{ section.title }}{% endif %} — Content Management
+{% endblock %}
+
+{% block header %}
+<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+  <a href="/admin/content/{{ section.key }}" class="btn btn-sm">
+    ← Back to {{ section.title }}
+  </a>
+  <h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">
+    {% if row.id %}Edit {{ section.title }} #{{ row.id }}{% else %}New {{ section.title }}{% endif %}
+  </h1>
+</div>
+{% endblock %}
+
+{% block content %}
+{% set currentSectionKey = section.key %}
+{% include "admin/sections/nav.njk" %}
+
+{% if error %}
+<div class="error-box">{{ error }}</div>
+{% endif %}
+
+<div class="card" style="max-width:820px;">
+  <form method="post" action="{% if row.id %}/admin/content/{{ section.key }}/{{ row.id }}{% else %}/admin/content/{{ section.key }}{% endif %}">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+    {% for field in section.fields %}
+    <div class="form-row">
+      {% if field.type == 'checkbox' %}
+      <div style="padding:10px 14px; background:rgba(255,255,255,0.6); border:1px solid var(--grey-200); border-radius:8px; margin-top:6px;">
+        <label for="{{ field.name }}" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; font-size:0.92rem; margin:0;">
+          <input
+            type="checkbox"
+            id="{{ field.name }}"
+            name="{{ field.name }}"
+            value="1"
+            style="width:auto;"
+            {% if row.id %}
+              {% if row[field.name] %}checked{% endif %}
+            {% else %}
+              {% if field.name == 'published' or row[field.name] %}checked{% endif %}
+            {% endif %}
+          >
+          <span>{{ field.label }}</span>
+        </label>
+        {% if field.help %}
+        <div style="font-size:0.8rem; color:var(--grey-500); margin-left:24px; margin-top:2px;">
+          {{ field.help }}
+        </div>
+        {% endif %}
+      </div>
+
+      {% elif field.type == 'textarea' or field.type == 'html' %}
+      <label for="{{ field.name }}">
+        {{ field.label }} {% if field.required %}<span style="color:var(--danger);">*</span>{% endif %}
+      </label>
+      <textarea
+        id="{{ field.name }}"
+        name="{{ field.name }}"
+        rows="5"
+        {% if field.required %}required{% endif %}
+      >{{ row[field.name] or '' }}</textarea>
+      {% if field.help %}
+      <div style="font-size:0.8rem; color:var(--grey-500); margin-top:4px;">
+        {{ field.help }}
+      </div>
+      {% endif %}
+
+      {% elif field.type == 'number' %}
+      <label for="{{ field.name }}">
+        {{ field.label }} {% if field.required %}<span style="color:var(--danger);">*</span>{% endif %}
+      </label>
+      <input
+        type="number"
+        id="{{ field.name }}"
+        name="{{ field.name }}"
+        value="{{ row[field.name] if row[field.name] is defined and row[field.name] !== null else '' }}"
+        {% if field.required %}required{% endif %}
+      >
+      {% if field.help %}
+      <div style="font-size:0.8rem; color:var(--grey-500); margin-top:4px;">
+        {{ field.help }}
+      </div>
+      {% endif %}
+
+      {% elif field.type == 'image' %}
+      <label for="{{ field.name }}">
+        {{ field.label }} {% if field.required %}<span style="color:var(--danger);">*</span>{% endif %}
+      </label>
+      <input
+        type="text"
+        id="{{ field.name }}"
+        name="{{ field.name }}"
+        value="{{ row[field.name] or '' }}"
+        placeholder="e.g. images/team/name.webp"
+        {% if field.required %}required{% endif %}
+      >
+      {% if row[field.name] %}
+      <div style="margin-top:8px; display:flex; align-items:center; gap:12px;">
+        <span style="font-size:0.82rem; color:var(--grey-600); font-weight:600;">Current Preview:</span>
+        <img
+          src="{% for part in row[field.name].split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}"
+          alt="Preview"
+          style="max-height:85px; border-radius:6px; border:1px solid var(--grey-300); background:#ffffff;"
+        >
+      </div>
+      {% endif %}
+      {% if field.help %}
+      <div style="font-size:0.8rem; color:var(--grey-500); margin-top:4px;">
+        {{ field.help }}
+      </div>
+      {% endif %}
+
+      {% else %}
+      {# text (default) #}
+      <label for="{{ field.name }}">
+        {{ field.label }} {% if field.required %}<span style="color:var(--danger);">*</span>{% endif %}
+      </label>
+      <input
+        type="text"
+        id="{{ field.name }}"
+        name="{{ field.name }}"
+        value="{{ row[field.name] or '' }}"
+        {% if field.required %}required{% endif %}
+      >
+      {% if field.help %}
+      <div style="font-size:0.8rem; color:var(--grey-500); margin-top:4px;">
+        {{ field.help }}
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <div class="form-actions" style="margin-top:24px;">
+      <button type="submit" class="btn btn-primary">
+        {% if row.id %}Save Changes{% else %}Create {{ section.title }}{% endif %}
+      </button>
+      <a href="/admin/content/{{ section.key }}" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+{% if row.id %}
+<div class="card" style="max-width:820px; border-top:3px solid var(--danger); margin-top:20px;">
+  <h3 style="font-size:0.95rem; font-weight:700; color:var(--danger); margin:0 0 6px;">
+    Delete {{ section.title }}
+  </h3>
+  <p style="font-size:0.82rem; color:var(--grey-600); margin:0 0 14px;">
+    Permanently remove this item from the database.
+  </p>
+  <form method="post" action="/admin/content/{{ section.key }}/{{ row.id }}/delete" onsubmit="return confirm('Are you sure you want to permanently delete this item?');">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

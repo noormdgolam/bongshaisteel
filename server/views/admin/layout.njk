@@ -93,6 +93,7 @@
     padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(15, 23, 42, 0.15);
     background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(6px);
     color: var(--grey-900); cursor: pointer; font-size: 0.9rem; font-weight: 600;
+    white-space: nowrap;
     transition: all 0.15s ease;
   }
   .btn:hover { background: #ffffff; text-decoration: none; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08); }
@@ -250,6 +251,12 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M4 20h16"/></svg>
         <span>Dashboard</span>
       </a>
+      {% if adminRole != 'sales' %}
+      <a href="/admin/content" class="{% if active == 'content' %}active{% endif %}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span>Content</span>
+      </a>
+      {% endif %}
       <a href="/admin/products" class="{% if active == 'products' %}active{% endif %}">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M9 11h6M9 15h6M9 19h3"/></svg>
         <span>Products</span>

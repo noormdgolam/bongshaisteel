@@ -300,6 +300,114 @@ try {
   });
   assert(activityEmpty.includes("No activity logs recorded."));
 
+  // Generic sections schema with every field type
+  const allTypesSchema = {
+    key: "team",
+    title: "Team Members",
+    description: "Leadership and engineering team",
+    orderable: true,
+    fields: [
+      { name: "name", label: "Full Name", type: "text", required: true },
+      { name: "bio", label: "Biography", type: "textarea", help: "Short bio" },
+      { name: "details", label: "HTML Details", type: "html", help: "Basic HTML allowed" },
+      { name: "sort_order", label: "Sort Order", type: "number" },
+      { name: "published", label: "Published", type: "checkbox" },
+      { name: "photo", label: "Photo Path", type: "image", help: "Site path" }
+    ]
+  };
+  const sectionsNav = [
+    { key: "site", title: "Site copy & SEO", count: null },
+    { key: "team", title: "Team Members", count: 2 }
+  ];
+
+  // sections/list.njk
+  const sectionsListNormal = render("admin/sections/list.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "content",
+    section: allTypesSchema,
+    sections: sectionsNav,
+    rows: [
+      { id: 1, name: "Engr. Noor", bio: "Chief Engineer", details: "Specs", sort_order: 1, published: 1, photo: "images/team/noor.webp" }
+    ]
+  });
+  assert(sectionsListNormal.includes("Engr. Noor"));
+  assert(sectionsListNormal.includes("Chief Engineer"));
+
+  const sectionsListEmpty = render("admin/sections/list.njk", {
+    adminName: "Munna",
+    adminRole: "editor",
+    csrfToken: "csrf-token-123",
+    active: "content",
+    section: allTypesSchema,
+    sections: sectionsNav,
+    rows: []
+  });
+  assert(sectionsListEmpty.includes("No entries in this section yet."));
+
+  // sections/form.njk - create
+  const sectionsFormCreate = render("admin/sections/form.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "content",
+    section: allTypesSchema,
+    sections: sectionsNav,
+    row: {},
+    error: null
+  });
+  assert(sectionsFormCreate.includes("New Team Members"));
+  assert(!sectionsFormCreate.includes("Delete Team Members"));
+
+  // sections/form.njk - edit
+  const sectionsFormEdit = render("admin/sections/form.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "content",
+    section: allTypesSchema,
+    sections: sectionsNav,
+    row: { id: 1, name: "Engr. Noor", bio: "Chief Engineer", details: "Specs", sort_order: 1, published: 1, photo: "images/team/noor.webp" },
+    error: "Validation failed"
+  });
+  assert(sectionsFormEdit.includes("Edit Team Members #1"));
+  assert(sectionsFormEdit.includes("Delete Team Members"));
+  assert(sectionsFormEdit.includes("Validation failed"));
+
+  // content/site.njk
+  const siteNormal = render("admin/content/site.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "content",
+    sections: sectionsNav,
+    groups: [
+      {
+        key: "hero",
+        title: "Hero Section",
+        fields: [
+          { name: "text.hero.title", label: "Hero Title", type: "text", value: "Prefab Steel Buildings" },
+          { name: "text.hero.description", label: "Hero Description", type: "textarea", value: "Engineered to AISC standards" }
+        ]
+      }
+    ],
+    error: null
+  });
+  assert(siteNormal.includes("Prefab Steel Buildings"));
+  assert(siteNormal.includes("text.hero.title"));
+
+  const siteEmpty = render("admin/content/site.njk", {
+    adminName: "Munna",
+    adminRole: "editor",
+    csrfToken: "csrf-token-123",
+    active: "content",
+    sections: sectionsNav,
+    groups: [],
+    error: null
+  });
+  assert(siteEmpty.includes("No site copy groups configured."));
+
   pass("1. Render without throwing", "all templates render normal and empty fixtures");
 } catch (err) {
   fail("1. Render without throwing", err);
@@ -444,6 +552,76 @@ try {
         active: "leads",
         lead: { id: 10, name: "Lead 10" },
         statuses: ["new", "contacted", "quoted", "won", "lost"]
+      })
+    },
+    {
+      name: "admin/sections/list.njk (orderable move forms)",
+      html: render("admin/sections/list.njk", {
+        adminName: "Admin",
+        adminRole: "admin",
+        csrfToken: token,
+        active: "content",
+        section: {
+          key: "faq",
+          title: "FAQ",
+          orderable: true,
+          fields: [{ name: "q", label: "Question", type: "text" }]
+        },
+        sections: [{ key: "faq", title: "FAQ", count: 3 }],
+        rows: [
+          { id: 1, q: "Q1" },
+          { id: 2, q: "Q2" },
+          { id: 3, q: "Q3" }
+        ]
+      })
+    },
+    {
+      name: "admin/sections/form.njk (new)",
+      html: render("admin/sections/form.njk", {
+        adminName: "Admin",
+        adminRole: "admin",
+        csrfToken: token,
+        active: "content",
+        section: {
+          key: "faq",
+          title: "FAQ",
+          fields: [{ name: "q", label: "Question", type: "text" }]
+        },
+        sections: [{ key: "faq", title: "FAQ", count: 0 }],
+        row: {}
+      })
+    },
+    {
+      name: "admin/sections/form.njk (edit & delete)",
+      html: render("admin/sections/form.njk", {
+        adminName: "Admin",
+        adminRole: "admin",
+        csrfToken: token,
+        active: "content",
+        section: {
+          key: "faq",
+          title: "FAQ",
+          fields: [{ name: "q", label: "Question", type: "text" }]
+        },
+        sections: [{ key: "faq", title: "FAQ", count: 1 }],
+        row: { id: 5, q: "Q5" }
+      })
+    },
+    {
+      name: "admin/content/site.njk (site save form)",
+      html: render("admin/content/site.njk", {
+        adminName: "Admin",
+        adminRole: "admin",
+        csrfToken: token,
+        active: "content",
+        sections: [{ key: "site", title: "Site copy", count: null }],
+        groups: [
+          {
+            key: "seo",
+            title: "SEO",
+            fields: [{ name: "seo.title", label: "Title", type: "text", value: "Bongshai" }]
+          }
+        ]
       })
     }
   ];
@@ -1031,6 +1209,289 @@ try {
   pass("18. Phone card layout for leads & activity", "both templates provide .mobile-card-list reflow for mobile");
 } catch (err) {
   fail("18. Phone card layout for leads & activity", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 19: Hostile values in every field type stay escaped inside textarea/input
+// ---------------------------------------------------------------------
+try {
+  const hostileScript = "</textarea><script>alert('xss')</script>";
+  const hostileAttr = '"><script>alert(\'attr\')</script>';
+
+  const hostileSchema = {
+    key: "faq",
+    title: "FAQ",
+    orderable: true,
+    fields: [
+      { name: "question", label: "Question", type: "text" },
+      { name: "answer", label: "Answer", type: "textarea" },
+      { name: "markup", label: "Markup", type: "html" },
+      { name: "order_num", label: "Order Num", type: "number" },
+      { name: "photo", label: "Photo", type: "image" }
+    ]
+  };
+
+  const hostileRow = {
+    id: 1,
+    question: hostileAttr,
+    answer: hostileScript,
+    markup: hostileScript,
+    order_num: hostileAttr,
+    photo: hostileAttr
+  };
+
+  const formHtml = render("admin/sections/form.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "content",
+    section: hostileSchema,
+    sections: [{ key: "faq", title: "FAQ", count: 1 }],
+    row: hostileRow
+  });
+
+  assert(!formHtml.includes("<script>alert("), "No live unescaped script tag should appear in sections/form.njk");
+  assert(formHtml.includes("&lt;/textarea&gt;&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;"), "Escaped textarea value must be present");
+
+  const siteHtml = render("admin/content/site.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "content",
+    sections: [{ key: "site", title: "Site copy", count: null }],
+    groups: [
+      {
+        key: "hero",
+        title: "Hero",
+        fields: [
+          { name: "text.hero.title", label: "Title", type: "text", value: hostileAttr },
+          { name: "text.hero.body", label: "Body", type: "textarea", value: hostileScript },
+          { name: "text.hero.raw", label: "Raw", type: "html", value: hostileScript }
+        ]
+      }
+    ]
+  });
+
+  assert(!siteHtml.includes("<script>alert("), "No live unescaped script tag should appear in content/site.njk");
+  assert(siteHtml.includes("&lt;/textarea&gt;&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;"), "Escaped site textarea value must be present");
+
+  pass("19. Hostile values in form field types remain escaped", "text, textarea, html, number, and image inputs escape hostile values without executing raw markup");
+} catch (err) {
+  fail("19. Hostile values in form field types remain escaped", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 20: Orderable move forms logic
+// ---------------------------------------------------------------------
+try {
+  const token = "token-order-test";
+  const orderableSchema = {
+    key: "services",
+    title: "Services",
+    orderable: true,
+    fields: [{ name: "name", label: "Name", type: "text" }]
+  };
+  const nonOrderableSchema = {
+    key: "services",
+    title: "Services",
+    orderable: false,
+    fields: [{ name: "name", label: "Name", type: "text" }]
+  };
+
+  const rows = [
+    { id: 10, name: "First Service" },
+    { id: 20, name: "Middle Service" },
+    { id: 30, name: "Last Service" }
+  ];
+
+  // Test orderable: true
+  const orderableHtml = render("admin/sections/list.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: token,
+    active: "content",
+    section: orderableSchema,
+    sections: [{ key: "services", title: "Services", count: 3 }],
+    rows
+  });
+
+  const $ord = cheerio.load(orderableHtml);
+
+  // First row in desktop table: should have down form, but NO up form
+  const firstRowForms = $ord('tbody tr:first-child form');
+  assert.strictEqual(firstRowForms.length, 1, "First row should have exactly 1 move form (down)");
+  assert.strictEqual(firstRowForms.find('input[name="direction"]').val(), "down", "First row move form must be direction=down");
+  assert.strictEqual(firstRowForms.attr("action"), "/admin/content/services/10/move");
+  assert.strictEqual(firstRowForms.find('input[name="_csrf"]').val(), token);
+
+  // Middle row in desktop table: should have both up and down forms
+  const middleRowForms = $ord('tbody tr:nth-child(2) form');
+  assert.strictEqual(middleRowForms.length, 2, "Middle row should have 2 move forms (up and down)");
+  assert.strictEqual(middleRowForms.eq(0).find('input[name="direction"]').val(), "up");
+  assert.strictEqual(middleRowForms.eq(0).attr("action"), "/admin/content/services/20/move");
+  assert.strictEqual(middleRowForms.eq(1).find('input[name="direction"]').val(), "down");
+  assert.strictEqual(middleRowForms.eq(1).attr("action"), "/admin/content/services/20/move");
+
+  // Last row in desktop table: should have up form, but NO down form
+  const lastRowForms = $ord('tbody tr:last-child form');
+  assert.strictEqual(lastRowForms.length, 1, "Last row should have exactly 1 move form (up)");
+  assert.strictEqual(lastRowForms.find('input[name="direction"]').val(), "up", "Last row move form must be direction=up");
+  assert.strictEqual(lastRowForms.attr("action"), "/admin/content/services/30/move");
+
+  // Test orderable: false
+  const nonOrderableHtml = render("admin/sections/list.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: token,
+    active: "content",
+    section: nonOrderableSchema,
+    sections: [{ key: "services", title: "Services", count: 3 }],
+    rows
+  });
+
+  const $nonOrd = cheerio.load(nonOrderableHtml);
+  const moveForms = $nonOrd('form[action*="/move"]');
+  assert.strictEqual(moveForms.length, 0, "No move forms should exist when orderable is false");
+
+  pass("20. Orderable move forms logic", "first row has no up, last row has no down, all forms POST with CSRF, none when orderable: false");
+} catch (err) {
+  fail("20. Orderable move forms logic", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 21: Checkbox logic in sections/form.njk
+// ---------------------------------------------------------------------
+try {
+  const checkboxSchema = {
+    key: "news",
+    title: "News",
+    fields: [
+      { name: "title", label: "Title", type: "text" },
+      { name: "published", label: "Published", type: "checkbox" },
+      { name: "pinned", label: "Pinned", type: "checkbox" }
+    ]
+  };
+
+  // 1. New row: published should default to checked, other checkboxes unchecked
+  const newRowHtml = render("admin/sections/form.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "content",
+    section: checkboxSchema,
+    sections: [{ key: "news", title: "News", count: 0 }],
+    row: {}
+  });
+  const $new = cheerio.load(newRowHtml);
+  const publishedNew = $new('input[name="published"]');
+  const pinnedNew = $new('input[name="pinned"]');
+  assert(publishedNew.is(":checked"), "Published checkbox should default to checked on new row");
+  assert(!pinnedNew.is(":checked"), "Other checkboxes (pinned) should NOT be checked by default on new row");
+
+  // 2. Edit row with truthy values
+  const editTruthyHtml = render("admin/sections/form.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "content",
+    section: checkboxSchema,
+    sections: [{ key: "news", title: "News", count: 1 }],
+    row: { id: 1, title: "News 1", published: 1, pinned: true }
+  });
+  const $truthy = cheerio.load(editTruthyHtml);
+  assert($truthy('input[name="published"]').is(":checked"), "Published should be checked when truthy");
+  assert($truthy('input[name="pinned"]').is(":checked"), "Pinned should be checked when truthy");
+
+  // 3. Edit row with falsy values
+  const editFalsyHtml = render("admin/sections/form.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "content",
+    section: checkboxSchema,
+    sections: [{ key: "news", title: "News", count: 1 }],
+    row: { id: 1, title: "News 1", published: 0, pinned: false }
+  });
+  const $falsy = cheerio.load(editFalsyHtml);
+  assert(!$falsy('input[name="published"]').is(":checked"), "Published should be unchecked when 0");
+  assert(!$falsy('input[name="pinned"]').is(":checked"), "Pinned should be unchecked when false");
+
+  pass("21. Checkbox logic in sections/form.njk", "published defaults to checked on new row, checked if truthy, unchecked if falsy");
+} catch (err) {
+  fail("21. Checkbox logic in sections/form.njk", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 22: Field names with dots survive into name attribute unchanged
+// ---------------------------------------------------------------------
+try {
+  const siteHtml = render("admin/content/site.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "content",
+    sections: [{ key: "site", title: "Site copy", count: null }],
+    groups: [
+      {
+        key: "hero",
+        title: "Hero",
+        fields: [
+          { name: "text.hero.title", label: "Title", type: "text", value: "Prefab Steel" },
+          { name: "text.hero.body", label: "Body", type: "textarea", value: "Description" }
+        ]
+      },
+      {
+        key: "seo",
+        title: "SEO",
+        fields: [
+          { name: "seo.meta_title", label: "Meta Title", type: "text", value: "Bongshai Steel" },
+          { name: "seo.meta_description", label: "Meta Description", type: "textarea", value: "Best steel in BD" }
+        ]
+      }
+    ]
+  });
+
+  const $ = cheerio.load(siteHtml);
+  assert.strictEqual($('input[name="text.hero.title"]').length, 1, 'input[name="text.hero.title"] must exist');
+  assert.strictEqual($('input[name="text.hero.title"]').val(), "Prefab Steel");
+  assert.strictEqual($('textarea[name="text.hero.body"]').length, 1, 'textarea[name="text.hero.body"] must exist');
+  assert.strictEqual($('input[name="seo.meta_title"]').length, 1, 'input[name="seo.meta_title"] must exist');
+  assert.strictEqual($('textarea[name="seo.meta_description"]').length, 1, 'textarea[name="seo.meta_description"] must exist');
+
+  pass("22. Dotted field names preserved in name attribute", "text.hero.title, seo.meta_description retain dot syntax");
+} catch (err) {
+  fail("22. Dotted field names preserved in name attribute", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 23: Content sidebar link role-based visibility
+// ---------------------------------------------------------------------
+try {
+  const roles = ["superadmin", "admin", "editor", "sales"];
+  const results = {};
+
+  for (const role of roles) {
+    const html = render("admin/dashboard.njk", {
+      adminName: "Test User",
+      adminRole: role,
+      csrfToken: "token",
+      active: "dashboard",
+      stats: {},
+      recentActivity: []
+    });
+    const $ = cheerio.load(html);
+    const hasContentLink = $('a[href="/admin/content"]').length > 0;
+    results[role] = hasContentLink;
+  }
+
+  assert.strictEqual(results.superadmin, true, "Content link must appear for superadmin");
+  assert.strictEqual(results.admin, true, "Content link must appear for admin");
+  assert.strictEqual(results.editor, true, "Content link must appear for editor");
+  assert.strictEqual(results.sales, false, "Content link must NOT appear for sales");
+
+  pass("23. Role-based navigation for Content link", "superadmin/admin/editor visible, sales hidden");
+} catch (err) {
+  fail("23. Role-based navigation for Content link", err);
 }
 
 console.log("\n-------------------------------------------------");
