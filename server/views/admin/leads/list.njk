@@ -1,0 +1,249 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Messages &amp; Inquiries{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">Messages &amp; Inquiries</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom:16px; padding:12px 16px;">
+  <!-- Status Filter Tabs -->
+  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; border-bottom:1px solid var(--grey-200); padding-bottom:12px; margin-bottom:12px;">
+    <a
+      href="/admin/leads?status=all&kind={{ (kind or 'all') | urlencode }}&q={{ (q or '') | urlencode }}"
+      class="btn btn-sm {% if status == 'all' or not status %}btn-primary{% endif %}"
+    >
+      All ({{ counts.all if counts and counts.all is defined and counts.all !== null else leads.length }})
+    </a>
+    <a
+      href="/admin/leads?status=new&kind={{ (kind or 'all') | urlencode }}&q={{ (q or '') | urlencode }}"
+      class="btn btn-sm {% if status == 'new' %}btn-primary{% endif %}"
+    >
+      New ({{ counts.new if counts and counts.new is defined and counts.new !== null else 0 }})
+    </a>
+    <a
+      href="/admin/leads?status=contacted&kind={{ (kind or 'all') | urlencode }}&q={{ (q or '') | urlencode }}"
+      class="btn btn-sm {% if status == 'contacted' %}btn-primary{% endif %}"
+    >
+      Contacted ({{ counts.contacted if counts and counts.contacted is defined and counts.contacted !== null else 0 }})
+    </a>
+    <a
+      href="/admin/leads?status=quoted&kind={{ (kind or 'all') | urlencode }}&q={{ (q or '') | urlencode }}"
+      class="btn btn-sm {% if status == 'quoted' %}btn-primary{% endif %}"
+    >
+      Quoted ({{ counts.quoted if counts and counts.quoted is defined and counts.quoted !== null else 0 }})
+    </a>
+    <a
+      href="/admin/leads?status=won&kind={{ (kind or 'all') | urlencode }}&q={{ (q or '') | urlencode }}"
+      class="btn btn-sm {% if status == 'won' %}btn-primary{% endif %}"
+    >
+      Won ({{ counts.won if counts and counts.won is defined and counts.won !== null else 0 }})
+    </a>
+    <a
+      href="/admin/leads?status=lost&kind={{ (kind or 'all') | urlencode }}&q={{ (q or '') | urlencode }}"
+      class="btn btn-sm {% if status == 'lost' %}btn-primary{% endif %}"
+    >
+      Lost ({{ counts.lost if counts and counts.lost is defined and counts.lost !== null else 0 }})
+    </a>
+  </div>
+
+  <!-- Filters Toolbar -->
+  <form method="get" action="/admin/leads" class="toolbar" style="margin:0;">
+    <input type="hidden" name="status" value="{{ status or 'all' }}">
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; flex:1;">
+      <select name="kind" style="padding:8px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.9rem; background:rgba(255,255,255,0.9);">
+        <option value="all" {% if kind == 'all' or not kind %}selected{% endif %}>All Types</option>
+        <option value="quote" {% if kind == 'quote' %}selected{% endif %}>Quote Requests</option>
+        <option value="contact" {% if kind == 'contact' %}selected{% endif %}>General Inquiries</option>
+      </select>
+
+      <input
+        type="text"
+        name="q"
+        value="{{ q or '' }}"
+        placeholder="Search name, phone, company..."
+        style="padding:8px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.9rem; min-width:220px; background:rgba(255,255,255,0.9);"
+      >
+
+      <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+      {% if q or (kind and kind != 'all') %}
+      <a href="/admin/leads?status={{ (status or 'all') | urlencode }}" class="btn btn-sm">Clear</a>
+      {% endif %}
+    </div>
+
+    <div>
+      <a
+        href="/admin/leads.csv?status={{ (status or 'all') | urlencode }}&kind={{ (kind or 'all') | urlencode }}&q={{ (q or '') | urlencode }}"
+        class="btn btn-sm"
+        title="Download matching inquiries as CSV"
+      >
+        📥 Download CSV
+      </a>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <div style="margin-bottom:12px; font-size:0.86rem; color:var(--grey-600); font-weight:600;">
+    Total Matching Inquiries: {{ total if total is defined and total !== null else leads.length }}
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:140px;">Date</th>
+          <th style="width:90px;">Type</th>
+          <th style="width:100px;">Status</th>
+          <th>Contact &amp; Company</th>
+          <th>Phone / WhatsApp</th>
+          <th style="width:120px;">Model</th>
+          <th style="width:120px;">Destination</th>
+          <th style="width:80px; text-align:right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in leads %}
+        <tr>
+          <td style="white-space:nowrap; font-size:0.84rem; color:var(--grey-600);">
+            {{ l.created_at | dhaka }}
+          </td>
+          <td>
+            {% if l.kind == 'quote' %}
+            <span class="pill pill-gold" style="text-transform:capitalize;">Quote</span>
+            {% else %}
+            <span class="pill pill-muted" style="text-transform:capitalize;">Contact</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if l.status == 'new' %}
+            <span class="pill pill-gold">New</span>
+            {% elif l.status == 'won' %}
+            <span class="pill pill-success">Won</span>
+            {% elif l.status == 'lost' %}
+            <span class="pill pill-danger">Lost</span>
+            {% elif l.status == 'quoted' %}
+            <span class="pill pill-muted" style="background:#e0e7ff; color:#3730a3;">Quoted</span>
+            {% else %}
+            <span class="pill pill-muted">{{ l.status | capitalize }}</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="/admin/leads/{{ l.id }}" style="color:var(--grey-900); font-weight:700; text-decoration:none;">
+              {{ l.name }}
+            </a>
+            {% if l.company %}
+            <div style="font-size:0.82rem; color:var(--grey-500);">{{ l.company }}</div>
+            {% endif %}
+          </td>
+          <td style="white-space:nowrap;">
+            {% if l.phone %}
+            <div>{{ l.phone }}</div>
+            {% set cleanDigits = l.phone | digits %}
+            {% if cleanDigits %}
+            <div style="margin-top:2px;">
+              <a
+                href="https://wa.me/{{ cleanDigits }}"
+                target="_blank"
+                rel="noopener"
+                class="btn btn-sm"
+                style="padding:2px 8px; font-size:0.75rem; color:#15803d; border-color:rgba(34,197,94,0.3);"
+              >
+                💬 WhatsApp
+              </a>
+            </div>
+            {% endif %}
+            {% else %}
+            <span style="color:var(--grey-500);">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if l.model_code %}
+            <code style="font-size:0.85rem; font-weight:600; color:var(--primary);">{{ l.model_code }}</code>
+            {% else %}
+            <span style="color:var(--grey-500);">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {{ l.destination or '—' }}
+          </td>
+          <td style="text-align:right; white-space:nowrap;">
+            <a href="/admin/leads/{{ l.id }}" class="btn btn-sm">View</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" style="text-align:center; padding:36px 20px; color:var(--grey-500);">
+            No messages found matching your criteria.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Card List -->
+  <div class="mobile-card-list">
+    {% for l in leads %}
+    <div class="admin-mobile-card lead-card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; gap:8px;">
+        <div>
+          <a href="/admin/leads/{{ l.id }}" style="font-size:0.95rem; font-weight:700; color:var(--grey-900);">
+            {{ l.name }}
+          </a>
+          {% if l.company %}
+          <div style="font-size:0.82rem; color:var(--grey-500);">{{ l.company }}</div>
+          {% endif %}
+        </div>
+        <a href="/admin/leads/{{ l.id }}" class="btn btn-sm">View</a>
+      </div>
+
+      <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin:6px 0;">
+        {% if l.kind == 'quote' %}
+        <span class="pill pill-gold">Quote</span>
+        {% else %}
+        <span class="pill pill-muted">Contact</span>
+        {% endif %}
+
+        {% if l.status == 'new' %}
+        <span class="pill pill-gold">New</span>
+        {% elif l.status == 'won' %}
+        <span class="pill pill-success">Won</span>
+        {% elif l.status == 'lost' %}
+        <span class="pill pill-danger">Lost</span>
+        {% else %}
+        <span class="pill pill-muted">{{ l.status | capitalize }}</span>
+        {% endif %}
+
+        {% if l.model_code %}
+        <code style="font-size:0.82rem; color:var(--primary);">{{ l.model_code }}</code>
+        {% endif %}
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:0.82rem; color:var(--grey-600); flex-wrap:wrap; gap:6px;">
+        <span>{{ l.created_at | dhaka }}</span>
+        {% if l.phone %}
+        {% set cleanDigits = l.phone | digits %}
+        {% if cleanDigits %}
+        <a
+          href="https://wa.me/{{ cleanDigits }}"
+          target="_blank"
+          rel="noopener"
+          class="btn btn-sm"
+          style="padding:2px 8px; font-size:0.75rem; color:#15803d; border-color:rgba(34,197,94,0.3);"
+        >
+          💬 WhatsApp
+        </a>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div class="admin-mobile-card" style="text-align:center; padding:32px 16px; color:var(--grey-500);">
+      No messages found matching your criteria.
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
