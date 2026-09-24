@@ -1,0 +1,286 @@
+{% extends "layout.njk" %}
+
+{% block breadcrumb_items %}
+  <a href="/products">Products</a>
+  <span class="separator">/</span>
+  <a href="/category/{{ product.category }}">{{ product.categoryName }}</a>
+  <span class="separator">/</span>
+  <span>{{ product.modelCode }}</span>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-bottom: 80px;">
+
+  <!-- Answer-First Opening (< 45 words direct factual statement) -->
+  <section class="answer-box">
+    <p>
+      <strong>Model {{ product.modelCode }} ({{ product.name }})</strong> is a certified pre-engineered {{ product.categoryName | lower }} manufactured in Dhaka, Bangladesh by Bongshai Steel. Engineered to AISC 360, Eurocode 3, and BNBC 2020 standards, it is export-ready worldwide with custom project pricing.
+    </p>
+  </section>
+
+  <!-- Trust Meta Bar -->
+  <div class="trust-meta-bar">
+    <span class="trust-badge-pill">AISC &amp; BNBC Certified</span>
+    <span class="trust-badge-pill">AWS D1.1 Welding Quality</span>
+    <span><strong>Author / Manufacturer:</strong> Bongshai Steel Engineering Team</span>
+    <span><strong>Model:</strong> {{ product.modelCode }}</span>
+    <span><strong>Last Updated:</strong> 2026-09-24</span>
+  </div>
+
+  <!-- Primary Product Hero & Details -->
+  <div class="category-cards-grid" style="grid-template-columns: 1.1fr 0.9fr; gap: 40px; margin-bottom: 50px;">
+    
+    <!-- Image Gallery Card -->
+    <div class="product-card" style="cursor: default; overflow: visible;">
+      <div class="product-thumb" style="height: 380px; border-radius: var(--radius-md) var(--radius-md) 0 0;">
+        <img src="{{ imageSrc.src }}"
+             {% if imageSrc.srcset %}srcset="{{ imageSrc.srcset }}" sizes="(max-width: 900px) 100vw, 600px"{% endif %}
+             alt="{{ product.name }} - Model {{ product.modelCode }}"
+             style="width: 100%; height: 100%; object-fit: cover;">
+        <span class="product-badge">{{ product.modelCode }}</span>
+      </div>
+      <div class="product-body">
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <a href="/#product-{{ product.id }}" class="btn-detail" style="flex: 1; text-align: center; text-decoration: none;" title="Open interactive 3D model in web explorer">
+            🌐 View Interactive 3D Model
+          </a>
+          <a href="{{ waLink }}" target="_blank" rel="noopener noreferrer" class="btn-get-quote" style="flex: 1; text-align: center; text-decoration: none; background: #25D366;" data-mcp-action="open-whatsapp-inquiry">
+            💬 WhatsApp Inquiry
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Details & Specs -->
+    <div>
+      <span class="product-category">{{ product.categoryName }}</span>
+      <h1 class="product-name" style="font-size: 2.2rem; margin-bottom: 16px;">{{ product.name }}</h1>
+      <p style="font-size: 1.1rem; color: var(--primary-navy); font-weight: 700; margin-bottom: 16px;">Model Code: {{ product.modelCode }}</p>
+      
+      <p class="product-desc" style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px;">
+        {{ product.desc }}
+      </p>
+
+      <div class="product-specs" style="grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px;">
+        <div class="spec-item">
+          <span class="spec-label">Structural Standard</span>
+          <span class="spec-val">AISC 360 / Eurocode 3</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">National Code</span>
+          <span class="spec-val">BNBC 2020 Compliant</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">Welding Standard</span>
+          <span class="spec-val">AWS D1.1 Certified</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">Steel Grade</span>
+          <span class="spec-val">SS400 / Q355 High Tensile</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">Export Destinations</span>
+          <span class="spec-val">Middle East, Africa, South Asia</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">Quotation Basis</span>
+          <span class="spec-val">Custom Per Project Dimensions</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <a href="#quoteSection" class="btn-primary-hero" style="display: block; text-align: center; text-decoration: none;">
+          Request Project Quotation for {{ product.modelCode }}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Technical FAQ & Engineering Breakdown -->
+  <section style="margin-bottom: 60px;">
+    <div class="section-header" style="text-align: left; margin-bottom: 24px;">
+      <span class="section-subtitle">Engineering Breakdown</span>
+      <h2 class="section-title" style="font-size: 1.75rem;">What are the engineering specifications of {{ product.name }} ({{ product.modelCode }})?</h2>
+    </div>
+
+    <div class="cat-card" style="padding: 28px; margin-bottom: 24px;">
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 12px;">Structural Design and Load Capacity</h3>
+      <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 16px;">
+        The {{ product.name }} ({{ product.modelCode }}) is engineered by Bongshai Steel's in-house structural engineers to withstand high wind velocity, seismic forces, and heavy dead/live loads. All primary framing members are fabricated from certified structural grade steel, pre-drilled, pre-punched, and precision-cut for rapid on-site bolted assembly.
+      </p>
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 12px;">Surface Treatment and Corrosion Protection</h3>
+      <p style="color: var(--text-muted); line-height: 1.7; margin: 0;">
+        Steel components receive industrial surface shot blasting followed by zinc-chromate anti-corrosive primer coating and durable epoxy or PU top coats, ensuring decades of service life in coastal and demanding industrial environments.
+      </p>
+    </div>
+
+    <div class="cat-card" style="padding: 28px;">
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 12px;">How to order or request an official quote for {{ product.modelCode }}?</h3>
+      <p style="color: var(--text-muted); line-height: 1.7; margin: 0;">
+        Because every pre-engineered building is custom engineered to client site dimensions, soil conditions, and eave heights, Bongshai Steel does not publish static price lists. Submit your required square footage and site location below or reach out via WhatsApp at {{ settings.hotline }} to receive a comprehensive technical proposal and cost estimate within 24 hours.
+      </p>
+    </div>
+  </section>
+
+  <!-- Quote Request Form -->
+  <section id="quoteSection" class="quote-action-card">
+    <div class="section-header" style="text-align: left; margin-bottom: 20px;">
+      <span class="section-subtitle">Direct Inquiry</span>
+      <h2 class="section-title" style="font-size: 1.75rem;">Request Official Quote for {{ product.modelCode }}</h2>
+      <p style="color: var(--text-muted);">Please provide your project specifications to receive an official engineering estimate.</p>
+    </div>
+
+    <form action="/#contact" method="GET"
+          data-mcp-action="request-product-quote"
+          data-mcp-description="Request an official technical specification sheet and project quote for this steel building model."
+          data-mcp-params='{"required": ["modelCode", "name", "phone"], "optional": ["dimensions", "country", "notes"]}'>
+      <input type="hidden" name="modelCode" value="{{ product.modelCode }}">
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">Full Name / Company</label>
+          <input type="text" name="name" required placeholder="Your Name or Company" style="width: 100%; padding: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); outline: none;">
+        </div>
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">Phone / WhatsApp</label>
+          <input type="tel" name="phone" required placeholder="+8801... / +971..." style="width: 100%; padding: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); outline: none;">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">Project Dimensions (Length &times; Width &times; Height in Feet or Metres)</label>
+          <input type="text" name="dimensions" placeholder="e.g. 100ft x 60ft x 24ft eave height" style="width: 100%; padding: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); outline: none;">
+        </div>
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">Project Country / Location</label>
+          <input type="text" name="country" placeholder="e.g. Bangladesh / UAE / Kenya" style="width: 100%; padding: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); outline: none;">
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 6px;">Additional Project Requirements</label>
+        <textarea name="notes" rows="3" placeholder="Specify crane capacity, insulation requirements, doors, or custom modifications..." style="width: 100%; padding: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); outline: none;"></textarea>
+      </div>
+
+      <button type="submit" class="btn-primary-hero" style="border: none; cursor: pointer; width: 100%;">
+        Submit Quote Request for {{ product.modelCode }}
+      </button>
+    </form>
+  </section>
+
+  <!-- Related Models in Same Category -->
+  {% if relatedProducts and relatedProducts.length %}
+  <section style="margin-top: 60px;">
+    <div class="section-header" style="text-align: left; margin-bottom: 24px;">
+      <span class="section-subtitle">Explore More Models</span>
+      <h2 class="section-title" style="font-size: 1.75rem;">Related {{ product.categoryName }} Models</h2>
+    </div>
+
+    <div class="products-grid">
+      {% for rel in relatedProducts %}
+      <div class="product-card">
+        <div class="product-thumb">
+          <img src="{{ rel.imageSrc.src }}"
+               {% if rel.imageSrc.srcset %}srcset="{{ rel.imageSrc.srcset }}" sizes="(max-width: 900px) 100vw, 400px"{% endif %}
+               alt="{{ rel.name }}"
+               loading="lazy">
+          <span class="product-badge">{{ rel.modelCode }}</span>
+        </div>
+        <div class="product-body">
+          <span class="product-category">{{ rel.categoryName }}</span>
+          <h3 class="product-name" style="font-size: 1.25rem;">{{ rel.name }}</h3>
+          <p class="product-desc" style="font-size: 0.9rem;">{{ rel.desc }}</p>
+          <div class="product-footer">
+            <a href="/products/{{ rel.modelCode }}" class="btn-detail">View Specs</a>
+            <a href="/#product-{{ rel.id }}" class="cat-card-link" style="font-size: 0.85rem;">3D View &rarr;</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block jsonld %}
+<!-- Structured Data: Product (exactly one Product JSON-LD block) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": {{ product.name | dump | safe }},
+  "model": {{ product.modelCode | dump | safe }},
+  "sku": {{ product.modelCode | dump | safe }},
+  "mpn": {{ product.modelCode | dump | safe }},
+  "category": {{ product.categoryName | dump | safe }},
+  "image": {{ fullImageUrl | dump | safe }},
+  "description": {{ product.desc | dump | safe }},
+  "brand": {
+    "@type": "Organization",
+    "name": "Bongshai Steel",
+    "url": "https://www.bongshaisteel.com"
+  },
+  "manufacturer": {
+    "@type": "Organization",
+    "name": "Bongshai Steel",
+    "url": "https://www.bongshaisteel.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "House #18, Road #18, Sector #10",
+      "addressLocality": "Uttara",
+      "addressRegion": "Dhaka",
+      "postalCode": "1230",
+      "addressCountry": "BD"
+    }
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": {{ canonicalUrl | dump | safe }},
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition",
+    "priceSpecification": {
+      "@type": "PriceSpecification",
+      "priceCurrency": "USD",
+      "description": "Custom project quotation based on building dimensions and structural load requirements"
+    }
+  }
+}
+</script>
+
+<!-- Structured Data: BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.bongshaisteel.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Products",
+      "item": "https://www.bongshaisteel.com/products"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": {{ product.categoryName | dump | safe }},
+      "item": "https://www.bongshaisteel.com/category/{{ product.category }}"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": {{ product.modelCode | dump | safe }},
+      "item": {{ canonicalUrl | dump | safe }}
+    }
+  ]
+}
+</script>
+{% endblock %}

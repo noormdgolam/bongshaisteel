@@ -1,0 +1,182 @@
+{% extends "layout.njk" %}
+
+{% block breadcrumb_items %}
+  <span>Products</span>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-bottom: 80px;">
+
+  <!-- Answer-First Opening (< 45 words) -->
+  <section class="answer-box">
+    <p>
+      <strong>Bongshai Steel Product Catalogue</strong> comprises 72 pre-engineered steel building models across 5 specialized categories: Factory Sheds, Structural Towers, Duplex Villas, Resort Cottages, and Container Houses, all manufactured in Dhaka and engineered to international building codes.
+    </p>
+  </section>
+
+  <!-- Trust Meta Bar -->
+  <div class="trust-meta-bar">
+    <span class="trust-badge-pill">72 Certified PEB Models</span>
+    <span class="trust-badge-pill">AISC 360 • BNBC 2020 • Eurocode 3</span>
+    <span><strong>Author / Exporter:</strong> Bongshai Steel Ltd.</span>
+    <span><strong>Headquarters:</strong> Uttara C/A, Dhaka, Bangladesh</span>
+    <span><strong>Last Updated:</strong> 2026-09-24</span>
+  </div>
+
+  <!-- Page Header -->
+  <div class="section-header" style="text-align: left; margin-bottom: 40px;">
+    <span class="section-subtitle">Complete Product Lineup</span>
+    <h1 class="section-title" style="font-size: 2.4rem;">Pre-Engineered Steel Building Catalogue</h1>
+    <p style="font-size: 1.15rem; color: var(--text-muted); max-width: 820px; margin-top: 10px;">
+      Explore our complete range of certified pre-engineered steel buildings, structural frameworks, and prefabricated modular units. Every structure is custom fabricated to your project dimensions and load requirements.
+    </p>
+  </div>
+
+  <!-- Category Groups -->
+  {% for group in categoryGroups %}
+  <section class="catalog-group" id="category-{{ group.category.key }}" style="margin-bottom: 60px;">
+    <div class="catalog-group-header" style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px;">
+      <div>
+        <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--text-primary); margin: 0;">
+          <span style="margin-right: 8px;">{{ group.category.icon }}</span>{{ group.category.name }}
+          <span style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin-left: 10px;">
+            ({{ group.products.length }} Models)
+          </span>
+        </h2>
+        <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 6px;">{{ group.category.blurb }}</p>
+      </div>
+      <div>
+        <a href="/category/{{ group.category.key }}" class="cat-card-link" style="font-size: 0.95rem; font-weight: 700;">
+          View All {{ group.category.name }}s &rarr;
+        </a>
+      </div>
+    </div>
+
+    <!-- Products Grid for this category -->
+    <div class="products-grid">
+      {% for prod in group.products %}
+      <div class="product-card">
+        <div class="product-thumb">
+          <img src="{{ prod.imageSrc.src }}"
+               {% if prod.imageSrc.srcset %}srcset="{{ prod.imageSrc.srcset }}" sizes="(max-width: 900px) 100vw, 400px"{% endif %}
+               alt="{{ prod.name }} - {{ prod.modelCode }}"
+               loading="lazy">
+          <span class="product-badge">{{ prod.modelCode }}</span>
+        </div>
+        <div class="product-body">
+          <span class="product-category">{{ group.category.name }}</span>
+          <h3 class="product-name" style="font-size: 1.25rem;">{{ prod.name }}</h3>
+          <p class="product-desc" style="font-size: 0.9rem;">{{ prod.desc }}</p>
+
+          <div class="product-footer">
+            <a href="/products/{{ prod.modelCode }}" class="btn-detail" title="View technical specs for {{ prod.modelCode }}">
+              View Specs
+            </a>
+            <a href="/#product-{{ prod.id }}" class="cat-card-link" style="font-size: 0.88rem;" title="View interactive 3D model in explorer">
+              3D View &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+
+  <!-- Engineering Standards & FAQ Section -->
+  <section style="margin-bottom: 60px;">
+    <div class="section-header" style="text-align: left; margin-bottom: 24px;">
+      <span class="section-subtitle">Technical FAQ</span>
+      <h2 class="section-title" style="font-size: 1.75rem;">Which steel building category fits your project?</h2>
+    </div>
+
+    <div class="cat-card" style="padding: 28px; margin-bottom: 24px;">
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 12px;">Selecting the Right Structural Framework</h3>
+      <p style="color: var(--text-muted); line-height: 1.7; margin-bottom: 16px;">
+        For wide clear spans and industrial operations with overhead cranes, <strong>Steel Factory Buildings</strong> (BH-IS-1001 to 1012) offer heavy portal frame construction up to 50 Ton crane capacity. For high-density urban or commercial sites, <strong>Structural Steel Buildings</strong> (BH-TSB-101 to 112) provide multi-story steel framing with composite deck concrete slabs. Residential and resort projects benefit from <strong>Duplex Steel Villas</strong> (60-day rapid build), <strong>Steel Cottage Houses</strong> (light-gauge weather-resistant vacation homes), and <strong>Steel Container Houses</strong> (modular 20ft &amp; 40ft modified site offices or luxury units).
+      </p>
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 12px;">How does Bongshai Steel quote and deliver international projects?</h3>
+      <p style="color: var(--text-muted); line-height: 1.7; margin: 0;">
+        All projects are quoted based on customer architectural drawings or required building envelope dimensions. Our engineering department prepares an AISC-compliant design, 3D structural model, bill of quantities, and competitive quotation within 24 hours. Once manufactured, structures are exported worldwide via ocean freight with full erection documentation.
+      </p>
+    </div>
+  </section>
+
+  <!-- Quote Request Card -->
+  <section class="quote-action-card">
+    <div class="section-header" style="text-align: left; margin-bottom: 20px;">
+      <span class="section-subtitle">Get Started</span>
+      <h2 class="section-title" style="font-size: 1.75rem;">Request an Official Custom Quote</h2>
+      <p style="color: var(--text-muted);">Have dimensions or architectural drawings ready? Contact our engineering team directly.</p>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+      <a href="https://wa.me/{{ settings.whatsappNumber | default('8801789949060') }}?text={{ ('Hello Bongshai Steel! I am reviewing your steel building catalogue and would like to request an official quote.') | urlencode }}"
+         target="_blank" rel="noopener noreferrer" class="btn-get-quote" style="background: #25D366; text-decoration: none; padding: 14px 28px; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px;"
+         data-mcp-action="open-whatsapp-inquiry">
+        💬 Chat on WhatsApp (+8801789-949060)
+      </a>
+      <a href="/#contact" class="btn-primary-hero" style="text-decoration: none; display: inline-block;">
+        Submit Online Project Inquiry
+      </a>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block jsonld %}
+<!-- Structured Data: CollectionPage & ItemList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Bongshai Steel Pre-Engineered Building Product Catalogue",
+  "description": "Comprehensive catalogue of 72 certified pre-engineered steel buildings, structural towers, duplex villas, cottages, and container houses.",
+  "url": "https://www.bongshaisteel.com/products",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Bongshai Steel",
+    "url": "https://www.bongshaisteel.com"
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "name": "Bongshai Steel Building Categories",
+    "numberOfItems": {{ categoryGroups.length }},
+    "itemListElement": [
+      {% for group in categoryGroups %}
+      {
+        "@type": "ListItem",
+        "position": {{ loop.index }},
+        "name": {{ group.category.name | dump | safe }},
+        "description": {{ group.category.blurb | dump | safe }},
+        "url": "https://www.bongshaisteel.com/category/{{ group.category.key }}"
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+}
+</script>
+
+<!-- Structured Data: BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://www.bongshaisteel.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Products",
+      "item": "https://www.bongshaisteel.com/products"
+    }
+  ]
+}
+</script>
+{% endblock %}
