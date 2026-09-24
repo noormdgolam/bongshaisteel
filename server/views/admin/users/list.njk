@@ -1,0 +1,135 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}User Accounts{% endblock %}
+
+{% block header %}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; width:100%;">
+  <div>
+    <h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">User Accounts</h1>
+    <div style="font-size:0.85rem; color:var(--grey-500); margin-top:2px;">Manage team sign-ins, roles, and administrative access</div>
+  </div>
+  <div>
+    <a href="/admin/users/new" class="btn btn-primary">➕ Add User</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div style="margin-bottom:14px; font-size:0.86rem; color:var(--grey-600); font-weight:600;">
+    Total Users: {{ users.length }}
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th style="width:130px;">Role</th>
+          <th style="width:110px;">Status</th>
+          <th style="width:180px;">Last Sign-In</th>
+          <th style="width:90px; text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <strong style="color:var(--grey-900); font-size:0.94rem;">{{ u.username }}</strong>
+                  {% if currentUserId and u.id == currentUserId %}
+                  <span class="pill pill-gold" style="font-size:0.72rem;">you</span>
+                  {% endif %}
+                </div>
+                <div style="font-size:0.82rem; color:var(--grey-500); margin-top:2px;">
+                  {{ u.name }}{% if u.name and u.email %} · {% endif %}{{ u.email }}
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="pill {% if u.role == 'superadmin' %}pill-gold{% elif u.role == 'admin' %}pill-primary{% elif u.role == 'editor' %}pill-info{% else %}pill-muted{% endif %}">
+              {{ u.role }}
+            </span>
+          </td>
+          <td>
+            {% if u.active %}
+            <span class="pill pill-success">Active</span>
+            {% else %}
+            <span class="pill pill-danger">Disabled</span>
+            {% endif %}
+          </td>
+          <td style="color:var(--grey-600); font-size:0.88rem; white-space:nowrap;">
+            {% if u.last_login_at %}
+            {{ u.last_login_at | dhaka }}
+            {% else %}
+            <span style="color:var(--grey-400);">never</span>
+            {% endif %}
+          </td>
+          <td style="text-align:right; white-space:nowrap;">
+            <a href="/admin/users/{{ u.id }}/edit" class="btn btn-sm">Edit</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" style="text-align:center; padding:36px 20px; color:var(--grey-500);">
+            No user accounts found. <a href="/admin/users/new">Add a new user</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Card List -->
+  <div class="mobile-card-list">
+    {% for u in users %}
+    <div class="admin-mobile-card user-card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:8px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <strong style="color:var(--grey-900); font-size:0.96rem;">{{ u.username }}</strong>
+            {% if currentUserId and u.id == currentUserId %}
+            <span class="pill pill-gold" style="font-size:0.72rem;">you</span>
+            {% endif %}
+          </div>
+          {% if u.name %}
+          <div style="font-size:0.84rem; color:var(--grey-700); margin-top:2px;">{{ u.name }}</div>
+          {% endif %}
+          {% if u.email %}
+          <div style="font-size:0.82rem; color:var(--grey-500);">{{ u.email }}</div>
+          {% endif %}
+        </div>
+        <a href="/admin/users/{{ u.id }}/edit" class="btn btn-sm" style="white-space:nowrap; flex-shrink:0;">Edit</a>
+      </div>
+
+      <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin:8px 0;">
+        <span class="pill {% if u.role == 'superadmin' %}pill-gold{% elif u.role == 'admin' %}pill-primary{% elif u.role == 'editor' %}pill-info{% else %}pill-muted{% endif %}">
+          {{ u.role }}
+        </span>
+        {% if u.active %}
+        <span class="pill pill-success">Active</span>
+        {% else %}
+        <span class="pill pill-danger">Disabled</span>
+        {% endif %}
+      </div>
+
+      <div style="font-size:0.80rem; color:var(--grey-500); margin-top:6px; padding-top:6px; border-top:1px dashed rgba(15,23,42,0.08);">
+        Last sign-in:
+        {% if u.last_login_at %}
+        <strong style="color:var(--grey-700);">{{ u.last_login_at | dhaka }}</strong>
+        {% else %}
+        <span style="color:var(--grey-400);">never</span>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:32px 16px; color:var(--grey-500); background:rgba(255,255,255,0.6); border-radius:10px; border:1px dashed var(--grey-300);">
+      No user accounts found. <a href="/admin/users/new" style="font-weight:600;">Add a new user</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -261,6 +261,12 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M9 11h6M9 15h6M9 19h3"/></svg>
         <span>Products</span>
       </a>
+      {% if adminRole != 'sales' %}
+      <a href="/admin/categories" class="{% if active == 'categories' %}active{% endif %}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Categories</span>
+      </a>
+      {% endif %}
       <a href="/admin/leads" class="{% if active == 'leads' %}active{% endif %}">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h4l2 3h4l2-3h4M4 12 5.5 5a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1L20 12M4 12v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/></svg>
         <span>Messages</span>

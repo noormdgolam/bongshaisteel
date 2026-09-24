@@ -1,0 +1,178 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}{% if user.id %}Edit User: {{ user.username }}{% else %}New User Account{% endif %}{% endblock %}
+
+{% block header %}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; width:100%;">
+  <div>
+    <h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">
+      {% if user.id %}Edit User: {{ user.username }}{% if isSelf %} <span class="pill pill-gold" style="font-size:0.75rem;">(you)</span>{% endif %}{% else %}New User Account{% endif %}
+    </h1>
+    <div style="font-size:0.85rem; color:var(--grey-500); margin-top:2px;">
+      <a href="/admin/users" style="color:var(--primary); text-decoration:none;">&larr; Back to users</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:720px;">
+  {% if error %}
+  <div class="banner banner-error" style="margin-bottom:20px;">
+    {{ error }}
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <form method="post" action="{% if user.id %}/admin/users/{{ user.id }}{% else %}/admin/users{% endif %}">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+      <div style="display:flex; flex-direction:column; gap:18px;">
+        <div>
+          <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+            Username <span style="color:var(--danger);">*</span>
+          </label>
+          <input
+            type="text"
+            name="username"
+            value="{{ user.username or '' }}"
+            required
+            placeholder="e.g. munna"
+            style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+          >
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div>
+            <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+              Full Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              value="{{ user.name or '' }}"
+              placeholder="e.g. Noor Md. Golam"
+              style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+            >
+          </div>
+          <div>
+            <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              value="{{ user.email or '' }}"
+              placeholder="e.g. noor@example.com"
+              style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+            Access Role <span style="color:var(--danger);">*</span>
+          </label>
+          <select
+            name="role"
+            {% if isSelf %}disabled{% endif %}
+            style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+          >
+            {% for r in roles %}
+            <option value="{{ r.value }}" {% if user.role == r.value or (not user.role and r.value == 'editor') %}selected{% endif %}>
+              {{ r.label }}{% if r.help %} — {{ r.help }}{% endif %}
+            </option>
+            {% endfor %}
+          </select>
+          {% if isSelf %}
+          <input type="hidden" name="role" value="{{ user.role }}">
+          <div style="font-size:0.8rem; color:var(--grey-500); margin-top:4px;">You cannot change your own role.</div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label style="display:inline-flex; align-items:center; gap:8px; cursor:{% if isSelf %}not-allowed{% else %}pointer{% endif %}; font-weight:600; font-size:0.9rem; color:var(--grey-800);">
+            <input
+              type="checkbox"
+              name="active"
+              value="1"
+              {% if isSelf %}disabled{% endif %}
+              {% if user.id %}{% if user.active %}checked{% endif %}{% else %}checked{% endif %}
+              style="width:18px; height:18px; border-radius:4px; accent-color:var(--primary);"
+            >
+            <span>Active account (can sign in to admin)</span>
+          </label>
+          {% if isSelf %}
+          <input type="hidden" name="active" value="1">
+          <div style="font-size:0.8rem; color:var(--grey-500); margin-top:2px;">You cannot disable your own account.</div>
+          {% endif %}
+        </div>
+
+        <div style="border-top:1px solid var(--grey-200); padding-top:16px;">
+          <h3 style="font-size:1rem; font-weight:700; margin:0 0 12px; color:var(--grey-900);">
+            {% if user.id %}Change Password{% else %}Account Password{% endif %}
+          </h3>
+          {% if user.id %}
+          <div style="font-size:0.85rem; color:var(--grey-500); margin-bottom:12px;">
+            leave both empty to keep the current password
+          </div>
+          {% endif %}
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div>
+              <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+                Password {% if not user.id %}<span style="color:var(--danger);">*</span>{% endif %}
+              </label>
+              <input
+                type="password"
+                name="password"
+                autocomplete="new-password"
+                {% if not user.id %}required{% endif %}
+                placeholder="{% if user.id %}••••••••{% else %}Min. 8 characters{% endif %}"
+                style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+              >
+            </div>
+            <div>
+              <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+                Confirm Password {% if not user.id %}<span style="color:var(--danger);">*</span>{% endif %}
+              </label>
+              <input
+                type="password"
+                name="password2"
+                autocomplete="new-password"
+                {% if not user.id %}required{% endif %}
+                placeholder="{% if user.id %}••••••••{% else %}Repeat password{% endif %}"
+                style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+              >
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:16px; border-top:1px solid var(--grey-200);">
+          <a href="/admin/users" class="btn">Cancel</a>
+          <button type="submit" class="btn btn-primary">
+            {% if user.id %}Save Changes{% else %}Create User{% endif %}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  {% if user.id and not isSelf %}
+  <div class="card" style="margin-top:24px; border:1px solid rgba(239, 68, 68, 0.2); background:rgba(254, 242, 242, 0.6);">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <strong style="color:var(--danger); font-size:0.95rem;">Delete User Account</strong>
+        <div style="font-size:0.84rem; color:var(--grey-600); margin-top:2px;">
+          Permanently remove {{ user.username }} from the system. This cannot be undone.
+        </div>
+      </div>
+      <form method="post" action="/admin/users/{{ user.id }}/delete" onsubmit="return confirm('Are you sure you want to delete user \'{{ user.username }}\'? This cannot be undone.');">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-danger">Delete User</button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
