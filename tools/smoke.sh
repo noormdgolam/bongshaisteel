@@ -89,12 +89,29 @@ echo "--- content round trip ---"
 want "load works when signed in" 200 "$(code -b "$JAR" "$B/admin/api.php?action=load")"
 wantgrep "  returns the seed content" '"products"'
 
+fixture "$PY" "$FIX_PY/mkpayload.py" "$TMP_PY/save1.json" "FIRST SAVE" "$PROJ_PY/data/content.default.json"
 want "save rejects a cross-site POST" 403 \
   "$(code -b "$JAR" -X POST -H "Origin: https://evil.example" -H "Content-Type: application/json" \
      -d '{"content":{"text":{"hero.title":"x"}}}' "$B/admin/api.php?action=save")"
 wantgrep "  with cross_site" "cross_site"
 
-fixture "$PY" "$FIX_PY/mkpayload.py" "$TMP_PY/save1.json" "FIRST SAVE" "$PROJ_PY/data/content.default.json"
+# A browser that says cross-site is refused whatever Origin claims.
+want "save rejects Sec-Fetch-Site: cross-site" 403 \
+  "$(code -b "$JAR" -X POST -H "Sec-Fetch-Site: cross-site" -H "Origin: $B" \
+     -H "Content-Type: application/json" -d '{"content":{"text":{}}}' "$B/admin/api.php?action=save")"
+
+# The regression this exists for: Chrome sends Origin: null on a form
+# navigation when the page carries a strict referrer policy. Sec-Fetch-Site
+# is what tells us it was still our own page.
+want "save accepts Sec-Fetch-Site: same-origin with Origin: null" 200 \
+  "$(code -b "$JAR" -X POST -H "Sec-Fetch-Site: same-origin" -H "Origin: null" \
+     -H "Content-Type: application/json" --data-binary "@$TMP/save1.json" "$B/admin/api.php?action=save")"
+
+# Without that header, a bare Origin: null is still refused.
+want "save rejects a bare Origin: null" 403 \
+  "$(code -b "$JAR" -X POST -H "Origin: null" -H "Content-Type: application/json" \
+     -d '{"content":{"text":{}}}' "$B/admin/api.php?action=save")"
+
 want "first save accepted" 200 \
   "$(code -b "$JAR" -X POST -H "Origin: $B" -H "Content-Type: application/json" \
      --data-binary "@$TMP/save1.json" "$B/admin/api.php?action=save")"

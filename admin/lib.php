@@ -134,7 +134,11 @@ function cms_security_headers(bool $html = false): void
 {
     if (headers_sent()) return;
     header('X-Content-Type-Options: nosniff');
-    header('Referrer-Policy: no-referrer');
+    // Not no-referrer: Chrome mirrors the referrer policy into the Origin header
+    // of a navigational form POST, so no-referrer made our own sign-in form
+    // arrive as Origin: null and fail the check below. same-origin still sends
+    // nothing to other sites.
+    header('Referrer-Policy: same-origin');
     header('X-Frame-Options: DENY');
     header('X-Robots-Tag: noindex, nofollow');
     if ($html) {
@@ -151,6 +155,16 @@ function cms_security_headers(bool $html = false): void
  */
 function cms_same_origin(): bool
 {
+    // Sec-Fetch-Site is set by the browser and is a forbidden header name, so
+    // no page can forge it. Where it exists it is the better answer, and it is
+    // immune to the Origin: null that a strict referrer policy produces on a
+    // form navigation.
+    $site = strtolower((string) ($_SERVER['HTTP_SEC_FETCH_SITE'] ?? ''));
+    if ($site !== '') {
+        return $site === 'same-origin' || $site === 'none';
+    }
+
+    // Older browsers and plain HTTP clients: fall back to Origin, then Referer.
     $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
     $sent = (string) ($_SERVER['HTTP_ORIGIN'] ?? '');
     if ($sent === '') $sent = (string) ($_SERVER['HTTP_REFERER'] ?? '');

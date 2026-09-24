@@ -70,7 +70,7 @@ deployment settings — a normal `git pull`/checkout leaves the files above alon
 | --- | --- |
 | Sign-in | One bcrypt password. **8 failed attempts from one IP → 15-minute lockout** (`admin/backups/.throttle.json`). |
 | Session | `HttpOnly`, `SameSite=Lax`, `Secure` over HTTPS; id regenerated on sign-in; expires after 2 h idle or 12 h total. |
-| CSRF | Every `POST` must carry a same-origin `Origin`/`Referer` — on the API, the sign-in form and the installer. |
+| CSRF | Every `POST` is checked against `Sec-Fetch-Site`, falling back to `Origin`/`Referer` on browsers that lack it — on the API, the sign-in form and the installer. |
 | Uploads | JPEG / PNG / WebP / GIF only, ≤ 8 MB and ≤ 40 MP, filename discarded and regenerated. First upload drops an `.htaccess` into `images/uploads/` that strips script handlers, so nothing stored there can execute. |
 | Saves | Auth + same-origin + a 4 MB body cap and a JSON depth cap. |
 | Restores | Auth + same-origin; the snapshot id must match `content-YYYYMMDD-HHMMSS.json` exactly, so no path can be traversed out of the backup folder. |
