@@ -13,7 +13,10 @@
    ========================================================================== */
 
 return [
-    // bcrypt/argon2 hash of the single admin password.
+    // Sign-in name. Case is ignored when it is checked.
+    'username'      => 'REPLACE_WITH_USERNAME',
+
+    // bcrypt/argon2 hash of that user's password.
     // The literal placeholder below never validates against any password.
     'password_hash' => 'REPLACE_WITH_HASH',
 

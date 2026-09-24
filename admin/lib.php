@@ -68,6 +68,10 @@ function cms_config_defaults(): array
         'max_upload'   => 8 * 1024 * 1024,
         'session_name' => 'bs_cms',
 
+        // Sign-in name. Installs made before usernames existed have no entry
+        // here, and keep working as 'admin'.
+        'username'     => 'admin',
+
         // Sign-in throttle.
         'max_attempts' => 8,        // failed sign-ins before a lockout
         'lockout'      => 900,      // seconds locked out, and the window failures are counted in

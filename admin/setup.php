@@ -29,9 +29,12 @@ $wrote = false;
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && !cms_same_origin()) {
     $msg = 'That request did not come from this site. Reload the page and try again.';
 } elseif (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
-    $pw  = (string) ($_POST['password'] ?? '');
-    $pw2 = (string) ($_POST['password2'] ?? '');
-    if (strlen($pw) < 6) {
+    $user = trim((string) ($_POST['username'] ?? ''));
+    $pw   = (string) ($_POST['password'] ?? '');
+    $pw2  = (string) ($_POST['password2'] ?? '');
+    if (!preg_match('/^[A-Za-z0-9._-]{3,40}$/', $user)) {
+        $msg = 'Pick a username of 3-40 letters, digits, dot, dash or underscore.';
+    } elseif (strlen($pw) < 6) {
         $msg = 'Use at least 6 characters.';
     } elseif ($pw !== $pw2) {
         $msg = 'The two passwords do not match.';
@@ -41,9 +44,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && !cms_same_origin()) {
         // Build config.php from the sample (or from scratch) with the hash filled in.
         $tpl = is_file($samplePath) ? (string) file_get_contents($samplePath) : '';
         if ($tpl !== '' && strpos($tpl, 'REPLACE_WITH_HASH') !== false) {
-            $out = str_replace('REPLACE_WITH_HASH', addslashes($hash), $tpl);
+            $out = str_replace(
+                ['REPLACE_WITH_USERNAME', 'REPLACE_WITH_HASH'],
+                [addslashes($user), addslashes($hash)],
+                $tpl);
         } else {
             $out = "<?php\nreturn " . var_export([
+                'username'      => $user,
                 'password_hash' => $hash,
                 'content_file'  => dirname(__DIR__) . '/data/content.json',
                 'default_file'  => dirname(__DIR__) . '/data/content.default.json',
@@ -93,9 +100,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && !cms_same_origin()) {
 <body>
   <form class="card" method="post" autocomplete="off">
     <h1>Set the CMS password</h1>
-    <p>Pick a password for the content editor. This writes <code>admin/config.php</code>.</p>
+    <p>Pick a username and password for the content editor. This writes <code>admin/config.php</code>.</p>
+    <label for="u">Username</label>
+    <input id="u" name="username" type="text" value="admin" required autofocus>
     <label for="p1">Password</label>
-    <input id="p1" name="password" type="password" required autofocus>
+    <input id="p1" name="password" type="password" required>
     <label for="p2">Repeat password</label>
     <input id="p2" name="password2" type="password" required>
     <button type="submit">Save</button>

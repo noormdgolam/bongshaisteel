@@ -19,6 +19,7 @@ mkdir -p "$TMP"
 B="${BASE_URL:-http://127.0.0.1:8788}"
 JAR="$TMP/cookies.txt"
 PW="${CMS_TEST_PASSWORD:-localtest123}"
+USER_NAME="${CMS_TEST_USER:-admin}"
 PY="${PYTHON:-python}"
 
 # Git Bash reports /c/... paths; a Windows python cannot open those.
@@ -59,11 +60,11 @@ cp "$PROJ/admin/config.sample.php" "$PROJ/admin/config.php"
 want "setup.php serves the form once armed" 200 "$(code "$B/admin/setup.php")"
 
 want "setup.php rejects a cross-site POST" 200 \
-  "$(code -X POST -H "Origin: https://evil.example" -d "password=$PW&password2=$PW" "$B/admin/setup.php")"
+  "$(code -X POST -H "Origin: https://evil.example" -d "username=$USER_NAME&password=$PW&password2=$PW" "$B/admin/setup.php")"
 wantgrep "  and says why" "did not come from this site"
 
 want "setup.php accepts a same-origin POST" 200 \
-  "$(code -X POST -H "Origin: $B" -d "password=$PW&password2=$PW" "$B/admin/setup.php")"
+  "$(code -X POST -H "Origin: $B" -d "username=$USER_NAME&password=$PW&password2=$PW" "$B/admin/setup.php")"
 wantgrep "  and writes config.php" "config.php written"
 want "setup.php is spent afterwards" 410 "$(code "$B/admin/setup.php")"
 
@@ -76,11 +77,16 @@ want "save needs auth" 403 "$(code -X POST -H "Origin: $B" -H "Content-Type: app
   -d '{"content":{"text":{}}}' "$B/admin/api.php?action=save")"
 
 want "wrong password is refused" 200 \
-  "$(code -c "$JAR" -X POST -H "Origin: $B" -d "password=nope" "$B/admin/login.php")"
-wantgrep "  with an error" "Incorrect password"
+  "$(code -c "$JAR" -X POST -H "Origin: $B" -d "username=$USER_NAME&password=nope" "$B/admin/login.php")"
+wantgrep "  with an error" "Incorrect username or password"
+
+want "right password under a wrong name is refused" 200 \
+  "$(code -c "$JAR" -X POST -H "Origin: $B" -d "username=nobody&password=$PW" "$B/admin/login.php")"
+wantgrep "  with the same vague error" "Incorrect username or password"
+rm -f "$PROJ/admin/backups/.throttle.json"
 
 want "right password signs in (302)" 302 \
-  "$(code -c "$JAR" -b "$JAR" -X POST -H "Origin: $B" -d "password=$PW" "$B/admin/login.php")"
+  "$(code -c "$JAR" -b "$JAR" -X POST -H "Origin: $B" -d "username=$USER_NAME&password=$PW" "$B/admin/login.php")"
 want "session now authed" 200 "$(code -b "$JAR" "$B/admin/api.php?action=whoami")"
 wantgrep "  authed:true" '"authed":true'
 
@@ -244,13 +250,13 @@ want "logout works" 200 "$(code -b "$JAR" -c "$JAR" -X POST -H "Origin: $B" "$B/
 want "  session gone" 403 "$(code -b "$JAR" "$B/admin/api.php?action=load")"
 
 for i in 1 2 3 4 5 6 7 8; do
-  code -X POST -H "Origin: $B" -d "password=wrong$i" "$B/admin/login.php" > /dev/null
+  code -X POST -H "Origin: $B" -d "username=$USER_NAME&password=wrong$i" "$B/admin/login.php" > /dev/null
 done
-code -X POST -H "Origin: $B" -d "password=$PW" "$B/admin/login.php" > /dev/null
+code -X POST -H "Origin: $B" -d "username=$USER_NAME&password=$PW" "$B/admin/login.php" > /dev/null
 wantgrep "8 failures lock the form (right password refused)" "Too many failed attempts"
 rm -f "$PROJ/admin/backups/.throttle.json"
 want "clearing .throttle.json unlocks it (302)" 302 \
-  "$(code -c "$JAR" -X POST -H "Origin: $B" -d "password=$PW" "$B/admin/login.php")"
+  "$(code -c "$JAR" -X POST -H "Origin: $B" -d "username=$USER_NAME&password=$PW" "$B/admin/login.php")"
 
 echo
 echo "================================"

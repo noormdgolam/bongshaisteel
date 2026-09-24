@@ -27,8 +27,16 @@ if ($ready) {
         } elseif (!cms_same_origin()) {
             $err = 'That sign-in did not come from this site. Reload the page and try again.';
         } else {
-            $pw = (string) ($_POST['password'] ?? '');
-            if ($pw !== '' && password_verify($pw, $cfg['password_hash'])) {
+            $user = trim((string) ($_POST['username'] ?? ''));
+            $pw   = (string) ($_POST['password'] ?? '');
+            $want = (string) ($cfg['username'] ?? cms_config_defaults()['username']);
+
+            // Both halves are always evaluated, so a wrong name and a wrong
+            // password take the same time and the error never says which.
+            $userOk = hash_equals(strtolower($want), strtolower($user));
+            $pwOk   = $pw !== '' && password_verify($pw, $cfg['password_hash']);
+
+            if ($userOk && $pwOk) {
                 cms_throttle_note(false);
                 cms_session_open();
                 cms_activity('auth.signin');
@@ -41,7 +49,7 @@ if ($ready) {
             $locked = cms_throttle_locked();
             $err = $locked > 0
                 ? 'Too many failed attempts. Try again in ' . (int) ceil($locked / 60) . ' min.'
-                : 'Incorrect password.';
+                : 'Incorrect username or password.';
         }
     }
 }
@@ -64,9 +72,10 @@ if ($ready) {
   h1 { margin: 0 0 4px; font-size: 1.25rem; }
   p.sub { margin: 0 0 22px; color: #94a3b8; font-size: .88rem; }
   label { display: block; font-weight: 600; font-size: .82rem; margin-bottom: 6px; color: #cbd5e1; }
-  input[type=password] { width: 100%; padding: 12px 14px; border-radius: 9px; border: 1px solid #475569;
-          background: #0f172a; color: #f1f5f9; font-size: 1rem; }
-  input[type=password]:focus { outline: 2px solid #38bdf8; outline-offset: 1px; }
+  input[type=password], input[type=text] { width: 100%; padding: 12px 14px; border-radius: 9px;
+          border: 1px solid #475569; background: #0f172a; color: #f1f5f9; font-size: 1rem; }
+  input:focus { outline: 2px solid #38bdf8; outline-offset: 1px; }
+  label + input { margin-bottom: 4px; }
   button { width: 100%; margin-top: 16px; padding: 12px; border: 0; border-radius: 9px; cursor: pointer;
           background: #0466c8; color: #fff; font-size: 1rem; font-weight: 700; }
   button:hover { background: #0355a6; }
@@ -87,8 +96,10 @@ if ($ready) {
       to set a password.
     </div>
 <?php else: ?>
+    <label for="user">Username</label>
+    <input id="user" name="username" type="text" autocomplete="username" required autofocus<?= $locked > 0 ? ' disabled' : '' ?>>
     <label for="pw">Password</label>
-    <input id="pw" name="password" type="password" required autofocus<?= $locked > 0 ? ' disabled' : '' ?>>
+    <input id="pw" name="password" type="password" autocomplete="current-password" required<?= $locked > 0 ? ' disabled' : '' ?>>
     <button type="submit"<?= $locked > 0 ? ' disabled' : '' ?>>Sign in</button>
     <?php if ($err): ?><div class="err"><?= htmlspecialchars($err) ?></div><?php endif; ?>
 <?php endif; ?>
