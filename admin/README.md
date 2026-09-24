@@ -3,6 +3,11 @@
 A tiny flat-file CMS for this static site. No database, no framework, no build
 step — just PHP files (same idea as `counter.php`) plus vanilla JS.
 
+**Nothing to install.** The host already runs PHP; the dashboard is plain HTML
+and JavaScript. No Node, no npm, no composer, no build. The scripts under
+`tools/` are developer conveniences and are never needed to run or edit the
+site.
+
 ## What it edits
 
 Everything visible on the one-page site: hero, stats, trust bar, section
@@ -55,6 +60,9 @@ deployment settings — a normal `git pull`/checkout leaves the files above alon
 - **Visual editor** — the "Visual editor ↗" link (opens `/?cms=1`). Click any
   outlined text on the real page to edit it in place; "Replace image" on photos.
   Lists (products, FAQ, stats, categories) are managed in the dashboard only.
+- **Backups & export** tab — download the current content as `content.json` or
+  as a `content.default.json` seed, import a JSON file into the editor, and
+  restore any of the server snapshots with one click.
 
 ## How it is locked down
 
@@ -65,6 +73,7 @@ deployment settings — a normal `git pull`/checkout leaves the files above alon
 | CSRF | Every `POST` must carry a same-origin `Origin`/`Referer` — on the API, the sign-in form and the installer. |
 | Uploads | JPEG / PNG / WebP / GIF only, ≤ 8 MB and ≤ 40 MP, filename discarded and regenerated. First upload drops an `.htaccess` into `images/uploads/` that strips script handlers, so nothing stored there can execute. |
 | Saves | Auth + same-origin + a 4 MB body cap and a JSON depth cap. |
+| Restores | Auth + same-origin; the snapshot id must match `content-YYYYMMDD-HHMMSS.json` exactly, so no path can be traversed out of the backup folder. |
 | Pasted text | The visual editor strips pasted markup down to plain text plus `<b> <i> <u> <a> <br>`; `javascript:` hrefs are dropped. |
 | Not served | `config.php`, `lib.php`, `README.md`, `backups/` — all denied in `admin/.htaccess`. `noindex`, `nosniff`, `DENY` framing and a CSP on the PHP pages. |
 
@@ -88,9 +97,41 @@ password? Delete `admin/config.php`, re-copy the sample, and re-upload
 
 ## If something breaks
 
-Restore the newest file from `admin/backups/` over `data/content.json`, or just
-delete `data/content.json` entirely — the site falls back to
-`data/content.default.json` and keeps working.
+1. Open **Backups & export** in the dashboard and press **Restore** on the
+   snapshot you want. One is taken before every save, and the newest 15 are kept.
+2. If the dashboard itself will not load, delete `data/content.json` over FTP or
+   in cPanel File Manager — the site falls back to `data/content.default.json`
+   and keeps working.
 
-To regenerate the seed after big manual catalog changes in `app.js`:
-`node tools/gen-default-content.mjs`.
+### Updating the seed
+
+`data/content.default.json` is the git-tracked fallback. The editor never writes
+it: it is a tracked file, and a local change would make the next cPanel pull
+fail. To refresh it, use **Backups & export → Download content.default.json**,
+put the file in the repo at `data/content.default.json`, then commit and push.
+
+(`node tools/gen-default-content.mjs` still regenerates the seed from `app.js`,
+but it is only for a developer machine with Node — the download button is the
+supported route.)
+
+## Running it on your own machine
+
+```
+php -S 127.0.0.1:8788 -t .        # from the repo root
+```
+
+Then open `http://127.0.0.1:8788/admin/`. The first run needs the same two setup
+steps as the host: copy `config.sample.php` to `config.php`, then open
+`setup.php`.
+
+`tools/smoke.sh` drives that whole flow end to end — installer, sign-in,
+throttle, CSRF, save, snapshot, restore, uploads — against a local server:
+
+```
+bash tools/smoke.sh
+```
+
+It is destructive by design (it wipes `data/content.json`, `admin/config.php`
+and `admin/backups/` to test the installer from scratch) and refuses to run
+against anything that is not localhost. It needs bash, curl, python3 and a PHP
+build with GD.

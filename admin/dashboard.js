@@ -60,21 +60,26 @@
     });
   }
 
+  /** Fill in anything missing so every tab can assume its shape. */
+  function normalise() {
+    ["text", "html", "settings", "seo", "sections", "media"].forEach(function (k) {
+      if (typeof content[k] !== "object" || content[k] == null) content[k] = {};
+    });
+    ["products", "categories", "mainCategories", "featuredIds"].forEach(function (k) {
+      if (!Array.isArray(content[k])) content[k] = [];
+    });
+    var s = content.sections;
+    ["stats", "trustBar", "services", "faq"].forEach(function (k) { if (!Array.isArray(s[k])) s[k] = []; });
+    if (typeof s.safety !== "object" || !s.safety) s.safety = { intro: "", points: [] };
+    if (!Array.isArray(s.safety.points)) s.safety.points = [];
+    if (!Array.isArray(content.settings.sisterLinks)) content.settings.sisterLinks = [];
+  }
+
   function load() {
     api("load").then(function (j) {
       if (!j.authed) { location.href = "login.php?return=" + encodeURIComponent("/admin/"); return; }
       content = j.content || {};
-      ["text", "html", "settings", "seo", "sections", "media"].forEach(function (k) {
-        if (typeof content[k] !== "object" || content[k] == null) content[k] = {};
-      });
-      ["products", "categories", "mainCategories", "featuredIds"].forEach(function (k) {
-        if (!Array.isArray(content[k])) content[k] = [];
-      });
-      var s = content.sections;
-      ["stats", "trustBar", "services", "faq"].forEach(function (k) { if (!Array.isArray(s[k])) s[k] = []; });
-      if (typeof s.safety !== "object" || !s.safety) s.safety = { intro: "", points: [] };
-      if (!Array.isArray(s.safety.points)) s.safety.points = [];
-      if (!Array.isArray(content.settings.sisterLinks)) content.settings.sisterLinks = [];
+      normalise();
 
       buildNav();
       var start = (location.hash || "").replace(/^#/, "");
@@ -298,7 +303,8 @@
     { id: "faq", label: "FAQ", render: renderFaq },
     { id: "products", label: "Products", render: renderProducts },
     { id: "categories", label: "Categories", render: renderCategories },
-    { id: "media", label: "Media", render: renderMedia }
+    { id: "media", label: "Media", render: renderMedia },
+    { id: "backups", label: "Backups & export", render: renderBackups }
   ];
 
   function buildNav() {
@@ -683,6 +689,137 @@
       head.appendChild(copy);
       it.appendChild(head);
       grid.appendChild(it);
+    });
+  }
+
+  /* ---------- BACKUPS & EXPORT -------------------------------------- */
+  function downloadJSON(name, obj) {
+    var url = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" }));
+    var a = h("a");
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  /** content-20260918-141951.json -> "18 Sep 2026, 14:19 UTC" */
+  function backupWhen(id) {
+    var m = /^content-(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})\.json$/.exec(id);
+    if (!m) return id;
+    var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return Number(m[3]) + " " + MON[Number(m[2]) - 1] + " " + m[1] + ", " + m[4] + ":" + m[5] + " UTC";
+  }
+
+  function renderBackups(root) {
+    root.appendChild(h("h1", null, "Backups & export"));
+    root.appendChild(h("p", "hint", "All of this runs in the browser or on the host — nothing to install."));
+
+    var g1 = group("Download");
+    g1.appendChild(h("p", "sub", "A copy of the content currently open in this dashboard."));
+    var dl = h("button", null, "Download content.json");
+    dl.type = "button";
+    dl.addEventListener("click", function () { downloadJSON("content.json", content); });
+    var seed = h("button", null, "Download content.default.json (seed)");
+    seed.type = "button";
+    seed.style.marginLeft = "8px";
+    seed.addEventListener("click", function () { downloadJSON("content.default.json", content); });
+    g1.appendChild(dl);
+    g1.appendChild(seed);
+    g1.appendChild(h("p", "sub",
+      "The seed is what the site shows if data/content.json ever goes missing. To refresh it: "
+      + "download it, put it in the repo at data/content.default.json, commit and push. "
+      + "The editor never writes that file itself — it is git-tracked, and a local change there "
+      + "would make the next cPanel pull fail."));
+    root.appendChild(g1);
+
+    var g2 = group("Import a JSON file");
+    var pick = document.createElement("input");
+    pick.type = "file";
+    pick.accept = ".json,application/json";
+    var imp = h("button", null, "Load into editor");
+    imp.type = "button";
+    imp.style.marginLeft = "8px";
+    imp.addEventListener("click", function () {
+      if (!pick.files || !pick.files[0]) { toast("Choose a .json file first.", "err"); return; }
+      var fr = new FileReader();
+      fr.onload = function () {
+        var j;
+        try { j = JSON.parse(String(fr.result)); }
+        catch (e) { toast("That file is not valid JSON.", "err"); return; }
+        if (!j || typeof j !== "object" || Array.isArray(j) || !(j.text || j.sections || j.products)) {
+          toast("That JSON does not look like site content.", "err");
+          return;
+        }
+        content = j;
+        normalise();
+        markDirty();
+        renderTab("backups");
+        toast("Loaded into the editor. Nothing is live until you press Save.", "ok");
+      };
+      fr.onerror = function () { toast("Could not read that file.", "err"); };
+      fr.readAsText(pick.files[0]);
+    });
+    g2.appendChild(pick);
+    g2.appendChild(imp);
+    root.appendChild(g2);
+
+    var g3 = group("Snapshots on the server");
+    g3.appendChild(h("p", "sub",
+      "One is taken before every save and before every restore. The newest 15 are kept."));
+    var list = h("div", "card-list", "Loading…");
+    g3.appendChild(list);
+    root.appendChild(g3);
+    loadBackups(list);
+  }
+
+  function loadBackups(list) {
+    api("backups").then(function (j) {
+      clear(list);
+      var rows = j.backups || [];
+      if (!rows.length) {
+        list.appendChild(h("p", "sub", "None yet — the first one appears after your next save."));
+        return;
+      }
+      rows.forEach(function (b) {
+        var it = h("div", "item");
+        var head = h("div", "item-head");
+        var meta = h("div");
+        meta.style.flex = "1";
+        meta.appendChild(h("div", null, backupWhen(b.id)));
+        meta.appendChild(h("div", "sub", b.id + " · " + Math.max(1, Math.round(b.size / 1024)) + " kB"));
+        head.appendChild(meta);
+
+        var btn = h("button", "danger", "Restore");
+        btn.type = "button";
+        btn.addEventListener("click", function () {
+          if (!confirm("Replace the live content with the snapshot from " + backupWhen(b.id)
+                       + "?\n\nThe content that is live now gets snapshotted first.")) return;
+          btn.disabled = true;
+          btn.textContent = "Restoring…";
+          api("restore", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: b.id })
+          }).then(function () {
+            dirty = false;
+            toast("Restored.", "ok");
+            load();
+          }).catch(function (e) {
+            if (e.message !== "auth") toast("Restore failed: " + e.message, "err");
+            btn.disabled = false;
+            btn.textContent = "Restore";
+          });
+        });
+        head.appendChild(btn);
+        it.appendChild(head);
+        list.appendChild(it);
+      });
+    }).catch(function (e) {
+      if (e.message === "auth") return;
+      clear(list);
+      list.appendChild(h("p", "sub", "Could not list snapshots: " + e.message));
     });
   }
 

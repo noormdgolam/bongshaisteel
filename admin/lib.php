@@ -346,6 +346,12 @@ function cms_handle_upload(): void
     $src = null;
     if (function_exists('imagecreatefromstring')) {
         $src = @imagecreatefromstring((string) file_get_contents($f['tmp_name']));
+        // GD is installed and still refused the bytes, so the file is damaged.
+        // Without this the fallback branch below would store the junk verbatim,
+        // which only makes sense on a host that has no GD at all.
+        if ($src === false) {
+            cms_fail(400, 'not_image', 'That image is damaged or incomplete — try re-saving it.');
+        }
     }
 
     $widths = [];
@@ -405,4 +411,38 @@ function cms_guard_upload_dir(string $dir): void
   Header set X-Content-Type-Options "nosniff"
 </IfModule>
 HT);
+}
+
+/* --------------------------------------------------------------------------
+   BACKUPS
+   -------------------------------------------------------------------------- */
+function cms_backup_name_ok(string $id): bool
+{
+    return (bool) preg_match('/^content-\d{8}-\d{6}\.json$/', $id);
+}
+
+function cms_backups_list(): array
+{
+    $cfg = cms_config();
+    $out = [];
+    foreach (glob($cfg['backup_dir'] . '/content-*.json') ?: [] as $f) {
+        $id = basename($f);
+        if (!cms_backup_name_ok($id)) continue;
+        $out[] = ['id' => $id, 'when' => gmdate('c', (int) filemtime($f)), 'size' => (int) filesize($f)];
+    }
+    // Newest first. The name is a UTC timestamp, so a string sort is enough.
+    usort($out, fn($a, $b) => strcmp($b['id'], $a['id']));
+    return $out;
+}
+
+function cms_restore_backup(string $id): array
+{
+    $cfg = cms_config();
+    // The pattern is basename-shaped, so no traversal can get through it.
+    if (!cms_backup_name_ok($id)) cms_fail(400, 'bad_id', 'That is not a snapshot file name.');
+    $path = $cfg['backup_dir'] . '/' . $id;
+    if (!is_file($path)) cms_fail(404, 'no_backup', 'That snapshot is no longer on the server.');
+    $j = json_decode((string) file_get_contents($path), true);
+    if (!is_array($j)) cms_fail(422, 'bad_backup', 'That snapshot is not readable JSON.');
+    return cms_write_content($j);   // snapshots the current content first
 }

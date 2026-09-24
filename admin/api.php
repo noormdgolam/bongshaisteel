@@ -5,6 +5,8 @@
    GET  ?action=whoami   public   { authed }
    POST ?action=save     auth     body { content:{...} }  -> { content }
    POST ?action=upload   auth     multipart file          -> { path, widths }
+   GET  ?action=backups  auth     { backups:[{id,when,size}] }
+   POST ?action=restore  auth     body { id }               -> { content }
    POST ?action=logout   -        { ok }
    ========================================================================== */
 require __DIR__ . '/lib.php';
@@ -48,6 +50,19 @@ switch ($action) {
         cms_require_auth();
         if (!$isPost) cms_fail(405, 'method', 'POST required.');
         cms_handle_upload();
+        break;
+
+    case 'backups':
+        cms_require_auth();
+        cms_ok(['backups' => cms_backups_list()]);
+        break;
+
+    case 'restore':
+        cms_require_auth();
+        if (!$isPost) cms_fail(405, 'method', 'POST required.');
+        $body = json_decode((string) file_get_contents('php://input'), true);
+        $id   = is_array($body) ? (string) ($body['id'] ?? '') : '';
+        cms_ok(['content' => cms_restore_backup($id)]);
         break;
 
     case 'logout':
