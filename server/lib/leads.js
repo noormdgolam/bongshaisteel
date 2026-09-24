@@ -33,6 +33,7 @@ const MAX_LEADS = Number(process.env.MAX_LEADS) || 2000;
 const LEAD_RATE = Number(process.env.LEAD_RATE) || 5;
 const LEAD_WINDOW = Number(process.env.LEAD_WINDOW) || 600; // seconds
 const SALT = process.env.LEAD_SALT || "";
+const USE_DB = process.env.CONTENT_SOURCE === "db";
 
 class LeadError extends Error {
   constructor(status, code, message) {
@@ -92,7 +93,22 @@ function rateNote(key) {
   writeJSON(RATE_FILE, all, false);
 }
 
-function activity(event, detail, key) {
+/** The activity trail: the database's activity_log when on it, else the file. */
+async function activity(event, detail, key, entityId) {
+  if (USE_DB) {
+    try {
+      await require("./db")("activity_log").insert({
+        action: String(event).slice(0, 50),
+        entity_type: "lead",
+        entity_id: entityId || null,
+        summary: String(detail || "").slice(0, 500),
+        from_hash: key,
+      });
+      return;
+    } catch (err) {
+      console.error("activity: database insert failed, writing to the file:", err.message);
+    }
+  }
   try {
     ensureBackupDir();
     const line = JSON.stringify({
@@ -123,7 +139,7 @@ function stamp() {
  * Validate and store one submission.
  * @returns {{stored: boolean}}  — throws LeadError on refusal.
  */
-function record(input, meta) {
+async function record(input, meta) {
   const body = input && typeof input === "object" ? input : {};
   const key = ipKey(meta.ip);
 
@@ -161,14 +177,42 @@ function record(input, meta) {
     agent: String(meta.agent || "").slice(0, 200),
   };
 
+  // Database first when the app runs on it; the file is the fallback so a
+  // lead is never lost to an outage — the importer picks it up later.
+  let where = "file";
+  if (USE_DB) {
+    try {
+      await storeInDb(lead);
+      where = "db";
+    } catch (err) {
+      console.error("lead: database insert failed, kept in data/leads.json instead:", err.message);
+    }
+  }
+  if (where === "file") storeInFile(lead);
+
+  rateNote(key);
+  await activity("lead.new", kind + " from " + fields.name, key, where === "db" ? lead.id : null);
+  return { stored: true };
+}
+
+function storeInFile(lead) {
   const all = readJSON(LEADS_FILE, []);
   const list = Array.isArray(all) ? all : [];
   list.unshift(lead);
   writeJSON(LEADS_FILE, list.slice(0, MAX_LEADS), true);
+}
 
-  rateNote(key);
-  activity("lead.new", kind + " from " + fields.name, key);
-  return { stored: true };
+async function storeInDb(lead) {
+  const f = lead.fields;
+  const row = {
+    public_id: lead.id, kind: lead.kind, status: "new", note: null,
+    model_code: f.modelCode || null, from_hash: lead.from, user_agent: lead.agent || null,
+  };
+  for (const c of ["name", "phone", "email", "company", "message", "destination",
+    "currency", "standard", "dimensions", "source"]) {
+    row[c] = f[c] == null ? null : f[c];
+  }
+  await require("./db")("leads").insert(row);
 }
 
 module.exports = { record, LeadError, FIELDS, LEADS_FILE };

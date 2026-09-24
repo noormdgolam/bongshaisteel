@@ -97,15 +97,26 @@ function sendHome(req, res, next) {
 app.get("/", sendHome);
 app.get("/index.html", sendHome);
 
+/* In database mode the static data/content.json on disk is stale, yet
+   apply.js in the browser re-applies whatever that URL returns — it would
+   paint the old file over the server-rendered database content. Serve the
+   live content object at the same URL instead. */
+if (content.SOURCE === "db") {
+  app.get("/data/content.json", (req, res) => {
+    res.set("Cache-Control", "no-cache");
+    res.json(content.load());
+  });
+}
+
 /* Ported PHP handlers, kept at their old URLs so no markup has to change. */
 const leadBody = [
   express.urlencoded({ extended: false, limit: "16kb" }),
   express.json({ limit: "16kb" }),
 ];
-app.post("/lead.php", leadBody, (req, res) => {
+app.post("/lead.php", leadBody, async (req, res) => {
   res.set("Cache-Control", "no-store");
   try {
-    const out = leads.record(req.body, { ip: req.ip, agent: req.get("user-agent") });
+    const out = await leads.record(req.body, { ip: req.ip, agent: req.get("user-agent") });
     res.json({ ok: true, stored: out.stored });
   } catch (err) {
     if (err instanceof leads.LeadError) {
@@ -237,7 +248,11 @@ app.use((err, req, res, next) => {
 });
 
 if (require.main === module) {
-  app.listen(PORT, () => console.log("Bongshai Steel listening on " + PORT));
+  // Load the content before taking traffic. init() resolves even when the
+  // database is down (it falls back to the file), so this never blocks boot.
+  content.init().then((info) => {
+    app.listen(PORT, () => console.log("Bongshai Steel listening on " + PORT + ", content from " + info.source));
+  });
 }
 
 module.exports = app;

@@ -168,6 +168,8 @@ async function main() {
     for (const [section, data] of Object.entries(p.site_content)) {
       await trx("site_content").insert({ section, data: JSON.stringify(data) });
     }
+    // Tell every running app worker the content changed (they poll _rev).
+    await require("../lib/content").bumpRev(trx);
 
     // Oldest first, so auto-increment ids follow arrival order.
     for (const l of [...newLeads].reverse()) {
