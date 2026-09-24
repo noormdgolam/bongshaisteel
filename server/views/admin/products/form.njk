@@ -1,0 +1,164 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}{% if product.id %}Edit Product #{{ product.id }}{% else %}New Product{% endif %} — Bongshai Steel Admin{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">
+  {% if product.id %}Edit Product: {{ product.model_code or product.name }}{% else %}Create New Product{% endif %}
+</h1>
+{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="error-box">{{ error }}</div>
+{% endif %}
+
+<div class="card" style="max-width:860px;">
+  <form method="post" action="{% if product.id %}/admin/products/{{ product.id }}{% else %}/admin/products{% endif %}">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
+      <div class="form-row">
+        <label for="model_code">Model Code <span style="color:var(--danger);">*</span></label>
+        <input
+          type="text"
+          id="model_code"
+          name="model_code"
+          value="{{ product.model_code or '' }}"
+          placeholder="e.g. BH-FS-1001"
+          required
+        >
+      </div>
+
+      <div class="form-row">
+        <label for="slug">URL Slug</label>
+        <input
+          type="text"
+          id="slug"
+          name="slug"
+          value="{{ product.slug or '' }}"
+          placeholder="e.g. factory-shed-bh-fs-1001"
+        >
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="name">Product Name <span style="color:var(--danger);">*</span></label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        value="{{ product.name or '' }}"
+        placeholder="e.g. Heavy Industrial Factory Shed"
+        required
+      >
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
+      <div class="form-row">
+        <label for="category_id">Category</label>
+        <select id="category_id" name="category_id">
+          <option value="">Select a category...</option>
+          {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if product.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label for="sort_order">Display Sort Order</label>
+        <input
+          type="number"
+          id="sort_order"
+          name="sort_order"
+          value="{{ product.sort_order if product.sort_order is defined and product.sort_order !== null else 0 }}"
+          min="0"
+        >
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label for="image">Image Path</label>
+      <input
+        type="text"
+        id="image"
+        name="image"
+        value="{{ product.image or '' }}"
+        placeholder="e.g. images/products/Model No-BH-IS-1001.webp"
+      >
+      {% if product.image %}
+      <div style="margin-top:10px; display:flex; align-items:center; gap:12px;">
+        <span style="font-size:0.82rem; color:var(--grey-600); font-weight:600;">Current Preview:</span>
+        <img
+          src="{% for part in product.image.split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}"
+          alt="Current image preview"
+          style="max-height:90px; border-radius:6px; border:1px solid var(--grey-300); background:#ffffff;"
+        >
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="form-row">
+      <label for="description">Product Description &amp; Technical Specifications</label>
+      <textarea
+        id="description"
+        name="description"
+        rows="6"
+        placeholder="Detailed structural specifications, building codes (AISC 360, Eurocode 3, BNBC 2020), wind loads, etc."
+      >{{ product.description or '' }}</textarea>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin:20px 0; padding:14px; background:rgba(255,255,255,0.6); border:1px solid var(--grey-200); border-radius:8px;">
+      <div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; font-size:0.9rem; margin:0;">
+          <input
+            type="checkbox"
+            id="published"
+            name="published"
+            value="1"
+            style="width:auto;"
+            {% if product.id %}{% if product.published %}checked{% endif %}{% else %}checked{% endif %}
+          >
+          <span>Published Live (Public Catalogue)</span>
+        </label>
+        <div style="font-size:0.78rem; color:var(--grey-500); margin-left:24px; margin-top:2px;">Visible to public buyers and search index</div>
+      </div>
+
+      <div>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; font-size:0.9rem; margin:0;">
+          <input
+            type="checkbox"
+            id="featured"
+            name="featured"
+            value="1"
+            style="width:auto;"
+            {% if product.featured %}checked{% endif %}
+          >
+          <span>Featured Model</span>
+        </label>
+        <div style="font-size:0.78rem; color:var(--grey-500); margin-left:24px; margin-top:2px;">Highlighted on home and catalog headers</div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        {% if product.id %}Save Changes{% else %}Create Product{% endif %}
+      </button>
+      <a href="/admin/products" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+{% if product.id %}
+<div class="card" style="max-width:860px; border-top:3px solid var(--danger); margin-top:20px;">
+  <h3 style="font-size:1rem; font-weight:700; color:var(--danger); margin:0 0 6px;">Delete Product</h3>
+  <p style="font-size:0.85rem; color:var(--grey-600); margin:0 0 16px;">
+    Permanently delete this product model from the database. This action cannot be undone.
+  </p>
+  <form method="post" action="/admin/products/{{ product.id }}/delete" onsubmit="return confirm('Are you sure you want to permanently delete this product?');">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <button type="submit" class="btn btn-danger">Delete Product</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

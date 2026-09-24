@@ -1,0 +1,91 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">Dashboard Overview</h1>
+{% endblock %}
+
+{% block content %}
+<div class="toolbar" style="margin-bottom:20px;">
+  <div style="font-size:0.95rem; color:var(--grey-600); font-weight:500;">
+    Welcome to Bongshai Steel administration console.
+  </div>
+  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+    <a href="/admin/products/new" class="btn btn-primary btn-sm">➕ Add Product</a>
+    <a href="/admin/products" class="btn btn-sm">📦 View Products</a>
+    <a href="/admin/leads" class="btn btn-sm">📬 View Messages</a>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card" style="border-left:4px solid var(--primary);">
+    <div class="num">{{ stats.products if stats.products is defined and stats.products !== null else 0 }}</div>
+    <div class="label">Total Products</div>
+  </div>
+  <div class="stat-card" style="border-left:4px solid var(--accent);">
+    <div class="num">{{ stats.categories if stats.categories is defined and stats.categories !== null else 0 }}</div>
+    <div class="label">Categories</div>
+  </div>
+  <div class="stat-card" style="border-left:4px solid #f59e0b;">
+    <div class="num">{{ stats.faqs if stats.faqs is defined and stats.faqs !== null else 0 }}</div>
+    <div class="label">FAQs Published</div>
+  </div>
+  <div class="stat-card" style="border-left:4px solid var(--success);">
+    <div class="num">{{ stats.leadsNew if stats.leadsNew is defined and stats.leadsNew !== null else 0 }}</div>
+    <div class="label">New Inquiries</div>
+  </div>
+  <div class="stat-card" style="border-left:4px solid #6366f1;">
+    <div class="num">{{ stats.leadsTotal if stats.leadsTotal is defined and stats.leadsTotal !== null else 0 }}</div>
+    <div class="label">Total Inquiries</div>
+  </div>
+  <div class="stat-card" style="border-left:4px solid #06b6d4;">
+    <div class="num">{% if stats.views is defined and stats.views !== null %}{{ stats.views }}{% else %}—{% endif %}</div>
+    <div class="label">Site Views</div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:24px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+    <h2 style="font-size:1.05rem; font-weight:700; margin:0; color:var(--grey-900);">Recent System Activity</h2>
+    <a href="/admin/activity" class="btn btn-sm">All Activity Log</a>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:170px;">Date &amp; Time</th>
+          <th style="width:140px;">Admin</th>
+          <th style="width:130px;">Action</th>
+          <th>Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in recentActivity %}
+        <tr>
+          <td style="white-space:nowrap; font-size:0.85rem; color:var(--grey-600);">
+            {{ item.created_at }}
+          </td>
+          <td>
+            <strong style="color:var(--grey-900);">{{ item.admin_name }}</strong>
+          </td>
+          <td>
+            <span class="pill pill-muted">{{ item.action }}</span>
+          </td>
+          <td style="color:var(--grey-700);">
+            {{ item.summary }}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4" style="text-align:center; padding:36px 20px; color:var(--grey-500);">
+            No recent activity recorded.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
