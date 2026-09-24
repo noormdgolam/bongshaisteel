@@ -408,6 +408,114 @@ try {
   });
   assert(siteEmpty.includes("No site copy groups configured."));
 
+  // users/list.njk
+  const usersNormal = render("admin/users/list.njk", {
+    adminName: "Munna",
+    adminRole: "superadmin",
+    csrfToken: "csrf-token-123",
+    active: "users",
+    currentUserId: 1,
+    users: [
+      { id: 1, username: "munna", name: "Noor", email: "munna@example.com", role: "superadmin", active: 1, last_login_at: new Date(), created_at: new Date() },
+      { id: 2, username: "sales1", name: "Sales One", email: "sales1@example.com", role: "sales", active: 0, last_login_at: null, created_at: new Date() }
+    ]
+  });
+  assert(usersNormal.includes("munna"));
+  assert(usersNormal.includes("sales1"));
+  assert(usersNormal.includes("you"));
+
+  const usersEmpty = render("admin/users/list.njk", {
+    adminName: "Munna",
+    adminRole: "superadmin",
+    csrfToken: "csrf-token-123",
+    active: "users",
+    currentUserId: 1,
+    users: []
+  });
+  assert(usersEmpty.includes("No user accounts found."));
+
+  // users/form.njk - new
+  const usersFormNew = render("admin/users/form.njk", {
+    adminName: "Munna",
+    adminRole: "superadmin",
+    csrfToken: "csrf-token-123",
+    active: "users",
+    user: {},
+    roles: [
+      { value: "superadmin", label: "Super Admin", help: "Full access" },
+      { value: "admin", label: "Admin", help: "General access" },
+      { value: "editor", label: "Editor", help: "Content only" },
+      { value: "sales", label: "Sales", help: "Leads only" }
+    ],
+    isSelf: false,
+    error: null
+  });
+  assert(usersFormNew.includes("New User Account"));
+  assert(usersFormNew.includes('name="username"'));
+
+  // users/form.njk - edit self
+  const usersFormEditSelf = render("admin/users/form.njk", {
+    adminName: "Munna",
+    adminRole: "superadmin",
+    csrfToken: "csrf-token-123",
+    active: "users",
+    user: { id: 1, username: "munna", name: "Noor", email: "munna@example.com", role: "superadmin", active: 1 },
+    roles: [{ value: "superadmin", label: "Super Admin" }],
+    isSelf: true,
+    error: null
+  });
+  assert(usersFormEditSelf.includes("Edit User: munna"));
+  assert(!usersFormEditSelf.includes("Delete User Account"));
+
+  // categories/list.njk
+  const catNormal = render("admin/categories/list.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "categories",
+    categories: [
+      { id: 1, key: "factory-sheds", name: "Factory Sheds", icon: "🏭", blurb: "Heavy industrial sheds", image: "images/categories/shed.webp", main_category_name: "Buildings", product_count: 5, sort_order: 1 }
+    ]
+  });
+  assert(catNormal.includes("Factory Sheds"));
+  assert(catNormal.includes("factory-sheds"));
+
+  const catEmpty = render("admin/categories/list.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "categories",
+    categories: []
+  });
+  assert(catEmpty.includes("No categories defined yet."));
+
+  // categories/form.njk - new
+  const catFormNew = render("admin/categories/form.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "categories",
+    category: {},
+    mainCategories: [{ id: 1, key: "buildings", name: "Buildings" }],
+    productCount: 0,
+    error: null
+  });
+  assert(catFormNew.includes("New Category"));
+
+  // categories/form.njk - edit with products
+  const catFormEdit = render("admin/categories/form.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "categories",
+    category: { id: 2, key: "towers", name: "Towers", icon: "🗼", blurb: "Telecom towers", image: null, main_category_id: 1 },
+    mainCategories: [{ id: 1, key: "buildings", name: "Buildings" }],
+    productCount: 3,
+    error: "Sample error"
+  });
+  assert(catFormEdit.includes("Edit Category: Towers"));
+  assert(catFormEdit.includes("This category still has 3 products — move them to another category first."));
+
   pass("1. Render without throwing", "all templates render normal and empty fixtures");
 } catch (err) {
   fail("1. Render without throwing", err);
@@ -622,6 +730,68 @@ try {
             fields: [{ name: "seo.title", label: "Title", type: "text", value: "Bongshai" }]
           }
         ]
+      })
+    },
+    {
+      name: "admin/users/form.njk (new)",
+      html: render("admin/users/form.njk", {
+        adminName: "Admin",
+        adminRole: "superadmin",
+        csrfToken: token,
+        active: "users",
+        user: {},
+        roles: [{ value: "admin", label: "Admin" }],
+        isSelf: false
+      })
+    },
+    {
+      name: "admin/users/form.njk (edit & delete)",
+      html: render("admin/users/form.njk", {
+        adminName: "Admin",
+        adminRole: "superadmin",
+        csrfToken: token,
+        active: "users",
+        user: { id: 10, username: "user10", role: "editor" },
+        roles: [{ value: "editor", label: "Editor" }],
+        isSelf: false
+      })
+    },
+    {
+      name: "admin/categories/list.njk (move forms)",
+      html: render("admin/categories/list.njk", {
+        adminName: "Admin",
+        adminRole: "admin",
+        csrfToken: token,
+        active: "categories",
+        categories: [
+          { id: 1, key: "c1", name: "Cat 1" },
+          { id: 2, key: "c2", name: "Cat 2" },
+          { id: 3, key: "c3", name: "Cat 3" }
+        ]
+      })
+    },
+    {
+      name: "admin/categories/form.njk (new)",
+      html: render("admin/categories/form.njk", {
+        adminName: "Admin",
+        adminRole: "admin",
+        csrfToken: token,
+        active: "categories",
+        category: {},
+        mainCategories: [],
+        productCount: 0
+      })
+    },
+    {
+      name: "admin/categories/form.njk (edit & delete)",
+      html: render("admin/categories/form.njk", {
+        adminName: "Admin",
+        adminRole: "admin",
+        csrfToken: token,
+        active: "categories",
+        category: { id: 25, key: "c25", name: "Cat 25" },
+        mainCategories: [],
+        productCount: 0
       })
     }
   ];
@@ -1492,6 +1662,311 @@ try {
   pass("23. Role-based navigation for Content link", "superadmin/admin/editor visible, sales hidden");
 } catch (err) {
   fail("23. Role-based navigation for Content link", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 24: Hostile strings in user and category fields render escaped
+// ---------------------------------------------------------------------
+try {
+  const hostileScript = '"><script>alert("xss")</script>';
+  const hostileTextarea = '</textarea><script>alert("textarea")</script>';
+
+  // Users list
+  const usersListHtml = render("admin/users/list.njk", {
+    adminName: "Admin",
+    adminRole: "superadmin",
+    csrfToken: "t",
+    active: "users",
+    users: [{
+      id: 99,
+      username: hostileScript,
+      name: hostileScript,
+      email: hostileScript,
+      role: "editor",
+      active: 1
+    }]
+  });
+  assert(!usersListHtml.includes('<script>alert('), "Hostile strings in users/list.njk must be escaped");
+
+  // Users form
+  const usersFormHtml = render("admin/users/form.njk", {
+    adminName: "Admin",
+    adminRole: "superadmin",
+    csrfToken: "t",
+    active: "users",
+    user: {
+      id: 99,
+      username: hostileScript,
+      name: hostileScript,
+      email: hostileScript,
+      role: "editor"
+    },
+    roles: [{ value: "editor", label: "Editor" }],
+    isSelf: false
+  });
+  assert(!usersFormHtml.includes('<script>alert('), "Hostile strings in users/form.njk must be escaped");
+
+  // Categories list
+  const catListHtml = render("admin/categories/list.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "categories",
+    categories: [{
+      id: 99,
+      key: hostileScript,
+      name: hostileScript,
+      blurb: hostileTextarea,
+      product_count: 0
+    }]
+  });
+  assert(!catListHtml.includes('<script>alert('), "Hostile strings in categories/list.njk must be escaped");
+
+  // Categories form
+  const catFormHtml = render("admin/categories/form.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "categories",
+    category: {
+      id: 99,
+      key: hostileScript,
+      name: hostileScript,
+      blurb: hostileTextarea
+    },
+    mainCategories: [],
+    productCount: 0
+  });
+  assert(!catFormHtml.includes('<script>alert('), "Hostile strings in categories/form.njk must be escaped");
+
+  pass("24. Hostile strings in user and category templates escaped", "username, name, email, category name, key, and blurb properly escaped");
+} catch (err) {
+  fail("24. Hostile strings in user and category templates escaped", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 25: isSelf user editing logic
+// ---------------------------------------------------------------------
+try {
+  // isSelf: true
+  const selfHtml = render("admin/users/form.njk", {
+    adminName: "Munna",
+    adminRole: "superadmin",
+    csrfToken: "t",
+    active: "users",
+    user: { id: 1, username: "munna", role: "superadmin", active: 1 },
+    roles: [{ value: "superadmin", label: "Super Admin" }],
+    isSelf: true
+  });
+  const $self = cheerio.load(selfHtml);
+  assert($self('select[name="role"]').is(":disabled"), "Role select must be disabled when isSelf is true");
+  assert($self('input[name="active"]').is(":disabled"), "Active checkbox must be disabled when isSelf is true");
+  assert.strictEqual($self('form[action*="/delete"]').length, 0, "Delete form must NOT be present when isSelf is true");
+
+  // isSelf: false
+  const notSelfHtml = render("admin/users/form.njk", {
+    adminName: "Munna",
+    adminRole: "superadmin",
+    csrfToken: "t",
+    active: "users",
+    user: { id: 2, username: "other", role: "editor", active: 1 },
+    roles: [{ value: "editor", label: "Editor" }],
+    isSelf: false
+  });
+  const $notSelf = cheerio.load(notSelfHtml);
+  assert(!$notSelf('select[name="role"]').is(":disabled"), "Role select must be enabled when isSelf is false");
+  assert(!$notSelf('input[name="active"]').is(":disabled"), "Active checkbox must be enabled when isSelf is false");
+  const delForm = $notSelf('form[action="/admin/users/2/delete"]');
+  assert.strictEqual(delForm.length, 1, "Delete form must be present when isSelf is false and user.id is set");
+  assert.strictEqual((delForm.attr("method") || "").toLowerCase(), "post");
+  assert.strictEqual(delForm.find('input[name="_csrf"]').val(), "t");
+
+  pass("25. isSelf user editing logic", "role select and active checkbox disabled without delete form when isSelf; enabled with delete form when not self");
+} catch (err) {
+  fail("25. isSelf user editing logic", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 26: Role select options dynamically driven by roles fixture
+// ---------------------------------------------------------------------
+try {
+  const customRoles = [
+    { value: "lead_engineer", label: "Lead Engineer", help: "Structural signing authority" },
+    { value: "site_inspector", label: "Site Inspector", help: "QA checks only" }
+  ];
+
+  const html = render("admin/users/form.njk", {
+    adminName: "Munna",
+    adminRole: "superadmin",
+    csrfToken: "t",
+    active: "users",
+    user: { id: 3, role: "lead_engineer" },
+    roles: customRoles,
+    isSelf: false
+  });
+
+  const $ = cheerio.load(html);
+  const options = $('select[name="role"] option');
+  assert.strictEqual(options.length, 2, "Select must contain exactly 2 options from custom roles fixture");
+  assert.strictEqual(options.eq(0).val(), "lead_engineer");
+  assert.strictEqual(options.eq(1).val(), "site_inspector");
+  assert.strictEqual($('select[name="role"] option[value="superadmin"]').length, 0, "superadmin must not be hardcoded when omitted from roles fixture");
+  assert(options.eq(0).is(":selected"), "Current user role should be selected");
+
+  pass("26. Role select dynamically rendered from roles fixture", "renders exactly what is passed with zero hardcoded options");
+} catch (err) {
+  fail("26. Role select dynamically rendered from roles fixture", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 27: Password fields required on new user, not required on edit
+// ---------------------------------------------------------------------
+try {
+  // New user
+  const newHtml = render("admin/users/form.njk", {
+    adminName: "Munna",
+    adminRole: "superadmin",
+    csrfToken: "t",
+    active: "users",
+    user: {},
+    roles: [{ value: "editor", label: "Editor" }],
+    isSelf: false
+  });
+  const $new = cheerio.load(newHtml);
+  const pwdNew = $new('input[name="password"]');
+  const pwd2New = $new('input[name="password2"]');
+  assert.strictEqual(pwdNew.attr("autocomplete"), "new-password", "Password field must have autocomplete='new-password'");
+  assert.strictEqual(pwd2New.attr("autocomplete"), "new-password", "Confirm password field must have autocomplete='new-password'");
+  assert(pwdNew.attr("required") !== undefined, "Password must be required on new user");
+  assert(pwd2New.attr("required") !== undefined, "Confirm password must be required on new user");
+
+  // Edit user
+  const editHtml = render("admin/users/form.njk", {
+    adminName: "Munna",
+    adminRole: "superadmin",
+    csrfToken: "t",
+    active: "users",
+    user: { id: 5, username: "existing" },
+    roles: [{ value: "editor", label: "Editor" }],
+    isSelf: false
+  });
+  const $edit = cheerio.load(editHtml);
+  const pwdEdit = $edit('input[name="password"]');
+  const pwd2Edit = $edit('input[name="password2"]');
+  assert.strictEqual(pwdEdit.attr("autocomplete"), "new-password");
+  assert.strictEqual(pwd2Edit.attr("autocomplete"), "new-password");
+  assert(pwdEdit.attr("required") === undefined, "Password must NOT be required on edit user");
+  assert(pwd2Edit.attr("required") === undefined, "Confirm password must NOT be required on edit user");
+  assert(editHtml.includes("leave both empty to keep the current password"), "Edit user form must include leave empty help text");
+
+  pass("27. Password field requirements and autocomplete", "required on create, optional on edit with help text, autocomplete='new-password' on both");
+} catch (err) {
+  fail("27. Password field requirements and autocomplete", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 28: Categories delete gating on productCount and move forms logic
+// ---------------------------------------------------------------------
+try {
+  const token = "cat-token-test";
+
+  // Category with products (> 0)
+  const busyCatHtml = render("admin/categories/form.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: token,
+    active: "categories",
+    category: { id: 10, key: "sheds", name: "Sheds" },
+    mainCategories: [],
+    productCount: 7
+  });
+  const $busy = cheerio.load(busyCatHtml);
+  assert.strictEqual($busy('form[action*="/delete"]').length, 0, "No delete form allowed when productCount > 0");
+  assert(busyCatHtml.includes("This category still has 7 products — move them to another category first."), "Must show warning with exact product count when > 0");
+
+  // Category with 0 products
+  const emptyCatHtml = render("admin/categories/form.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: token,
+    active: "categories",
+    category: { id: 11, key: "towers", name: "Towers" },
+    mainCategories: [],
+    productCount: 0
+  });
+  const $empty = cheerio.load(emptyCatHtml);
+  const delCatForm = $empty('form[action="/admin/categories/11/delete"]');
+  assert.strictEqual(delCatForm.length, 1, "Delete form must be present when productCount is 0");
+  assert.strictEqual((delCatForm.attr("method") || "").toLowerCase(), "post");
+  assert.strictEqual(delCatForm.find('input[name="_csrf"]').val(), token);
+
+  // Category list move forms
+  const catListHtml = render("admin/categories/list.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: token,
+    active: "categories",
+    categories: [
+      { id: 101, key: "c1", name: "Cat 1" },
+      { id: 102, key: "c2", name: "Cat 2" },
+      { id: 103, key: "c3", name: "Cat 3" }
+    ]
+  });
+  const $list = cheerio.load(catListHtml);
+
+  // First row in desktop table: only down form
+  const firstRowForms = $list('tbody tr:first-child form');
+  assert.strictEqual(firstRowForms.length, 1, "First category row must have only 1 move form (down)");
+  assert.strictEqual(firstRowForms.find('input[name="direction"]').val(), "down");
+  assert.strictEqual(firstRowForms.attr("action"), "/admin/categories/101/move");
+  assert.strictEqual(firstRowForms.find('input[name="_csrf"]').val(), token);
+
+  // Middle row in desktop table: both up and down
+  const midRowForms = $list('tbody tr:nth-child(2) form');
+  assert.strictEqual(midRowForms.length, 2, "Middle category row must have both up and down forms");
+  assert.strictEqual(midRowForms.eq(0).find('input[name="direction"]').val(), "up");
+  assert.strictEqual(midRowForms.eq(1).find('input[name="direction"]').val(), "down");
+
+  // Last row in desktop table: only up form
+  const lastRowForms = $list('tbody tr:last-child form');
+  assert.strictEqual(lastRowForms.length, 1, "Last category row must have only 1 move form (up)");
+  assert.strictEqual(lastRowForms.find('input[name="direction"]').val(), "up");
+  assert.strictEqual(lastRowForms.attr("action"), "/admin/categories/103/move");
+
+  pass("28. Categories delete gating and move forms logic", "warning message when products > 0, delete form when 0; first row no up, last row no down");
+} catch (err) {
+  fail("28. Categories delete gating and move forms logic", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 29: Categories sidebar link role-based visibility
+// ---------------------------------------------------------------------
+try {
+  const roles = ["superadmin", "admin", "editor", "sales"];
+  const results = {};
+
+  for (const role of roles) {
+    const html = render("admin/dashboard.njk", {
+      adminName: "Test User",
+      adminRole: role,
+      csrfToken: "token",
+      active: "dashboard",
+      stats: {},
+      recentActivity: []
+    });
+    const $ = cheerio.load(html);
+    const hasCategoriesLink = $('a[href="/admin/categories"]').length > 0;
+    results[role] = hasCategoriesLink;
+  }
+
+  assert.strictEqual(results.superadmin, true, "Categories link must appear for superadmin");
+  assert.strictEqual(results.admin, true, "Categories link must appear for admin");
+  assert.strictEqual(results.editor, true, "Categories link must appear for editor");
+  assert.strictEqual(results.sales, false, "Categories link must NOT appear for sales");
+
+  pass("29. Role-based navigation for Categories link", "superadmin/admin/editor visible, sales hidden");
+} catch (err) {
+  fail("29. Role-based navigation for Categories link", err);
 }
 
 console.log("\n-------------------------------------------------");

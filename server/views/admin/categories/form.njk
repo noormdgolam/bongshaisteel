@@ -1,0 +1,175 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}{% if category.id %}Edit Category: {{ category.name }}{% else %}New Category{% endif %}{% endblock %}
+
+{% block header %}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; width:100%;">
+  <div>
+    <h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">
+      {% if category.id %}Edit Category: {{ category.name }}{% else %}New Category{% endif %}
+    </h1>
+    <div style="font-size:0.85rem; color:var(--grey-500); margin-top:2px;">
+      <a href="/admin/categories" style="color:var(--primary); text-decoration:none;">&larr; Back to categories</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:720px;">
+  {% if error %}
+  <div class="banner banner-error" style="margin-bottom:20px;">
+    {{ error }}
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <form method="post" action="{% if category.id %}/admin/categories/{{ category.id }}{% else %}/admin/categories{% endif %}">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+      <div style="display:flex; flex-direction:column; gap:18px;">
+        <div style="display:grid; grid-template-columns:1fr 2fr; gap:16px;">
+          <div>
+            <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+              URL Key <span style="color:var(--danger);">*</span>
+            </label>
+            <input
+              type="text"
+              name="key"
+              value="{{ category.key or '' }}"
+              required
+              placeholder="e.g. factory-sheds"
+              style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+            >
+            <div style="font-size:0.8rem; color:var(--grey-500); margin-top:4px;">
+              lower-case letters, digits and dashes — it appears in the page URL /category/&lt;key&gt;
+            </div>
+          </div>
+          <div>
+            <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+              Category Name <span style="color:var(--danger);">*</span>
+            </label>
+            <input
+              type="text"
+              name="name"
+              value="{{ category.name or '' }}"
+              required
+              placeholder="e.g. Factory Sheds"
+              style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+            >
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 2fr; gap:16px;">
+          <div>
+            <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+              Icon
+            </label>
+            <input
+              type="text"
+              name="icon"
+              value="{{ category.icon or '' }}"
+              placeholder="e.g. 🏭"
+              style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+            >
+            <div style="font-size:0.8rem; color:var(--grey-500); margin-top:4px;">
+              one emoji
+            </div>
+          </div>
+          <div>
+            <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+              Main Category
+            </label>
+            <select
+              name="main_category_id"
+              style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+            >
+              <option value="">(none)</option>
+              {% for mc in mainCategories %}
+              <option value="{{ mc.id }}" {% if category.main_category_id == mc.id %}selected{% endif %}>
+                {{ mc.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+            Blurb / Description
+          </label>
+          <textarea
+            name="blurb"
+            rows="4"
+            placeholder="Short description of this product family..."
+            style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95); font-family:inherit;"
+          >{{ category.blurb or '' }}</textarea>
+        </div>
+
+        <div>
+          <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px; color:var(--grey-800);">
+            Image Path
+          </label>
+          <input
+            type="text"
+            name="image"
+            value="{{ category.image or '' }}"
+            placeholder="images/categories/example.webp"
+            style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+          >
+          <div style="font-size:0.8rem; color:var(--grey-500); margin-top:4px;">
+            Site-relative image path (e.g. images/products/Model No-BH-IS-1001.webp)
+          </div>
+          {% if category.image %}
+          <div style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+            <img
+              src="{% for part in category.image.split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}"
+              alt="{{ category.name }}"
+              style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid var(--grey-300); background:#f8fafc;"
+              loading="lazy"
+            >
+            <span style="font-size:0.82rem; color:var(--grey-500);">Current preview</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:16px; border-top:1px solid var(--grey-200);">
+          <a href="/admin/categories" class="btn">Cancel</a>
+          <button type="submit" class="btn btn-primary">
+            {% if category.id %}Save Changes{% else %}Create Category{% endif %}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  {% if category.id %}
+  <div class="card" style="margin-top:24px; border:1px solid {% if productCount > 0 %}rgba(245, 158, 11, 0.3){% else %}rgba(239, 68, 68, 0.2){% endif %}; background:{% if productCount > 0 %}rgba(254, 243, 199, 0.4){% else %}rgba(254, 242, 242, 0.6){% endif %};">
+    {% if productCount > 0 %}
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span style="font-size:1.4rem;">⚠️</span>
+      <div>
+        <strong style="color:var(--grey-900); font-size:0.95rem;">Cannot Delete Category</strong>
+        <div style="font-size:0.86rem; color:var(--grey-700); margin-top:2px;">
+          This category still has {{ productCount }} products — move them to another category first.
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <strong style="color:var(--danger); font-size:0.95rem;">Delete Category</strong>
+        <div style="font-size:0.84rem; color:var(--grey-600); margin-top:2px;">
+          Permanently remove {{ category.name }}. This category currently has 0 products.
+        </div>
+      </div>
+      <form method="post" action="/admin/categories/{{ category.id }}/delete" onsubmit="return confirm('Are you sure you want to delete category \'{{ category.name }}\'? This cannot be undone.');">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-danger">Delete Category</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
