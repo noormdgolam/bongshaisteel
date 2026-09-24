@@ -485,6 +485,9 @@ module.exports = function createAdminRouter({ db, content }) {
   require("./admin-content")(router, {
     db, auth, logActivity, contentChanged, view, on, FormError, roles: CONTENT_ROLES,
   });
+  require("./admin-users")(router, {
+    db, auth, logActivity, contentChanged, view, on, FormError, contentRoles: CONTENT_ROLES,
+  });
 
   return router;
 };

@@ -38,11 +38,12 @@
               name="key"
               value="{{ category.key or '' }}"
               required
+              {% if category.id %}readonly{% endif %}
               placeholder="e.g. factory-sheds"
-              style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);"
+              style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:{% if category.id %}var(--grey-100){% else %}rgba(255,255,255,0.95){% endif %};"
             >
             <div style="font-size:0.8rem; color:var(--grey-500); margin-top:4px;">
-              lower-case letters, digits and dashes — it appears in the page URL /category/&lt;key&gt;
+              {% if category.id %}fixed once created — it is part of /category/&lt;key&gt; links already in use{% else %}lower-case letters, digits and dashes — it appears in the page URL /category/&lt;key&gt;{% endif %}
             </div>
           </div>
           <div>
