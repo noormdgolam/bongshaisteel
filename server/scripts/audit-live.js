@@ -114,8 +114,16 @@ async function main() {
 
   r = await req("GET", "/sitemap.xml");
   const locs = r.text.match(/<loc>[^<]+<\/loc>/g) || [];
-  check(r.status === 200 && locs.length === 79, "sitemap: 79 URLs", locs.length);
+  check(r.status === 200 && locs.length === 80, "sitemap: 80 URLs (home, 72 products, catalogue, categories, projects)", locs.length);
   check(locs.every((l) => l.startsWith("<loc>" + BASE + "/")), "sitemap: every URL on " + BASE, locs.find((l) => !l.startsWith("<loc>" + BASE)));
+  r = await req("GET", "/projects");
+  const $pr = cheerio.load(r.text);
+  check(r.status === 200 && $pr(".proj-card").length === 14 && $pr(".proj-row").length === 15, "projects: 14 steel buildings + 15 group projects", r.status + " " + $pr(".proj-card").length + "/" + $pr(".proj-row").length);
+  check(/Bongshai Engineering/.test(r.text), "projects: group projects attributed to Bongshai Engineering");
+  r = await req("GET", "/");
+  const $h = cheerio.load(r.text);
+  check($h("#navProductsMenu .dropdown-sublink").length >= 5 && !/Steel Furniture|Door and Gate/.test($h("#navProductsMenu").text()), "menu: product lines from the database, retired lines gone", $h("#navProductsMenu").text().replace(/\s+/g, " ").slice(0, 120));
+  check($h('a.call-widget[href^="tel:+880"]').length === 1, "home: call button with the hotline");
   r = await req("GET", "/robots.txt");
   check(r.status === 200 && /sitemap/i.test(r.text), "robots.txt: present, names the sitemap", r.status);
 
@@ -200,7 +208,7 @@ async function main() {
     lf = formsOf(r.text).find((f) => f.action === "/admin/login");
     r = await req("POST", "/admin/login", { body: new URLSearchParams({ ...lf.fields, username: "admin", password: PASS }), headers: { "content-type": "application/x-www-form-urlencoded", "sec-fetch-site": "same-origin" } });
     check(r.status === 302 && r.location === "/admin", "admin: owner signs in", r.status + " " + r.location);
-    for (const p of ["/admin", "/admin/products", "/admin/categories", "/admin/content", "/admin/leads", "/admin/activity", "/admin/users", "/admin/media", "/admin/backups"]) {
+    for (const p of ["/admin", "/admin/products", "/admin/categories", "/admin/content", "/admin/leads", "/admin/activity", "/admin/users", "/admin/media", "/admin/backups", "/admin/projects"]) {
       r = await req("GET", p, { redirect: "follow" });
       check(r.status === 200 && !/Something went wrong|RENDER ERROR/.test(r.text), "admin page " + p, r.status);
     }
