@@ -623,6 +623,102 @@ try {
   });
   assert(backupsEmpty.includes("No backups recorded yet."));
 
+  // projects/list.njk - normal
+  const projectsListNormal = render("admin/projects/list.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "projects",
+    groups: [
+      {
+        value: "steel",
+        label: "Pre-Engineered Steel Buildings",
+        projects: [
+          {
+            id: 1,
+            delivered_by: "steel",
+            title: "Steel Warehouse Facility",
+            category: "Commercial",
+            year_label: "2024",
+            client: "Acme Logistics Ltd",
+            location: "Gazipur",
+            image: "images/projects/p1.webp",
+            published: 1,
+            sort_order: 1
+          }
+        ]
+      },
+      {
+        value: "engineering",
+        label: "Industrial Engineering",
+        projects: []
+      }
+    ],
+    total: 1
+  });
+  assert(projectsListNormal.includes("Steel Warehouse Facility"));
+  assert(projectsListNormal.includes("Pre-Engineered Steel Buildings"));
+  assert(projectsListNormal.includes("Acme Logistics Ltd"));
+
+  // projects/list.njk - empty
+  const projectsListEmpty = render("admin/projects/list.njk", {
+    adminName: "Munna",
+    adminRole: "editor",
+    csrfToken: "csrf-token-123",
+    active: "projects",
+    groups: [],
+    total: 0
+  });
+  assert(projectsListEmpty.includes("Total Projects: 0"));
+
+  // projects/form.njk - new
+  const projectsFormNew = render("admin/projects/form.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "projects",
+    project: {},
+    groups: [
+      { value: "steel", label: "Steel Buildings" },
+      { value: "engineering", label: "Engineering" }
+    ],
+    mediaPaths: ["images/uploads/p1.webp", "images/uploads/p2.webp"],
+    error: null
+  });
+  assert(projectsFormNew.includes("New Project"));
+  assert(!projectsFormNew.includes("Delete Project"));
+  assert(projectsFormNew.includes('name="title"'));
+
+  // projects/form.njk - edit
+  const projectsFormEdit = render("admin/projects/form.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "projects",
+    project: {
+      id: 10,
+      delivered_by: "steel",
+      title: "Manufacturing Plant",
+      category: "Industrial",
+      year_label: "2021–2022",
+      client: "Steel Corp",
+      principal_contractor: "Bongshai",
+      location: "Chittagong",
+      scope: "Heavy structural steel frame",
+      summary: "Completed ahead of schedule",
+      image: "images/uploads/p1.webp",
+      published: 1
+    },
+    groups: [
+      { value: "steel", label: "Steel Buildings" }
+    ],
+    mediaPaths: ["images/uploads/p1.webp"],
+    error: "Validation error sample"
+  });
+  assert(projectsFormEdit.includes("Edit Project: Manufacturing Plant"));
+  assert(projectsFormEdit.includes("Delete Project"));
+  assert(projectsFormEdit.includes("Validation error sample"));
+
   pass("1. Render without throwing", "all templates render normal and empty fixtures");
 } catch (err) {
   fail("1. Render without throwing", err);
@@ -924,6 +1020,51 @@ try {
         snapshots: [{ id: 42, created_at: new Date(), admin_name: "Admin", reason: "manual", note: "Test", bytes: 50000, counts: null }],
         keep: 60,
         autoGapMinutes: 30
+      })
+    },
+    {
+      name: "admin/projects/list.njk (move forms)",
+      html: render("admin/projects/list.njk", {
+        adminName: "Admin",
+        adminRole: "admin",
+        csrfToken: token,
+        active: "projects",
+        groups: [
+          {
+            value: "steel",
+            label: "Steel",
+            projects: [
+              { id: 101, title: "P1" },
+              { id: 102, title: "P2" },
+              { id: 103, title: "P3" }
+            ]
+          }
+        ],
+        total: 3
+      })
+    },
+    {
+      name: "admin/projects/form.njk (new)",
+      html: render("admin/projects/form.njk", {
+        adminName: "Admin",
+        adminRole: "admin",
+        csrfToken: token,
+        active: "projects",
+        project: {},
+        groups: [{ value: "steel", label: "Steel" }],
+        mediaPaths: []
+      })
+    },
+    {
+      name: "admin/projects/form.njk (edit & delete forms)",
+      html: render("admin/projects/form.njk", {
+        adminName: "Admin",
+        adminRole: "admin",
+        csrfToken: token,
+        active: "projects",
+        project: { id: 77, title: "P77" },
+        groups: [{ value: "steel", label: "Steel" }],
+        mediaPaths: []
       })
     }
   ];
@@ -2331,6 +2472,269 @@ try {
   pass("35. Role-based navigation for Media and Backups links", "Media: superadmin/admin/editor; Backups: superadmin/admin only");
 } catch (err) {
   fail("35. Role-based navigation for Media and Backups links", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 36: Hostile strings in projects templates render escaped
+// ---------------------------------------------------------------------
+try {
+  const hostileScript = '"><script>alert("xss")</script>';
+  const hostileTextarea = '</textarea><script>alert("textarea")</script>';
+  const hostileMedia = 'images/uploads/"><script>alert("img")</script>.webp';
+
+  // Projects list hostile
+  const listHtml = render("admin/projects/list.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "projects",
+    groups: [
+      {
+        value: "steel",
+        label: "Steel Projects",
+        projects: [
+          {
+            id: 99,
+            title: hostileScript,
+            category: hostileScript,
+            year_label: hostileScript,
+            client: hostileScript,
+            location: hostileScript,
+            image: null,
+            published: 1,
+            sort_order: 1
+          }
+        ]
+      }
+    ],
+    total: 1
+  });
+  assert(!listHtml.includes('<script>alert('), "Hostile strings in projects/list.njk must be escaped");
+
+  // Projects form hostile
+  const formHtml = render("admin/projects/form.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "projects",
+    project: {
+      id: 99,
+      delivered_by: "steel",
+      title: hostileScript,
+      client: hostileScript,
+      location: hostileScript,
+      scope: hostileTextarea,
+      summary: hostileTextarea,
+      image: hostileMedia,
+      published: 1
+    },
+    groups: [{ value: "steel", label: "Steel" }],
+    mediaPaths: [hostileMedia]
+  });
+  assert(!formHtml.includes('<script>alert('), "Hostile strings in projects/form.njk must be escaped");
+
+  pass("36. Hostile strings in projects templates escaped", "title, client, location, scope, summary, and media path safely escaped");
+} catch (err) {
+  fail("36. Hostile strings in projects templates escaped", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 37: Image control constraint (exactly one radio group named image)
+// ---------------------------------------------------------------------
+try {
+  const formHtml = render("admin/projects/form.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "projects",
+    project: {
+      id: 1,
+      image: "images/uploads/sample.webp"
+    },
+    groups: [{ value: "steel", label: "Steel" }],
+    mediaPaths: [
+      "images/uploads/img1.webp",
+      "images/uploads/img2.webp",
+      "images/uploads/sample.webp"
+    ]
+  });
+
+  const $ = cheerio.load(formHtml);
+  const imageInputs = $('[name="image"]');
+  assert(imageInputs.length > 0, "Form must have inputs with name='image'");
+
+  imageInputs.each((i, el) => {
+    assert.strictEqual(
+      $(el).attr("type"),
+      "radio",
+      `Control with name="image" must be type="radio", got tag ${el.tagName} type ${$(el).attr("type")}`
+    );
+  });
+
+  const textInputsNamedImage = $('input[type="text"][name="image"], select[name="image"], textarea[name="image"]');
+  assert.strictEqual(textInputsNamedImage.length, 0, "No text/select/textarea input should be named 'image'");
+
+  const checkedRadio = $('input[type="radio"][name="image"]:checked');
+  assert.strictEqual(checkedRadio.length, 1, "Exactly one radio button should be checked");
+  assert.strictEqual(checkedRadio.val(), "images/uploads/sample.webp", "Selected photo radio should match project.image");
+
+  pass("37. Exactly one radio group named 'image'", "all image controls are radios forming one group, no conflicting inputs");
+} catch (err) {
+  fail("37. Exactly one radio group named 'image'", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 38: Move forms missing at each group's ends & at most one move-up per project
+// ---------------------------------------------------------------------
+try {
+  const token = "t-projects-move";
+  const listHtml = render("admin/projects/list.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: token,
+    active: "projects",
+    groups: [
+      {
+        value: "steel",
+        label: "Steel Group",
+        projects: [
+          { id: 10, title: "Steel 1" },
+          { id: 20, title: "Steel 2" },
+          { id: 30, title: "Steel 3" }
+        ]
+      },
+      {
+        value: "engineering",
+        label: "Engineering Group",
+        projects: [
+          { id: 40, title: "Eng 1" },
+          { id: 50, title: "Eng 2" }
+        ]
+      }
+    ],
+    total: 5
+  });
+
+  const $ = cheerio.load(listHtml);
+
+  // Group 1: Steel
+  const g1 = $('.card').eq(0);
+  const g1Rows = g1.find('tbody tr');
+  assert.strictEqual(g1Rows.length, 3);
+
+  // Steel row 1 (first): only down
+  const g1r1Forms = g1Rows.eq(0).find('form[action*="/move"]');
+  assert.strictEqual(g1r1Forms.length, 1);
+  assert.strictEqual(g1r1Forms.find('input[name="direction"]').val(), "down");
+  assert.strictEqual(g1r1Forms.attr("action"), "/admin/projects/10/move");
+
+  // Steel row 2 (mid): up and down
+  const g1r2Forms = g1Rows.eq(1).find('form[action*="/move"]');
+  assert.strictEqual(g1r2Forms.length, 2);
+  assert.strictEqual(g1r2Forms.eq(0).find('input[name="direction"]').val(), "up");
+  assert.strictEqual(g1r2Forms.eq(1).find('input[name="direction"]').val(), "down");
+
+  // Steel row 3 (last): only up
+  const g1r3Forms = g1Rows.eq(2).find('form[action*="/move"]');
+  assert.strictEqual(g1r3Forms.length, 1);
+  assert.strictEqual(g1r3Forms.find('input[name="direction"]').val(), "up");
+  assert.strictEqual(g1r3Forms.attr("action"), "/admin/projects/30/move");
+
+  // Group 2: Engineering
+  const g2 = $('.card').eq(1);
+  const g2Rows = g2.find('tbody tr');
+  assert.strictEqual(g2Rows.length, 2);
+
+  // Eng row 1 (first): only down
+  const g2r1Forms = g2Rows.eq(0).find('form[action*="/move"]');
+  assert.strictEqual(g2r1Forms.length, 1);
+  assert.strictEqual(g2r1Forms.find('input[name="direction"]').val(), "down");
+  assert.strictEqual(g2r1Forms.attr("action"), "/admin/projects/40/move");
+
+  // Eng row 2 (last): only up
+  const g2r2Forms = g2Rows.eq(1).find('form[action*="/move"]');
+  assert.strictEqual(g2r2Forms.length, 1);
+  assert.strictEqual(g2r2Forms.find('input[name="direction"]').val(), "up");
+  assert.strictEqual(g2r2Forms.attr("action"), "/admin/projects/50/move");
+
+  // Assert Lesson 1: at most one move-up form per project in the entire HTML
+  const allMoveUpForms = $('form[action*="/move"]').filter((i, el) => {
+    return $(el).find('input[name="direction"]').val() === "up";
+  });
+  const upFormActions = [];
+  allMoveUpForms.each((i, el) => {
+    upFormActions.push($(el).attr("action"));
+  });
+
+  const upOccurrences = {};
+  for (const action of upFormActions) {
+    upOccurrences[action] = (upOccurrences[action] || 0) + 1;
+    assert.strictEqual(upOccurrences[action], 1, `Move-up for ${action} appeared more than once! Single markup required.`);
+  }
+
+  pass("38. Move forms boundary & single markup constraints", "missing at each group's ends; at most one move-up per project across entire HTML");
+} catch (err) {
+  fail("38. Move forms boundary & single markup constraints", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 39: delivered_by options dynamically driven by groups fixture
+// ---------------------------------------------------------------------
+try {
+  const customGroups = [
+    { value: "custom_division", label: "Specialty Structures" }
+  ];
+
+  const formHtml = render("admin/projects/form.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "projects",
+    project: { id: 1, delivered_by: "custom_division" },
+    groups: customGroups,
+    mediaPaths: []
+  });
+
+  const $ = cheerio.load(formHtml);
+  const options = $('select[name="delivered_by"] option, input[name="delivered_by"]');
+  assert.strictEqual(options.length, 1, "delivered_by must contain exactly 1 option from custom groups fixture");
+  assert.strictEqual(options.val(), "custom_division");
+  assert($('option[value="steel"], input[value="steel"]').length === 0, "Hardcoded 'steel' must not exist when omitted from groups fixture");
+
+  pass("39. delivered_by options dynamically rendered from groups", "renders exactly what is passed with zero hardcoded groups");
+} catch (err) {
+  fail("39. delivered_by options dynamically rendered from groups", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 40: Projects sidebar link role-based visibility
+// ---------------------------------------------------------------------
+try {
+  const roles = ["superadmin", "admin", "editor", "sales"];
+  const results = {};
+
+  for (const role of roles) {
+    const html = render("admin/dashboard.njk", {
+      adminName: "Test User",
+      adminRole: role,
+      csrfToken: "token",
+      active: "dashboard",
+      stats: {},
+      recentActivity: []
+    });
+    const $ = cheerio.load(html);
+    results[role] = $('a[href="/admin/projects"]').length > 0;
+  }
+
+  // Projects: superadmin/admin/editor visible, sales hidden
+  assert.strictEqual(results.superadmin, true, "Projects link must appear for superadmin");
+  assert.strictEqual(results.admin, true, "Projects link must appear for admin");
+  assert.strictEqual(results.editor, true, "Projects link must appear for editor");
+  assert.strictEqual(results.sales, false, "Projects link must NOT appear for sales");
+
+  pass("40. Role-based navigation for Projects link", "superadmin/admin/editor visible, sales hidden");
+} catch (err) {
+  fail("40. Role-based navigation for Projects link", err);
 }
 
 console.log("\n-------------------------------------------------");

@@ -1,0 +1,127 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Completed Projects{% endblock %}
+
+{% block header %}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; width:100%;">
+  <div>
+    <h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">Completed Projects</h1>
+    <div style="font-size:0.85rem; color:var(--grey-500); margin-top:2px;">Manage portfolio projects, project details, and photos displayed on the /projects page</div>
+  </div>
+  <div>
+    <a href="/admin/projects/new" class="btn btn-primary">➕ Add Project</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if notice %}
+<div class="notice-box">{{ notice }}</div>
+{% endif %}
+{% if error %}
+<div class="error-box">{{ error }}</div>
+{% endif %}
+
+<div style="margin-bottom:18px; font-size:0.88rem; color:var(--grey-600); font-weight:600;">
+  Total Projects: {{ total if total is defined and total !== null else 0 }}
+</div>
+
+{% for g in groups %}
+<div class="card" style="margin-bottom:28px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--grey-200); flex-wrap:wrap; gap:8px;">
+    <div>
+      <h2 style="font-size:1.1rem; font-weight:700; margin:0; color:var(--grey-900);">{{ g.label }}</h2>
+    </div>
+    <span class="pill pill-muted" style="font-size:0.75rem;">
+      {{ g.projects.length if g.projects else 0 }} project{% if not g.projects or g.projects.length != 1 %}s{% endif %}
+    </span>
+  </div>
+
+  {% if g.projects and g.projects.length %}
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:68px;">Photo</th>
+          <th>Project Details</th>
+          <th style="width:140px;">Location</th>
+          <th style="width:160px;">Client</th>
+          <th style="width:90px;">Status</th>
+          <th style="width:95px; text-align:center;">Order</th>
+          <th style="width:80px; text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in g.projects %}
+        <tr>
+          <td>
+            {% if p.image %}
+            <img
+              src="{% for part in p.image.split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}"
+              alt="{{ p.title }}"
+              class="product-thumb"
+              loading="lazy"
+            >
+            {% else %}
+            <div class="product-thumb placeholder-thumb" style="font-size:0.72rem; color:var(--grey-400); display:flex; align-items:center; justify-content:center; text-align:center; padding:2px;">
+              No photo
+            </div>
+            {% endif %}
+          </td>
+          <td>
+            <div>
+              <strong style="color:var(--grey-900); font-size:0.94rem;">{{ p.title }}</strong>
+              <div style="font-size:0.82rem; color:var(--grey-500); margin-top:2px;">
+                {% if p.year_label %}{{ p.year_label }}{% endif %}
+                {% if p.year_label and p.category %} · {% endif %}
+                {% if p.category %}{{ p.category }}{% endif %}
+              </div>
+            </div>
+          </td>
+          <td>
+            <span style="font-size:0.86rem; color:var(--grey-700);">{{ p.location or '—' }}</span>
+          </td>
+          <td>
+            <span style="font-size:0.86rem; color:var(--grey-700);">{{ p.client or '—' }}</span>
+          </td>
+          <td>
+            {% if p.published %}
+            <span class="pill pill-success">Live</span>
+            {% else %}
+            <span class="pill pill-danger">Hidden</span>
+            {% endif %}
+          </td>
+          <td style="text-align:center; white-space:nowrap;">
+            <div style="display:inline-flex; gap:4px; align-items:center;">
+              {% if not loop.first %}
+              <form method="post" action="/admin/projects/{{ p.id }}/move" style="display:inline; margin:0;">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <input type="hidden" name="direction" value="up">
+                <button type="submit" class="btn btn-sm" title="Move Up" style="padding:4px 8px; font-size:0.8rem; line-height:1;">↑</button>
+              </form>
+              {% endif %}
+              {% if not loop.last %}
+              <form method="post" action="/admin/projects/{{ p.id }}/move" style="display:inline; margin:0;">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <input type="hidden" name="direction" value="down">
+                <button type="submit" class="btn btn-sm" title="Move Down" style="padding:4px 8px; font-size:0.8rem; line-height:1;">↓</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+          <td style="text-align:right; white-space:nowrap;">
+            <a href="/admin/projects/{{ p.id }}/edit" class="btn btn-sm">Edit</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="text-align:center; padding:32px 16px; color:var(--grey-500); background:rgba(255,255,255,0.6); border-radius:10px; border:1px dashed var(--grey-300);">
+    No projects in this group yet. <a href="/admin/projects/new" style="font-weight:600;">Add a project</a>
+  </div>
+  {% endif %}
+</div>
+{% endfor %}
+{% endblock %}
