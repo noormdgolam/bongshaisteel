@@ -1,0 +1,40 @@
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “alt-php74” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-alt-php74 .php .php7 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION BEGIN
+<IfModule Litespeed>
+</IfModule>
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END
+
+# ----------------------------------------------------------------------------
+# Template for /home/abongsha/bongshaisteel.com/.htaccess — NOT tracked there.
+# Uploaded over FTP. The blocks above are cPanel's own, copied as found on
+# 2026-09-25; cPanel adds its Passenger block when the Node app is started.
+# Keeping this file out of git means cPanel editing it never blocks a pull.
+# ----------------------------------------------------------------------------
+
+# Bongshai Steel — docroot rules.
+#
+# LiteSpeed answers any request that matches a file on disk before Passenger
+# sees it. That is right for images, styles and scripts, and it is why this
+# folder must never contain index.html, lead.php, counter.php or sitemap.xml:
+# Node serves those URLs, and a file of the same name would silently win.
+
+RewriteEngine On
+
+# One canonical origin, for static files too (Node redirects its own pages).
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://www.bongshaisteel.com/$1 [R=301,L]
+RewriteCond %{HTTP_HOST} ^bongshaisteel\.com$ [NC]
+RewriteRule ^(.*)$ https://www.bongshaisteel.com/$1 [R=301,L]
+
+# Never hand out anything that is not part of the public site, even if a
+# deploy mistake copies it here: app source, runtime data, VCS and dotfiles.
+RewriteRule ^(server|deploy|node_modules|tools)(/|$) - [F,L]
+RewriteCond %{REQUEST_URI} !^/\.well-known/
+RewriteRule (^|/)\. - [F,L]
+RewriteRule ^data/leads\.json$ - [F,L]
+RewriteRule \.(php|sh|sql|gz|log|env|md|yml)$ - [F,L]

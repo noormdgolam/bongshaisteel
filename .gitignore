@@ -45,3 +45,6 @@ counter.txt
 /server/backups/
 /server/tmp/
 /server/_cron/*.log
+
+# The docroot .htaccess is managed over FTP (template: deploy/htaccess.docroot)
+/.htaccess
