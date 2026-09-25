@@ -93,7 +93,7 @@ async function runVerification() {
       const title = $("title").text().trim();
       const canonical = $('link[rel="canonical"]').attr("href");
       const hasThree = res.html.includes("three.min.js");
-      const hasName = res.html.includes(cat.name);
+      const hasName = cheerio.load(res.html).root().text().includes(cat.name);
 
       const passed =
         res.status === 200 &&

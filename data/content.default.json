@@ -198,6 +198,13 @@
       "ready": true
     },
     {
+      "key": "commercial",
+      "name": "Commercial Steel Building",
+      "icon": "🏢",
+      "blurb": "Steel-framed buildings for retail, education, offices, banks, healthcare and communities.",
+      "ready": true
+    },
+    {
       "key": "residential",
       "name": "Residential Steel Building",
       "icon": "🏘️",
@@ -214,12 +221,96 @@
   ],
   "categories": [
     {
+      "key": "peb-steel-building",
+      "name": "PEB Steel Building",
+      "icon": "🏗️",
+      "main": "steel-building"
+    },
+    {
       "key": "factory",
       "name": "Steel Factory Building",
       "icon": "🏭",
       "blurb": "SS400/Q355 heavy portal frame, 10–50 Ton EOT crane ready, PU insulation.",
       "image": "images/products/Model No-BH-IS-1006.webp",
       "main": "steel-building"
+    },
+    {
+      "key": "warehouse",
+      "name": "Warehouse",
+      "icon": "🏬",
+      "main": "steel-building"
+    },
+    {
+      "key": "godown",
+      "name": "Godown",
+      "icon": "📦",
+      "main": "steel-building"
+    },
+    {
+      "key": "farm-house",
+      "name": "Farm House",
+      "icon": "🌾",
+      "main": "steel-building"
+    },
+    {
+      "key": "indoor-stadium",
+      "name": "Indoor Stadium",
+      "icon": "🏟️",
+      "main": "steel-building"
+    },
+    {
+      "key": "auditorium",
+      "name": "Auditorium",
+      "icon": "🎭",
+      "main": "steel-building"
+    },
+    {
+      "key": "aircraft-hangar",
+      "name": "Aircraft Hangar",
+      "icon": "✈️",
+      "main": "steel-building"
+    },
+    {
+      "key": "supermarket",
+      "name": "Super Market",
+      "icon": "🛒",
+      "main": "commercial"
+    },
+    {
+      "key": "school-college",
+      "name": "School & College",
+      "icon": "🏫",
+      "main": "commercial"
+    },
+    {
+      "key": "office",
+      "name": "Office Building",
+      "icon": "🏢",
+      "main": "commercial"
+    },
+    {
+      "key": "bank",
+      "name": "Bank Building",
+      "icon": "🏦",
+      "main": "commercial"
+    },
+    {
+      "key": "university",
+      "name": "University",
+      "icon": "🎓",
+      "main": "commercial"
+    },
+    {
+      "key": "hospital",
+      "name": "Hospital",
+      "icon": "🏥",
+      "main": "commercial"
+    },
+    {
+      "key": "community-center",
+      "name": "Community Center",
+      "icon": "🏛️",
+      "main": "commercial"
     },
     {
       "key": "duplex",
@@ -246,11 +337,47 @@
       "main": "residential"
     },
     {
+      "key": "hotel-resort",
+      "name": "Hotel & Resort",
+      "icon": "🏨",
+      "main": "residential"
+    },
+    {
+      "key": "accommodation-unit",
+      "name": "Accommodation Unit",
+      "icon": "🛏️",
+      "main": "residential"
+    },
+    {
+      "key": "pipe-racks",
+      "name": "Pipe Racks",
+      "icon": "🛢️",
+      "main": "structure"
+    },
+    {
+      "key": "equipment-supports",
+      "name": "Equipment Support Structures",
+      "icon": "⚙️",
+      "main": "structure"
+    },
+    {
+      "key": "built-up-girders",
+      "name": "Built-up Girders & Columns",
+      "icon": "🏗️",
+      "main": "structure"
+    },
+    {
       "key": "structural",
       "name": "Structural Steel Building",
       "icon": "🏢",
       "blurb": "Multi-story steel apartment towers, composite decking concrete slab, engineered to international structural standards.",
       "image": "images/products/bh-tsb-109.webp",
+      "main": "structure"
+    },
+    {
+      "key": "high-rise",
+      "name": "High-rise Buildings",
+      "icon": "🏙️",
       "main": "structure"
     }
   ],

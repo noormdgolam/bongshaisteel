@@ -43,8 +43,10 @@ function getSitemapEntries(options = {}) {
 
   // 2. Category Pages
   const categories = Array.isArray(content.categories) ? content.categories : [];
+  const withModels = new Set((Array.isArray(content.products) ? content.products : []).map((p) => p.category));
   for (const cat of categories) {
-    if (!cat.key) continue;
+    // Building types without models are quote-on-request pages (noindex).
+    if (!cat.key || !withModels.has(cat.key)) continue;
     entries.push({
       loc: `${baseUrl}/category/${encodeURIComponent(cat.key)}`,
       lastmod

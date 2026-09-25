@@ -456,7 +456,7 @@ function productCardHTML(p) {
 function renderCategoryCards() {
   const container = document.getElementById("categoryCardsGrid");
   if (!container) return;
-  container.innerHTML = CATEGORIES.map(c => {
+  container.innerHTML = CATEGORIES.filter(c => PRODUCTS_DATA.some(p => p.category === c.key)).map(c => {
     const modelCount = PRODUCTS_DATA.filter(p => p.category === c.key).length;
     return `
       <button type="button" class="cat-card" onclick="navigateToCategory('${c.key}')">
@@ -509,6 +509,19 @@ function goToMainCategory(key, updateHash = true) {
 }
 
 
+// A building type with no published models yet: built to order, quoted per project.
+function onRequestHTML(c) {
+  return `
+    <div class="catalog-group">
+      <div class="catalog-group-header"><h3>${c.icon || ""} ${c.name} <span>(built to order)</span></h3></div>
+      <div class="cat-card" style="padding:24px; cursor:default; text-align:left;">
+        <p style="color:var(--text-muted); margin-bottom:14px;">${c.name} projects are engineered and fabricated to your size, site and use. Tell us your requirements and our engineering team will prepare a design and quotation.</p>
+        <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="openQuoteModal()">Request a Quote</button>
+      </div>
+    </div>
+  `;
+}
+
 function renderComingSoon(cat) {
   const container = document.getElementById("productsViewContainer");
   if (!container) return;
@@ -535,8 +548,10 @@ function renderCatalog(filterCategory, groups = CATEGORIES) {
   if (!container) return;
 
   if (filterCategory === "all") {
+    const lineView = groups !== CATEGORIES;
     container.innerHTML = groups.map(c => {
       const items = PRODUCTS_DATA.filter(p => p.category === c.key);
+      if (!items.length) return lineView ? onRequestHTML(c) : "";
       return `
         <div class="catalog-group">
           <div class="catalog-group-header">
@@ -548,7 +563,10 @@ function renderCatalog(filterCategory, groups = CATEGORIES) {
     }).join("");
   } else {
     const items = PRODUCTS_DATA.filter(p => p.category === filterCategory);
-    container.innerHTML = `<div class="products-grid">${items.map(productCardHTML).join("")}</div>`;
+    const cat = CATEGORIES.find(c => c.key === filterCategory);
+    container.innerHTML = items.length
+      ? `<div class="products-grid">${items.map(productCardHTML).join("")}</div>`
+      : (cat ? onRequestHTML(cat) : "");
   }
 }
 

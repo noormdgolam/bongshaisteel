@@ -250,7 +250,7 @@ function navMarkup(d) {
         '<li><button class="mobile-nested-link" type="button" onclick="navigateToCategory(\'' + key(c.key) + '\')">' + label(c) + "</button></li>").join("") +
       "</ul></li>").join(""),
     catalogFilterChips: '<button type="button" ' + pill + " onclick=\"navigateToCategory('all')\">All Models (" + prods.length + ")</button>" +
-      lines.map((x) => x.cats).flat().map((c) =>
+      lines.map((x) => x.cats).flat().filter((c) => count(c) > 0).map((c) =>
         '<button type="button" ' + pill + ' onclick="navigateToCategory(\'' + key(c.key) + '\')">' + label(c) + " (" + count(c) + ")</button>").join(""),
     footerProductLinks: lines.map(({ m }) =>
       '<li><button type="button" onclick="goToMainCategory(\'' + key(m.key) + '\')">' + esc(m.name) + "</button></li>").join(""),

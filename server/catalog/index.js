@@ -169,6 +169,11 @@ module.exports = function createCatalogRouter(options = {}) {
       const context = {
         category,
         products: categoryProducts,
+        // A building type with no published models yet: a quote-on-request
+        // page, kept out of search results until it has models to show.
+        robots: categoryProducts.length ? undefined : "noindex, follow",
+        waLink: buildWhatsAppLink(content.settings && content.settings.whatsappNumber,
+          "Hello Bongshai Steel! I would like a quote for a " + category.name + "."),
         pageTitle: `${category.name} Exporter & Manufacturer | Bongshai Steel`,
         pageDescription: `Explore ${category.name} models by Bongshai Steel. ${category.blurb || ""} AISC 360, BNBC 2020 & Eurocode certified manufacturing in Bangladesh.`,
         canonicalUrl,

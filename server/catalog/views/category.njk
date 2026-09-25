@@ -9,6 +9,7 @@
 {% block content %}
 <div class="container" style="padding-bottom: 80px;">
 
+  {% if products.length %}
   <!-- Answer-First Opening (< 45 words) -->
   <section class="answer-box">
     <p>
@@ -25,6 +26,8 @@
     <span><strong>Last Updated:</strong> 2026-09-24</span>
   </div>
 
+  {% endif %}
+
   <!-- Category Title & Blurb -->
   <div class="section-header" style="text-align: left; margin-bottom: 36px;">
     <span class="section-subtitle">Certified Steel Building Category</span>
@@ -36,6 +39,7 @@
     </p>
   </div>
 
+  {% if products.length %}
   <!-- Models Grid -->
   <div class="products-grid" style="margin-bottom: 60px;">
     {% for prod in products %}
@@ -64,6 +68,14 @@
     </div>
     {% endfor %}
   </div>
+  {% else %}
+  <!-- No published models yet: built to order, quoted per project. -->
+  <div class="answer-box" style="margin-bottom: 60px;">
+    <p style="margin-bottom: 14px;"><strong>{{ category.name }}</strong> projects are engineered and fabricated to order. Share your size, location and use, and our engineering team will prepare a design and quotation.</p>
+    <a href="/#contact" class="btn-primary-hero" style="margin-right: 10px;">Request a Quote</a>
+    <a href="{{ waLink }}" class="btn-secondary-hero" target="_blank" rel="noopener noreferrer">WhatsApp Us</a>
+  </div>
+  {% endif %}
 
   <!-- Category FAQ & Engineering Authority -->
   <section style="margin-bottom: 60px;">

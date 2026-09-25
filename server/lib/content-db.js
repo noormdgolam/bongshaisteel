@@ -43,11 +43,11 @@ async function loadFromDb(db) {
     try { site[r.section] = JSON.parse(r.data); } catch { site[r.section] = {}; }
   }
 
-  // Only what has something to show is public: a category with a published
-  // product, and a product line with such a category. New building types
-  // appear in the menu by themselves once the admin adds their first product.
+  // Every building type under a product line is public (owner: the menu shows
+  // the whole range). One without published models is a quote-on-request
+  // page — noindex and outside the sitemap until it has models.
   const used = new Set(products.map((p) => p.category_key));
-  const visibleCats = cats.filter((c) => used.has(c.key));
+  const visibleCats = cats.filter((c) => c.main_category_id || used.has(c.key));
   const mainKey = Object.fromEntries(mains.map((m) => [m.id, m.key]));
   const visibleMains = mains.filter((m) => visibleCats.some((c) => c.main_category_id === m.id));
 

@@ -308,7 +308,7 @@
           }).join("") + "</ul></li>";
       }).join(""),
       catalogFilterChips: '<button type="button" ' + pill + " onclick=\"navigateToCategory('all')\">All Models (" + prods.length + ")</button>" +
-        allCats.map(function (c) {
+        allCats.filter(function (c) { return count(c) > 0; }).map(function (c) {
           return '<button type="button" ' + pill + ' onclick="navigateToCategory(\'' + key(c.key) + '\')">' + label(c) + " (" + count(c) + ")</button>";
         }).join(""),
       footerProductLinks: lines.map(function (x) {
