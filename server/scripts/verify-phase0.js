@@ -161,6 +161,20 @@ function richContent(seed) {
 }
 
 async function main() {
+  // This check swaps data/content.json between states, so the Node app must
+  // read that file. In db mode it would keep serving the database and the
+  // second state would "fail" for no real reason. File mode answers /admin
+  // with 503; db mode does not.
+  const admin = await fetch(new URL("admin/login", NODE_URL), { redirect: "manual" });
+  if (admin.status !== 503) {
+    console.error("NODE_URL (" + NODE_URL + ") is running with CONTENT_SOURCE=db.\n" +
+      "Start a file-mode instance and point at it:\n" +
+      "  CONTENT_SOURCE=file PORT=3101 node server.js\n" +
+      "  NODE_URL=http://127.0.0.1:3101/ node scripts/verify-phase0.js\n" +
+      "(db mode is covered by scripts/verify-db-mode.js.)");
+    process.exit(2);
+  }
+
   const seed = JSON.parse(fs.readFileSync(SEED, "utf8"));
   const hadLive = fs.existsSync(LIVE);
   const backup = hadLive ? fs.readFileSync(LIVE) : null;
