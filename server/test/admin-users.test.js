@@ -210,7 +210,8 @@ async function main() {
     check(r.status === 422, "an invalid key is refused", r.status);
     r = await v3("POST", f.action, { ...f.fields, key: CAT, name: "Test " + XSS, blurb: XSS, image: "images/products/Model No-BH-IS-1001.webp" });
     const cat = await db("categories").where({ key: CAT }).first();
-    check(r.status === 302 && cat && content.load().categories.some((c) => c.key === CAT), "a category is created and reaches the live content", r.status);
+    check(r.status === 302 && cat && !content.load().categories.some((c) => c.key === CAT),
+      "a category is created, and stays out of the public menu while it has no products", r.status);
     r = await v3("GET", "/admin/categories");
     check(!injected(r.html), "  the list shows its hostile name escaped");
     const moves = forms(r.html).filter((x) => x.action === "/admin/categories/" + cat.id + "/move");

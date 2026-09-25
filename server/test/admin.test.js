@@ -104,6 +104,7 @@ async function cleanup() {
 
 async function main() {
   await setupUsers();
+  const CAT_COUNT = Number((await db("categories").count({ n: "*" }))[0].n);
   await content.refresh();
 
   const app = express();
@@ -159,7 +160,7 @@ async function main() {
     r = await a.req("GET", "/admin");
     check(r.status === 200 && r.data.view === "admin/dashboard.njk" && r.data.active === "dashboard", "dashboard renders", r.status + " " + JSON.stringify(r.data).slice(0, 120));
     const st = (r.data && r.data.stats) || {};
-    check(st.products >= 72 && st.categories === 5 && st.faqs === 9 && typeof st.leadsNew === "number",
+    check(st.products >= 72 && st.categories === CAT_COUNT && st.faqs === 9 && typeof st.leadsNew === "number",
       "  with the contract's stats", JSON.stringify(st));
     check(r.data.adminRole === "admin" && r.data.adminName === "Test admin", "  and adminName/adminRole", r.data.adminName + "/" + r.data.adminRole);
     csrf = r.data.csrfToken;
@@ -215,7 +216,7 @@ async function main() {
 
     /* --- product list */
     r = await a.req("GET", "/admin/products");
-    check(r.status === 200 && r.data.total >= 72 && r.data.categories === 5 && r.data.category === "all", "product list: all products, 5 categories", JSON.stringify({ t: r.data.total, c: r.data.categories }));
+    check(r.status === 200 && r.data.total >= 72 && r.data.categories === CAT_COUNT && r.data.category === "all", "product list: all products, every category", JSON.stringify({ t: r.data.total, c: r.data.categories }));
     r = await a.req("GET", "/admin/products?q=BH-IS-100");
     check(r.data.total === 9 && r.data.q === "BH-IS-100", "search by model code", r.data.total);
     r = await a.req("GET", "/admin/products?category=cottage");

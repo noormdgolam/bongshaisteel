@@ -43,6 +43,14 @@ async function loadFromDb(db) {
     try { site[r.section] = JSON.parse(r.data); } catch { site[r.section] = {}; }
   }
 
+  // Only what has something to show is public: a category with a published
+  // product, and a product line with such a category. New building types
+  // appear in the menu by themselves once the admin adds their first product.
+  const used = new Set(products.map((p) => p.category_key));
+  const visibleCats = cats.filter((c) => used.has(c.key));
+  const mainKey = Object.fromEntries(mains.map((m) => [m.id, m.key]));
+  const visibleMains = mains.filter((m) => visibleCats.some((c) => c.main_category_id === m.id));
+
   const featured = products
     .filter((p) => p.featured)
     .sort((a, b) => (a.featured_order ?? 1e9) - (b.featured_order ?? 1e9))
@@ -66,11 +74,12 @@ async function loadFromDb(db) {
       team: team.map((m) => compact({ name: m.name, role: m.role, bio: m.bio, photo: m.photo })),
       serviceAreas: areas.map((a) => compact({ name: a.name, note: a.note })),
     },
-    mainCategories: mains.map((m) => compact({
+    mainCategories: visibleMains.map((m) => compact({
       key: m.key, name: m.name, icon: m.icon, blurb: m.blurb, ready: !!m.ready,
     })),
-    categories: cats.map((c) => compact({
+    categories: visibleCats.map((c) => compact({
       key: c.key, name: c.name, icon: c.icon, blurb: c.blurb, image: c.image,
+      main: mainKey[c.main_category_id],
     })),
     products: products.map((p) => compact({
       id: p.slug,

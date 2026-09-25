@@ -105,6 +105,7 @@
     renderTestimonials(sec.testimonials);
     renderTeam(sec.team);
     renderServiceAreas(sec.serviceAreas);
+    renderNav(d);
   }
 
   /* ----------------------------------------------------------------------
@@ -268,6 +269,54 @@
         'font-size:0.85rem; font-weight:700;"' +
         (a.note ? ' title="' + esc(a.note) + '"' : "") + ">" + esc(a.name) + "</span>";
     }).join("");
+  }
+
+  /* Product menu — desktop dropdown, mobile drawer, catalogue filter pills
+     and footer. Same function as navMarkup() in server/lib/render.js; keep
+     the two identical. */
+  function navMarkup(d) {
+    var mains = Array.isArray(d.mainCategories) ? d.mainCategories : [];
+    var cats = Array.isArray(d.categories) ? d.categories : [];
+    var prods = Array.isArray(d.products) ? d.products : [];
+    function key(k) { return String(k || "").replace(/[^a-z0-9-]/gi, ""); }
+    function label(c) { return (c.icon ? esc(c.icon) + " " : "") + esc(c.name); }
+    function count(c) { return prods.filter(function (p) { return p.category === c.key; }).length; }
+    var lines = mains.map(function (m, i) {
+      return { m: m, cats: cats.filter(function (c) { return c.main === m.key || (!c.main && i === 0); }) };
+    }).filter(function (x) { return x.cats.length; });
+    var pill = 'class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;"';
+    var allCats = [];
+    lines.forEach(function (x) { allCats = allCats.concat(x.cats); });
+    return {
+      navProductsMenu: lines.map(function (x) {
+        return '<div class="dropdown-item-wrap"><button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory(\'' + key(x.m.key) + '\')">' +
+          '<span class="dropdown-icon-dot"></span><span>' + esc(x.m.name) + '</span><span class="sub-arrow">▸</span></button>' +
+          '<div class="nested-dropdown-menu">' + x.cats.map(function (c) {
+            return '<button class="dropdown-sublink" type="button" onclick="navigateToCategory(\'' + key(c.key) + '\')">' + label(c) + "</button>";
+          }).join("") + "</div></div>";
+      }).join(""),
+      mobileProductsMenu: lines.map(function (x) {
+        return '<li><button class="mobile-sub-link" type="button" onclick="goToMainCategory(\'' + key(x.m.key) + '\')">' + esc(x.m.name) + " ▾</button>" +
+          '<ul class="mobile-nested-menu">' + x.cats.map(function (c) {
+            return '<li><button class="mobile-nested-link" type="button" onclick="navigateToCategory(\'' + key(c.key) + '\')">' + label(c) + "</button></li>";
+          }).join("") + "</ul></li>";
+      }).join(""),
+      catalogFilterChips: '<button type="button" ' + pill + " onclick=\"navigateToCategory('all')\">All Models (" + prods.length + ")</button>" +
+        allCats.map(function (c) {
+          return '<button type="button" ' + pill + ' onclick="navigateToCategory(\'' + key(c.key) + '\')">' + label(c) + " (" + count(c) + ")</button>";
+        }).join(""),
+      footerProductLinks: lines.map(function (x) {
+        return '<li><button type="button" onclick="goToMainCategory(\'' + key(x.m.key) + '\')">' + esc(x.m.name) + "</button></li>";
+      }).join(""),
+    };
+  }
+
+  function renderNav(d) {
+    var parts = navMarkup(d);
+    Object.keys(parts).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = parts[id];
+    });
   }
 
   function renderFooterSister(links) {

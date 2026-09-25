@@ -207,7 +207,45 @@ function build(d) {
       (a.note ? ' title="' + esc(a.note) + '"' : "") + ">" + esc(a.name) + "</span>").join(""));
   }
 
+  for (const [id, html] of Object.entries(navMarkup(d))) {
+    if ($("#" + id).length) $("#" + id).html(html);
+  }
+
   return $.html();
+}
+
+/* Product menu — desktop dropdown, mobile drawer, catalogue filter pills and
+   footer — from the product lines and categories in the content (content-db
+   lists only those with products). apply.js has the same function for the
+   browser; keep the two identical. */
+function navMarkup(d) {
+  const mains = Array.isArray(d.mainCategories) ? d.mainCategories : [];
+  const cats = Array.isArray(d.categories) ? d.categories : [];
+  const prods = Array.isArray(d.products) ? d.products : [];
+  const key = (k) => String(k || "").replace(/[^a-z0-9-]/gi, "");
+  const under = (m, i) => cats.filter((c) => c.main === m.key || (!c.main && i === 0));
+  const lines = mains.map((m, i) => ({ m, cats: under(m, i) })).filter((x) => x.cats.length);
+  const label = (c) => (c.icon ? esc(c.icon) + " " : "") + esc(c.name);
+  const count = (c) => prods.filter((p) => p.category === c.key).length;
+  const pill = 'class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;"';
+  return {
+    navProductsMenu: lines.map(({ m, cats: cs }) =>
+      '<div class="dropdown-item-wrap"><button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory(\'' + key(m.key) + '\')">' +
+      '<span class="dropdown-icon-dot"></span><span>' + esc(m.name) + '</span><span class="sub-arrow">▸</span></button>' +
+      '<div class="nested-dropdown-menu">' + cs.map((c) =>
+        '<button class="dropdown-sublink" type="button" onclick="navigateToCategory(\'' + key(c.key) + '\')">' + label(c) + "</button>").join("") +
+      "</div></div>").join(""),
+    mobileProductsMenu: lines.map(({ m, cats: cs }) =>
+      '<li><button class="mobile-sub-link" type="button" onclick="goToMainCategory(\'' + key(m.key) + '\')">' + esc(m.name) + " ▾</button>" +
+      '<ul class="mobile-nested-menu">' + cs.map((c) =>
+        '<li><button class="mobile-nested-link" type="button" onclick="navigateToCategory(\'' + key(c.key) + '\')">' + label(c) + "</button></li>").join("") +
+      "</ul></li>").join(""),
+    catalogFilterChips: '<button type="button" ' + pill + " onclick=\"navigateToCategory('all')\">All Models (" + prods.length + ")</button>" +
+      lines.map((x) => x.cats).flat().map((c) =>
+        '<button type="button" ' + pill + ' onclick="navigateToCategory(\'' + key(c.key) + '\')">' + label(c) + " (" + count(c) + ")</button>").join(""),
+    footerProductLinks: lines.map(({ m }) =>
+      '<li><button type="button" onclick="goToMainCategory(\'' + key(m.key) + '\')">' + esc(m.name) + "</button></li>").join(""),
+  };
 }
 
 function stamp() {

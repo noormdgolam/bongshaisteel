@@ -488,17 +488,20 @@ function navigateToCategory(catKey, updateHash = true) {
   if (updateHash) updateUrlHash("category-" + catKey);
 }
 
-// Routes a Products-nav / home-card click to the shared Products view,
-// rendering either the real Prefab Buildings catalog or an honest
-// "Coming Soon" placeholder for the four product lines with no models yet.
+// Routes a product-line click (menu, footer) to the Products view: that line's
+// building types, grouped. Old links to lines that no longer exist (the former
+// "prefab", …) open the full catalogue instead of a dead end.
 function goToMainCategory(key, updateHash = true) {
   const cat = MAIN_CATEGORIES.find(c => c.key === key);
-  if (!cat) return;
+  if (!cat) { navigateToCategory("all", updateHash); return; }
   navigateToView("productsView", false);
   const title = document.getElementById("productsViewTitle");
   if (title) title.textContent = cat.name;
-  if (cat.ready) {
-    renderCatalog("all");
+  const lineCats = CATEGORIES.filter(c => c.main === key);
+  if (lineCats.length) {
+    renderCatalog("all", lineCats);
+  } else if (cat.ready && !CATEGORIES.some(c => c.main)) {
+    renderCatalog("all"); // content without line keys: one line holds everything
   } else {
     renderComingSoon(cat);
   }
@@ -527,12 +530,12 @@ function renderFeatured() {
 }
 
 // Full catalog (Products view) — grouped by category on "all", flat on a specific category
-function renderCatalog(filterCategory) {
+function renderCatalog(filterCategory, groups = CATEGORIES) {
   const container = document.getElementById("productsViewContainer");
   if (!container) return;
 
   if (filterCategory === "all") {
-    container.innerHTML = CATEGORIES.map(c => {
+    container.innerHTML = groups.map(c => {
       const items = PRODUCTS_DATA.filter(p => p.category === c.key);
       return `
         <div class="catalog-group">

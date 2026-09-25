@@ -191,39 +191,25 @@
   },
   "mainCategories": [
     {
-      "key": "prefab",
-      "name": "Prefab Buildings",
+      "key": "steel-building",
+      "name": "Steel Building",
       "icon": "🏗️",
-      "blurb": "Pre-engineered steel factories, apartment buildings, duplex homes, cottages, and container houses.",
+      "blurb": "Pre-engineered (PEB) steel buildings for industry, storage, sport and aviation.",
+      "ready": true
+    },
+    {
+      "key": "residential",
+      "name": "Residential Steel Building",
+      "icon": "🏘️",
+      "blurb": "Steel homes, cottages, container houses, hotels and staff accommodation.",
       "ready": true
     },
     {
       "key": "structure",
-      "name": "Steel Structure",
+      "name": "Structural Steel",
       "icon": "🏛️",
       "blurb": "Structural steel fabrication for industrial and commercial projects.",
-      "ready": false
-    },
-    {
-      "key": "furniture",
-      "name": "Steel Furniture",
-      "icon": "🪑",
-      "blurb": "Durable steel furniture for home, office, and industrial use.",
-      "ready": false
-    },
-    {
-      "key": "doorgate",
-      "name": "Door and Gate",
-      "icon": "🚪",
-      "blurb": "Custom steel doors and gates built to order.",
-      "ready": false
-    },
-    {
-      "key": "siteothers",
-      "name": "Others Steel Products",
-      "icon": "🔧",
-      "blurb": "Additional steel products and on-site fabrication services.",
-      "ready": false
+      "ready": true
     }
   ],
   "categories": [
@@ -232,35 +218,40 @@
       "name": "Steel Factory Building",
       "icon": "🏭",
       "blurb": "SS400/Q355 heavy portal frame, 10–50 Ton EOT crane ready, PU insulation.",
-      "image": "images/products/Model No-BH-IS-1006.webp"
-    },
-    {
-      "key": "structural",
-      "name": "Structural Steel Building",
-      "icon": "🏢",
-      "blurb": "Multi-story steel apartment towers, composite decking concrete slab, engineered to international structural standards.",
-      "image": "images/products/bh-tsb-109.webp"
+      "image": "images/products/Model No-BH-IS-1006.webp",
+      "main": "steel-building"
     },
     {
       "key": "duplex",
       "name": "Duplex Steel Building",
       "icon": "🏘️",
       "blurb": "Modern 2-story luxury steel duplexes, 4 Bed/4 Bath, 60-day rapid build.",
-      "image": "images/products/dv-104.webp"
+      "image": "images/products/dv-104.webp",
+      "main": "residential"
     },
     {
       "key": "cottage",
       "name": "Steel Cottage House",
       "icon": "🏡",
       "blurb": "Eco resort prefab cottages, fiber cement cladding, fast on-site setup.",
-      "image": "images/products/Model No-BH-CH-405.webp"
+      "image": "images/products/Model No-BH-CH-405.webp",
+      "main": "residential"
     },
     {
       "key": "container",
       "name": "Steel Container House",
       "icon": "🚢",
       "blurb": "20ft & 40ft modified container site offices & luxury homes.",
-      "image": "images/products/bh-ch-502.webp"
+      "image": "images/products/bh-ch-502.webp",
+      "main": "residential"
+    },
+    {
+      "key": "structural",
+      "name": "Structural Steel Building",
+      "icon": "🏢",
+      "blurb": "Multi-story steel apartment towers, composite decking concrete slab, engineered to international structural standards.",
+      "image": "images/products/bh-tsb-109.webp",
+      "main": "structure"
     }
   ],
   "products": [

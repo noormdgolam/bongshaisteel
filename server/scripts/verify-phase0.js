@@ -61,7 +61,8 @@ const FINGERPRINT = `(function (doc) {
   out.wa = []; each("[data-cms-wa]", function (e) { out.wa.push(e.getAttribute("href")); });
   out.containers = {};
   ["statsContainer", "trustBarContainer", "servicesGrid", "safetyPoints", "faqList", "footerSister",
-   "testimonialsList", "teamList", "serviceAreasList"].forEach(function (id) {
+   "testimonialsList", "teamList", "serviceAreasList",
+   "navProductsMenu", "mobileProductsMenu", "catalogFilterChips", "footerProductLinks"].forEach(function (id) {
     var e = doc.getElementById(id); out.containers[id] = e ? ws(e.innerHTML) : null;
   });
   out.visible = {};
@@ -78,7 +79,8 @@ const SKELETON = `(function (html) {
   var blank = function (s) { Array.prototype.forEach.call(q(s), function (e) { e.innerHTML = ""; }); };
   blank("[data-cms], [data-cms-set], [data-cms-html], title");
   ["statsContainer", "trustBarContainer", "servicesGrid", "safetyPoints", "faqList", "footerSister",
-   "testimonialsList", "teamList", "serviceAreasList"].forEach(function (id) {
+   "testimonialsList", "teamList", "serviceAreasList",
+   "navProductsMenu", "mobileProductsMenu", "catalogFilterChips", "footerProductLinks"].forEach(function (id) {
     var e = doc.getElementById(id); if (e) e.innerHTML = "";
   });
   ["testimonialsSection", "teamSection", "serviceAreasBlock"].forEach(function (id) {

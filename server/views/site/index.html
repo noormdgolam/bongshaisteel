@@ -339,43 +339,11 @@
         
         <!-- PRODUCTS MEGA DROPDOWN -->
         <li class="nav-item">
-          <button class="nav-link" type="button" onclick="goToMainCategory('prefab')" aria-haspopup="true" aria-expanded="false">
+          <button class="nav-link" type="button" onclick="navigateToCategory('all')" aria-haspopup="true" aria-expanded="false">
             <span data-cms="nav.products">Products</span>
             <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
-          <div class="dropdown-menu" role="menu">
-            <div class="dropdown-item-wrap">
-              <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('prefab')">
-                <span class="dropdown-icon-dot"></span>
-                <span data-cms="nav.cat.prefab">Prefab Buildings</span>
-                <span class="sub-arrow">▸</span>
-              </button>
-              <div class="nested-dropdown-menu">
-                <button class="dropdown-sublink" type="button" onclick="navigateToCategory('factory')">🏭 Steel Factory Building</button>
-                <button class="dropdown-sublink" type="button" onclick="navigateToCategory('structural')">🏢 Structural Steel Building</button>
-                <button class="dropdown-sublink" type="button" onclick="navigateToCategory('duplex')">🏘️ Duplex Steel Building</button>
-                <button class="dropdown-sublink" type="button" onclick="navigateToCategory('cottage')">🏡 Steel Cottage House</button>
-                <button class="dropdown-sublink" type="button" onclick="navigateToCategory('container')">🚢 Steel Container House</button>
-              </div>
-            </div>
-
-            <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('structure')">
-              <span class="dropdown-icon-dot"></span>
-              <span data-cms="nav.cat.structure">Steel Structure</span>
-            </button>
-            <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('furniture')">
-              <span class="dropdown-icon-dot"></span>
-              <span data-cms="nav.cat.furniture">Steel Furniture</span>
-            </button>
-            <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('doorgate')">
-              <span class="dropdown-icon-dot"></span>
-              <span data-cms="nav.cat.doorgate">Door and Gate</span>
-            </button>
-            <button class="dropdown-link" type="button" role="menuitem" onclick="goToMainCategory('siteothers')">
-              <span class="dropdown-icon-dot"></span>
-              <span data-cms="nav.cat.siteothers">Others Steel Products</span>
-            </button>
-          </div>
+          <div class="dropdown-menu" role="menu" id="navProductsMenu"></div>
         </li>
 
         <li class="nav-item">
@@ -410,23 +378,8 @@
       <ul class="mobile-menu">
         <li><button class="mobile-link" type="button" onclick="navigateToView('homeView')"><span data-cms="nav.home">Home</span></button></li>
         <li>
-          <button class="mobile-link" type="button" onclick="goToMainCategory('prefab')">Products</button>
-          <ul class="mobile-sub-menu">
-            <li>
-              <button class="mobile-sub-link" type="button" onclick="goToMainCategory('prefab')">Prefab Buildings ▾</button>
-              <ul class="mobile-nested-menu">
-                <li><button class="mobile-nested-link" type="button" onclick="navigateToCategory('factory')">🏭 Steel Factory Building</button></li>
-                <li><button class="mobile-nested-link" type="button" onclick="navigateToCategory('structural')">🏢 Structural Steel Building</button></li>
-                <li><button class="mobile-nested-link" type="button" onclick="navigateToCategory('duplex')">🏘️ Duplex Steel Building</button></li>
-                <li><button class="mobile-nested-link" type="button" onclick="navigateToCategory('cottage')">🏡 Steel Cottage House</button></li>
-                <li><button class="mobile-nested-link" type="button" onclick="navigateToCategory('container')">🚢 Steel Container House</button></li>
-              </ul>
-            </li>
-            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('structure')">Steel Structure</button></li>
-            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('furniture')">Steel Furniture</button></li>
-            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('doorgate')">Door and Gate</button></li>
-            <li><button class="mobile-sub-link" type="button" onclick="goToMainCategory('siteothers')">Others Steel Products</button></li>
-          </ul>
+          <button class="mobile-link" type="button" onclick="navigateToCategory('all')">Products</button>
+          <ul class="mobile-sub-menu" id="mobileProductsMenu"></ul>
         </li>
         <li><button class="mobile-link" type="button" onclick="navigateToView('servicesView')"><span data-cms="nav.services">Services</span></button></li>
         <li><button class="mobile-link" type="button" onclick="navigateToView('safetyView')">Health & Safety Policy</button></li>
@@ -454,7 +407,7 @@
           <p class="hero-description" data-cms="hero.description">Bongshai Steel is a Bangladesh-based manufacturer and exporter of pre-engineered steel buildings — 72 models across factory sheds, duplex villas, cottages, and container houses. All structures are engineered to AISC 360, Eurocode 3, and BNBC 2020 standards.</p>
           <p style="font-size: 0.82rem; color: #94a3b8; margin: 0 0 1.5rem 0;" data-cms-html="hero.byline"><time datetime="2026-08-08">Last updated: August 8, 2026</time> · Reviewed & Approved by <strong>SMA Awal, Chief Engineer</strong>, Bongshai Steel</p>
           <div class="hero-buttons">
-            <button class="btn-primary-hero" onclick="goToMainCategory('prefab')" data-cms="hero.btnPrimary">Explore Full Catalog</button>
+            <button class="btn-primary-hero" onclick="navigateToCategory('all')" data-cms="hero.btnPrimary">Explore Full Catalog</button>
             <button class="btn-secondary-hero" onclick="openQuoteModal()" data-cms="hero.btnSecondary">Request Custom Quote</button>
           </div>
         </div>
@@ -639,7 +592,7 @@
         </div>
         <div class="products-grid" id="featuredGrid"></div>
         <div style="text-align:center; margin-top:45px;">
-          <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="goToMainCategory('prefab')">Browse Complete Catalog (72 Models)</button>
+          <button class="btn-primary-hero" style="border:none; cursor:pointer;" onclick="navigateToCategory('all')">Browse Complete Catalog (72 Models)</button>
         </div>
       </div>
     </section>
@@ -671,14 +624,7 @@
       </div>
 
       <!-- Quick Category Filter Pills -->
-      <div style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:40px;">
-        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('all')">All Models (72)</button>
-        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('factory')">🏭 Factory (12)</button>
-        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('structural')">🏢 Structural (12)</button>
-        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('duplex')">🏘️ Duplex (12)</button>
-        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('cottage')">🏡 Cottage (24)</button>
-        <button type="button" class="btn-secondary-hero" style="padding:8px 18px; font-size:0.88rem; border-radius:20px;" onclick="navigateToCategory('container')">🚢 Container (12)</button>
-      </div>
+      <div id="catalogFilterChips" style="display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:40px;"></div>
 
       <div id="productsViewContainer"></div>
     </div>
@@ -852,13 +798,7 @@
 
       <div class="footer-col">
         <h4>Products</h4>
-        <ul class="footer-links">
-          <li><button type="button" onclick="goToMainCategory('prefab')">Prefab Buildings</button></li>
-          <li><button type="button" onclick="goToMainCategory('structure')">Steel Structure</button></li>
-          <li><button type="button" onclick="goToMainCategory('furniture')">Steel Furniture</button></li>
-          <li><button type="button" onclick="goToMainCategory('doorgate')">Door and Gate</button></li>
-          <li><button type="button" onclick="goToMainCategory('siteothers')">Others Steel Products</button></li>
-        </ul>
+        <ul class="footer-links" id="footerProductLinks">        </ul>
       </div>
 
       <div class="footer-col">
