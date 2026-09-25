@@ -37,4 +37,8 @@ RewriteRule ^(server|deploy|node_modules|tools)(/|$) - [F,L]
 RewriteCond %{REQUEST_URI} !^/\.well-known/
 RewriteRule (^|/)\. - [F,L]
 RewriteRule ^data/leads\.json$ - [F,L]
+# /lead.php and /counter.php are Node routes (no such files exist here).
+RewriteCond %{REQUEST_URI} !^/(lead|counter)\.php$
 RewriteRule \.(php|sh|sql|gz|log|env|md|yml)$ - [F,L]
+# Files the deploy set aside (*.retired-<stamp>) are for rollback, not visitors.
+RewriteRule \.retired-\d+$ - [F,L]

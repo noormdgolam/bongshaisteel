@@ -1,5 +1,7 @@
 # Cutover: static site → Node app
 
+**Status: LIVE since 2026-09-25 (deploy 3e1f8df + boot fix).** Rollback below still applies.
+
 What changes for visitors: nothing visible, except that the quote form works
 again (live `main` has no `lead.php`, so quote requests are dropped today) and
 72 product pages plus a 79-URL sitemap appear.
