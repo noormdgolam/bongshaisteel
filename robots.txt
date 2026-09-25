@@ -3,6 +3,7 @@
 # --- All bots: default allow ---
 User-agent: *
 Allow: /
+Disallow: /admin/
 
 # --- AI Search-Augmented Crawlers (allow — these drive AI citations) ---
 User-agent: GPTBot
