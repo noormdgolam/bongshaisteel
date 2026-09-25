@@ -117,6 +117,12 @@ function build(d) {
     });
   }
 
+  // data-cms-tel: tel: link from settings.hotline (digits and a leading +)
+  if (settings.hotline) {
+    const tel = String(settings.hotline).replace(/[^0-9+]/g, "");
+    if (tel) $("[data-cms-tel]").attr("href", "tel:" + tel);
+  }
+
   /* ---- repeatable blocks ---- */
   const stats = sec.stats;
   if ($("#statsContainer").length && Array.isArray(stats)) {

@@ -1341,6 +1341,26 @@ button.cat-card {
   color: #64748b;
 }
 
+/* Floating call button: phones only, stacked above the WhatsApp button. */
+.call-widget {
+  position: fixed;
+  bottom: 104px;
+  right: 34px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: var(--primary-navy);
+  color: #ffffff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(4, 102, 200, 0.4);
+  z-index: 2500;
+  text-decoration: none;
+}
+.call-widget svg { width: 26px; height: 26px; fill: currentColor; }
+@media (max-width: 768px) { .call-widget { display: flex; } }
+
 /* Floating WhatsApp Widget */
 .whatsapp-widget {
   position: fixed;

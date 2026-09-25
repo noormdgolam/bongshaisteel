@@ -88,6 +88,12 @@
       if (v && typeof v === "string") applyImg(el, v, d);
     });
 
+    // data-cms-tel      -> tel: link from settings.hotline
+    if (settings.hotline) {
+      var tel = String(settings.hotline).replace(/[^0-9+]/g, "");
+      if (tel) each("[data-cms-tel]", function (a) { a.setAttribute("href", "tel:" + tel); });
+    }
+
     // data-cms-wa       -> rewrite wa.me/<number> in href from settings
     if (settings.whatsappNumber) {
       each("[data-cms-wa]", function (a) {
