@@ -516,6 +516,113 @@ try {
   assert(catFormEdit.includes("Edit Category: Towers"));
   assert(catFormEdit.includes("This category still has 3 products — move them to another category first."));
 
+  // media/list.njk - normal
+  const mediaNormal = render("admin/media/list.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "media",
+    items: [
+      {
+        path: "images/products/Model No-BH-IS-1001.webp",
+        name: "Model No-BH-IS-1001.webp",
+        bytes: 45000,
+        modified: new Date(),
+        variants: [400, 700],
+        usedBy: ["Product BH-IS-1001"]
+      },
+      {
+        path: "images/misc/banner.webp",
+        name: "banner.webp",
+        bytes: 85000,
+        modified: new Date(),
+        variants: [400],
+        usedBy: []
+      }
+    ],
+    uploaded: "images/misc/banner.webp",
+    maxMB: 8,
+    available: true,
+    notice: "Notice text",
+    error: null
+  });
+  assert(mediaNormal.includes("Model No-BH-IS-1001.webp"));
+  assert(mediaNormal.includes("banner.webp"));
+  assert(mediaNormal.includes("Just uploaded"));
+
+  // media/list.njk - empty
+  const mediaEmpty = render("admin/media/list.njk", {
+    adminName: "Munna",
+    adminRole: "editor",
+    csrfToken: "csrf-token-123",
+    active: "media",
+    items: [],
+    uploaded: null,
+    maxMB: 8,
+    available: true
+  });
+  assert(mediaEmpty.includes("No media files uploaded yet."));
+
+  // media/list.njk - available: false
+  const mediaUnavailable = render("admin/media/list.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "media",
+    items: [],
+    uploaded: null,
+    maxMB: 8,
+    available: false
+  });
+  assert(mediaUnavailable.includes("Image processing is currently unavailable"));
+
+  // backups/list.njk - normal
+  const backupsNormal = render("admin/backups/list.njk", {
+    adminName: "Munna",
+    adminRole: "superadmin",
+    csrfToken: "csrf-token-123",
+    active: "backups",
+    snapshots: [
+      {
+        id: 1,
+        created_at: new Date(),
+        admin_name: "Munna",
+        reason: "manual",
+        note: "Initial snapshot",
+        bytes: 102400,
+        counts: { products: 12, categories: 3, sections: 10 }
+      },
+      {
+        id: 2,
+        created_at: new Date(),
+        admin_name: null,
+        reason: "auto",
+        note: null,
+        bytes: 103000,
+        counts: null
+      }
+    ],
+    keep: 60,
+    autoGapMinutes: 30,
+    notice: null,
+    error: null
+  });
+  assert(backupsNormal.includes("#1"));
+  assert(backupsNormal.includes("Initial snapshot"));
+  assert(backupsNormal.includes("system"));
+
+  // backups/list.njk - empty
+  const backupsEmpty = render("admin/backups/list.njk", {
+    adminName: "Munna",
+    adminRole: "admin",
+    csrfToken: "csrf-token-123",
+    active: "backups",
+    snapshots: [],
+    keep: 60,
+    autoGapMinutes: 30
+  });
+  assert(backupsEmpty.includes("No backups recorded yet."));
+
   pass("1. Render without throwing", "all templates render normal and empty fixtures");
 } catch (err) {
   fail("1. Render without throwing", err);
@@ -792,6 +899,31 @@ try {
         category: { id: 25, key: "c25", name: "Cat 25" },
         mainCategories: [],
         productCount: 0
+      })
+    },
+    {
+      name: "admin/media/list.njk (upload & delete forms)",
+      html: render("admin/media/list.njk", {
+        adminName: "Admin",
+        adminRole: "admin",
+        csrfToken: token,
+        active: "media",
+        items: [{ path: "images/misc/test.webp", name: "test.webp", bytes: 1000, modified: new Date(), variants: [], usedBy: [] }],
+        uploaded: null,
+        maxMB: 8,
+        available: true
+      })
+    },
+    {
+      name: "admin/backups/list.njk (create & restore forms)",
+      html: render("admin/backups/list.njk", {
+        adminName: "Admin",
+        adminRole: "superadmin",
+        csrfToken: token,
+        active: "backups",
+        snapshots: [{ id: 42, created_at: new Date(), admin_name: "Admin", reason: "manual", note: "Test", bytes: 50000, counts: null }],
+        keep: 60,
+        autoGapMinutes: 30
       })
     }
   ];
@@ -1967,6 +2099,238 @@ try {
   pass("29. Role-based navigation for Categories link", "superadmin/admin/editor visible, sales hidden");
 } catch (err) {
   fail("29. Role-based navigation for Categories link", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 30: Hostile strings in media and backups templates render escaped
+// ---------------------------------------------------------------------
+try {
+  const hostileScript = '"><script>alert("xss")</script>';
+  const hostileTextarea = '</textarea><script>alert("textarea")</script>';
+
+  // Media list hostile
+  const mediaHtml = render("admin/media/list.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "media",
+    items: [{
+      path: hostileScript,
+      name: hostileScript,
+      bytes: 2048,
+      modified: new Date(),
+      variants: [],
+      usedBy: [hostileScript]
+    }],
+    uploaded: hostileScript,
+    maxMB: 8,
+    available: true
+  });
+  assert(!mediaHtml.includes('<script>alert('), "Hostile script must NOT execute unescaped in media/list.njk");
+
+  // Backups list hostile
+  const backupsHtml = render("admin/backups/list.njk", {
+    adminName: "Admin",
+    adminRole: "superadmin",
+    csrfToken: "t",
+    active: "backups",
+    snapshots: [{
+      id: 99,
+      created_at: new Date(),
+      admin_name: hostileScript,
+      reason: "manual",
+      note: hostileTextarea,
+      bytes: 4096,
+      counts: null
+    }],
+    keep: 60,
+    autoGapMinutes: 30
+  });
+  assert(!backupsHtml.includes('<script>alert('), "Hostile script must NOT execute unescaped in backups/list.njk");
+
+  pass("30. Hostile strings in media & backups templates escaped", "name, path, usedBy, admin_name, and note safely escaped");
+} catch (err) {
+  fail("30. Hostile strings in media & backups templates escaped", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 31: Upload form enctype and file input configuration
+// ---------------------------------------------------------------------
+try {
+  const html = render("admin/media/list.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t-upload",
+    active: "media",
+    items: [],
+    uploaded: null,
+    maxMB: 8,
+    available: true
+  });
+  const $ = cheerio.load(html);
+  const uploadForm = $('form[action="/admin/media"]');
+  assert.strictEqual(uploadForm.length, 1, "Expected exactly 1 upload form targeting /admin/media");
+  assert.strictEqual(uploadForm.attr("enctype"), "multipart/form-data", "Upload form must have enctype='multipart/form-data'");
+  assert.strictEqual((uploadForm.attr("method") || "").toLowerCase(), "post", "Upload form method must be POST");
+
+  const fileInput = uploadForm.find('input[type="file"][name="file"]');
+  assert.strictEqual(fileInput.length, 1, "Upload form must contain input[type='file'][name='file']");
+  assert(fileInput.attr("required") !== undefined, "File input must be required");
+
+  pass("31. Upload form enctype and file input configuration", "enctype='multipart/form-data', method=post, file input named 'file' and required");
+} catch (err) {
+  fail("31. Upload form enctype and file input configuration", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 32: Media delete forms logic & lesson 1 constraint
+// ---------------------------------------------------------------------
+try {
+  const html = render("admin/media/list.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t-delete",
+    active: "media",
+    items: [
+      { path: "images/used.webp", name: "used.webp", bytes: 5000, modified: new Date(), variants: [], usedBy: ["Product BH-100"] },
+      { path: "images/unused1.webp", name: "unused1.webp", bytes: 6000, modified: new Date(), variants: [], usedBy: [] },
+      { path: "images/unused2.webp", name: "unused2.webp", bytes: 7000, modified: new Date(), variants: [], usedBy: [] }
+    ],
+    uploaded: null,
+    maxMB: 8,
+    available: true
+  });
+
+  const $ = cheerio.load(html);
+  const deleteForms = $('form[action="/admin/media/delete"]');
+  assert.strictEqual(deleteForms.length, 2, "Expected exactly 2 delete forms for the 2 unused items");
+
+  const pathsInForms = [];
+  deleteForms.each((i, el) => {
+    const pathVal = $(el).find('input[name="path"]').val();
+    pathsInForms.push(pathVal);
+    assert.strictEqual($(el).find('input[name="_csrf"]').val(), "t-delete");
+    assert($(el).attr("onsubmit") && $(el).attr("onsubmit").includes("confirm("), "Delete form must have confirmation prompt");
+  });
+
+  assert(!pathsInForms.includes("images/used.webp"), "Item with usedBy must NOT have a delete form");
+  assert(pathsInForms.includes("images/unused1.webp"));
+  assert(pathsInForms.includes("images/unused2.webp"));
+
+  // Verify Lesson 1: Each media path appears in at most one delete form
+  const pathOccurrences = {};
+  for (const p of pathsInForms) {
+    pathOccurrences[p] = (pathOccurrences[p] || 0) + 1;
+    assert.strictEqual(pathOccurrences[p], 1, `Path ${p} appeared more than once in delete forms! Single markup required.`);
+  }
+
+  pass("32. Media delete forms logic & single markup constraint", "each media path appears in at most one delete form; usedBy items have none");
+} catch (err) {
+  fail("32. Media delete forms logic & single markup constraint", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 33: available: false disables upload form submit and file input
+// ---------------------------------------------------------------------
+try {
+  const html = render("admin/media/list.njk", {
+    adminName: "Admin",
+    adminRole: "admin",
+    csrfToken: "t",
+    active: "media",
+    items: [],
+    uploaded: null,
+    maxMB: 8,
+    available: false
+  });
+  const $ = cheerio.load(html);
+  const uploadForm = $('form[action="/admin/media"]');
+  const fileInput = uploadForm.find('input[name="file"]');
+  const submitBtn = uploadForm.find('button[type="submit"]');
+
+  assert(fileInput.is(":disabled"), "File input must be disabled when available is false");
+  assert(submitBtn.is(":disabled"), "Submit button must be disabled when available is false");
+
+  pass("33. available: false disables upload controls", "file input and submit button disabled when image processing is unavailable");
+} catch (err) {
+  fail("33. available: false disables upload controls", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 34: Each snapshot has exactly one restore form with confirm()
+// ---------------------------------------------------------------------
+try {
+  const token = "t-restore";
+  const snapshotsList = [
+    { id: 101, created_at: new Date(), admin_name: "Munna", reason: "manual", note: "N1", bytes: 1000, counts: null },
+    { id: 102, created_at: new Date(), admin_name: "Admin", reason: "auto", note: "N2", bytes: 2000, counts: null },
+    { id: 103, created_at: new Date(), admin_name: null, reason: "before-restore", note: "N3", bytes: 3000, counts: null }
+  ];
+
+  const html = render("admin/backups/list.njk", {
+    adminName: "Admin",
+    adminRole: "superadmin",
+    csrfToken: token,
+    active: "backups",
+    snapshots: snapshotsList,
+    keep: 60,
+    autoGapMinutes: 30
+  });
+
+  const $ = cheerio.load(html);
+
+  for (const s of snapshotsList) {
+    const restoreForms = $(`form[action="/admin/backups/${s.id}/restore"]`);
+    assert.strictEqual(restoreForms.length, 1, `Snapshot #${s.id} must have exactly one restore form`);
+    assert.strictEqual((restoreForms.attr("method") || "").toLowerCase(), "post");
+    assert.strictEqual(restoreForms.find('input[name="_csrf"]').val(), token);
+    const onsubmit = restoreForms.attr("onsubmit") || "";
+    assert(onsubmit.includes("confirm("), `Restore form for #${s.id} must have confirm() prompt`);
+    assert(onsubmit.includes(`snapshot #${s.id}`), `Restore confirm text should reference snapshot #${s.id}`);
+  }
+
+  pass("34. Exactly one restore form with confirm() per snapshot", "all snapshots have exactly 1 POST restore form with CSRF and confirm()");
+} catch (err) {
+  fail("34. Exactly one restore form with confirm() per snapshot", err);
+}
+
+// ---------------------------------------------------------------------
+// Check 35: Media and Backups sidebar links role-based visibility
+// ---------------------------------------------------------------------
+try {
+  const roles = ["superadmin", "admin", "editor", "sales"];
+  const mediaResults = {};
+  const backupsResults = {};
+
+  for (const role of roles) {
+    const html = render("admin/dashboard.njk", {
+      adminName: "Test User",
+      adminRole: role,
+      csrfToken: "token",
+      active: "dashboard",
+      stats: {},
+      recentActivity: []
+    });
+    const $ = cheerio.load(html);
+    mediaResults[role] = $('a[href="/admin/media"]').length > 0;
+    backupsResults[role] = $('a[href="/admin/backups"]').length > 0;
+  }
+
+  // Media: superadmin/admin/editor visible, sales hidden
+  assert.strictEqual(mediaResults.superadmin, true, "Media link must appear for superadmin");
+  assert.strictEqual(mediaResults.admin, true, "Media link must appear for admin");
+  assert.strictEqual(mediaResults.editor, true, "Media link must appear for editor");
+  assert.strictEqual(mediaResults.sales, false, "Media link must NOT appear for sales");
+
+  // Backups: superadmin/admin visible, editor/sales hidden
+  assert.strictEqual(backupsResults.superadmin, true, "Backups link must appear for superadmin");
+  assert.strictEqual(backupsResults.admin, true, "Backups link must appear for admin");
+  assert.strictEqual(backupsResults.editor, false, "Backups link must NOT appear for editor");
+  assert.strictEqual(backupsResults.sales, false, "Backups link must NOT appear for sales");
+
+  pass("35. Role-based navigation for Media and Backups links", "Media: superadmin/admin/editor; Backups: superadmin/admin only");
+} catch (err) {
+  fail("35. Role-based navigation for Media and Backups links", err);
 }
 
 console.log("\n-------------------------------------------------");
