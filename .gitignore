@@ -41,3 +41,6 @@ counter.txt
 
 # Node runtime state (lead fallback, counters) — never committed, never public
 /server/var/
+/server/backups/
+/server/tmp/
+/server/_cron/*.log

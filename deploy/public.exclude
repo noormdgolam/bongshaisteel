@@ -1,0 +1,23 @@
+# rsync exclude list: what never goes to the docroot (see cpanel-deploy.sh).
+# The Node app — deployed to APPROOT instead.
+/server/
+# Deploy tooling, VCS and editor/agent folders.
+/deploy/
+/.git/
+/.gitignore
+/.cpanel.yml
+/.agents/
+/.claude/
+/tools/
+# Notes for people, not for visitors.
+*.md
+# Would hide a Node route if present (the deploy script also moves any aside).
+/index.html
+/lead.php
+/counter.php
+/sitemap.xml
+# Runtime data that belongs to the host copy, never overwritten from git.
+/data/content.json
+/data/leads.json
+/images/uploads/
+/counter.txt

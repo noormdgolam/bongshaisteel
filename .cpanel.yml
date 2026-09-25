@@ -1,0 +1,6 @@
+---
+# cPanel Git Version Control runs this on "Deploy HEAD Commit".
+# All the logic, and its safety checks, are in deploy/cpanel-deploy.sh.
+deployment:
+  tasks:
+    - /bin/bash deploy/cpanel-deploy.sh

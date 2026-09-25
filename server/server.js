@@ -272,9 +272,16 @@ app.use((err, req, res, next) => {
 });
 
 if (require.main === module) {
-  // Load the content before taking traffic. init() resolves even when the
-  // database is down (it falls back to the file), so this never blocks boot.
-  content.init().then((info) => {
+  // Apply any pending migrations first (a deploy that adds a table then needs
+  // no manual step), then load the content before taking traffic. Neither
+  // blocks boot: a failed migration is logged, and init() falls back to the
+  // file when the database is down.
+  const migrate = content.SOURCE === "db"
+    ? require("./lib/db").migrate.latest()
+      .then(([batch, log]) => { if (log.length) console.log("migrations applied (batch " + batch + "): " + log.join(", ")); })
+      .catch((err) => console.error("migrations:", err.message))
+    : Promise.resolve();
+  migrate.then(() => content.init()).then((info) => {
     app.listen(PORT, () => console.log("Bongshai Steel listening on " + PORT + ", content from " + info.source));
   });
 }

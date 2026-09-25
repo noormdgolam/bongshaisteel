@@ -1,0 +1,33 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+# Written by cPanel's Node.js Selector when the app is created (CUTOVER.md,
+# step 3). Its values are copied here so a deploy does not wipe them — if
+# cPanel shows different ones, cPanel is right: copy its block over this one.
+PassengerAppRoot "/home/abongsha/bongshai-steel-node"
+PassengerBaseURI "/"
+PassengerNodejs "/home/abongsha/nodevenv/bongshai-steel-node/22/bin/node"
+PassengerAppType node
+PassengerStartupFile server.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+
+# Bongshai Steel — docroot rules.
+#
+# LiteSpeed answers any request that matches a file on disk before Passenger
+# sees it. That is right for images, styles and scripts, and it is why this
+# folder must never contain index.html, lead.php, counter.php or sitemap.xml:
+# Node serves those URLs, and a file of the same name would silently win.
+
+RewriteEngine On
+
+# One canonical origin, for static files too (Node redirects its own pages).
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://www.bongshaisteel.com/$1 [R=301,L]
+RewriteCond %{HTTP_HOST} ^bongshaisteel\.com$ [NC]
+RewriteRule ^(.*)$ https://www.bongshaisteel.com/$1 [R=301,L]
+
+# Never hand out anything that is not part of the public site, even if a
+# deploy mistake copies it here: app source, runtime data, VCS and dotfiles.
+RewriteRule ^(server|deploy|node_modules)(/|$) - [F,L]
+RewriteCond %{REQUEST_URI} !^/\.well-known/
+RewriteRule (^|/)\. - [F,L]
+RewriteRule ^data/leads\.json$ - [F,L]
+RewriteRule \.(php|sh|sql|gz|log|env|md|yml)$ - [F,L]
