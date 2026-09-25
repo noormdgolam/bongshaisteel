@@ -114,16 +114,39 @@ const leadBody = [
   express.urlencoded({ extended: false, limit: "16kb" }),
   express.json({ limit: "16kb" }),
 ];
+/* app.js posts with fetch and reads JSON. A plain HTML form (the catalogue's
+   product pages, or any form with JavaScript off) gets a small page instead of
+   raw JSON: a browser navigating sends Accept: text/html, fetch sends a wildcard. */
+const escHtml = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+function leadPage(res, status, heading, text, back) {
+  const href = /^\/[\w\-/]*$/.test(back || "") ? back : "/";
+  res.status(status).type("html").send("<!doctype html><html lang=en><meta charset=utf-8>" +
+    "<meta name=viewport content='width=device-width,initial-scale=1'><meta name=robots content=noindex>" +
+    "<title>" + escHtml(heading) + " | Bongshai Steel</title><link rel=stylesheet href='/styles.css'>" +
+    "<main class=container style='max-width:640px;padding:80px 20px;text-align:center'>" +
+    "<h1 class=section-title>" + escHtml(heading) + "</h1><p style='margin:16px 0 28px'>" + escHtml(text) + "</p>" +
+    "<a class=btn-primary-hero href='" + escHtml(href) + "'>Back</a></main></html>");
+}
 app.post("/lead.php", leadBody, async (req, res) => {
   res.set("Cache-Control", "no-store");
+  const wantsPage = /text\/html/.test(req.get("accept") || "");
+  let back = "/";
+  try { const ref = new URL(req.get("referer") || "", "https://x.invalid"); if (ref.host === req.get("host")) back = ref.pathname; } catch { /* keep / */ }
   try {
     const out = await leads.record(req.body, { ip: req.ip, agent: req.get("user-agent") });
+    if (wantsPage) {
+      return leadPage(res, 200, "Thank you — request received",
+        "Our engineering team will contact you shortly" + (req.body && req.body.phone ? " on " + String(req.body.phone).slice(0, 40) : "") + ".", back);
+    }
     res.json({ ok: true, stored: out.stored });
   } catch (err) {
     if (err instanceof leads.LeadError) {
+      if (wantsPage) return leadPage(res, err.status, "Please check the form", err.message, back);
       return res.status(err.status).json({ ok: false, error: err.code, message: err.message });
     }
     console.error("lead.php:", err);
+    if (wantsPage) return leadPage(res, 500, "Not sent", "Could not save that just now. Please call or WhatsApp us instead.", back);
     res.status(500).json({ ok: false, error: "server", message: "Could not save that just now." });
   }
 });
