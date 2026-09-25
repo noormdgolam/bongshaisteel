@@ -51,7 +51,18 @@ module.exports = function createCatalogRouter(options = {}) {
 
   const router = express.Router();
 
+  /* The product menu for the layout: lines that have visible categories, in
+     order (content-db already hides empty ones). Same data as navMarkup(). */
+  function navLines(content) {
+    const mains = Array.isArray(content.mainCategories) ? content.mainCategories : [];
+    const cats = Array.isArray(content.categories) ? content.categories : [];
+    return mains
+      .map((m, i) => ({ key: m.key, name: m.name, cats: cats.filter((c) => c.main === m.key || (!c.main && i === 0)) }))
+      .filter((l) => l.cats.length);
+  }
+
   function renderView(res, next, viewName, context) {
+    context = { navLines: navLines(getContent() || {}), ...context };
     env.render(viewName, context, (err, html) => {
       if (err) return next(err);
       res.setHeader("Content-Type", "text/html; charset=utf-8");
@@ -95,6 +106,33 @@ module.exports = function createCatalogRouter(options = {}) {
       };
 
       renderView(res, next, "index.njk", context);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Completed projects: GET /projects — from the database (options.getProjects);
+  // "not mine" when the app runs without one.
+  router.get("/projects", async (req, res, next) => {
+    if (typeof options.getProjects !== "function") return next();
+    try {
+      const content = getContent();
+      const origin = siteOrigin(content);
+      const all = await options.getProjects();
+      const withImage = (p) => ({ ...p, imageSrc: p.image ? buildSrcset(p.image, content.media) : null });
+      const steel = all.filter((p) => p.delivered_by === "steel").map(withImage);
+      const engineering = all.filter((p) => p.delivered_by === "engineering").map(withImage);
+      const clients = [...new Set(engineering.map((p) => p.client).filter(Boolean))];
+      renderView(res, next, "projects.njk", {
+        steel, engineering, clients,
+        pageTitle: "Completed Projects | Bongshai Steel",
+        pageDescription: "Steel buildings delivered by Bongshai Steel across Bangladesh, and the Bongshai Group's completed engineering projects since 2008.",
+        canonicalUrl: origin + "/projects",
+        ogTitle: "Completed Projects | Bongshai Steel",
+        ogDescription: steel.length + " steel buildings and " + engineering.length + " engineering projects delivered by the Bongshai Group.",
+        settings: content.settings || {},
+        currentNav: "projects",
+      });
     } catch (err) {
       next(err);
     }

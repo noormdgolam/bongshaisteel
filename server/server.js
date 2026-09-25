@@ -187,7 +187,13 @@ if (content.SOURCE === "db") {
 /* Server-rendered catalogue: /products, /products/:modelCode, /category/:key.
    Built in server/catalog/ (Antigravity's lane). Unknown slugs call next(),
    so they fall through to the HTML 404 below. */
-app.use(createCatalogRouter({ getContent: content.load }));
+app.use(createCatalogRouter({
+  getContent: content.load,
+  // Projects live only in the database; without it /projects is a 404.
+  getProjects: content.SOURCE === "db"
+    ? () => require("./lib/db")("projects").where({ published: true }).orderBy("sort_order").orderBy("id")
+    : null,
+}));
 
 /* Sitemap: the home page plus every catalogue URL, generated from the same
    content the pages render from, so it can never list a page that 404s.
@@ -207,6 +213,7 @@ app.get("/sitemap.xml", (req, res, next) => {
     const entries = [
       { loc: origin + "/", lastmod: homeMod, changefreq: "weekly", priority: "1.0" },
       ...catalogSitemap({ baseUrl: origin, getContent: () => data }),
+      ...(content.SOURCE === "db" ? [{ loc: origin + "/projects", lastmod: today, changefreq: "monthly", priority: "0.7" }] : []),
     ];
     const body = entries.map((e) =>
       "  <url>\n" +
