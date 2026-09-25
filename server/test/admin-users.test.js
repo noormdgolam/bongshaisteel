@@ -61,7 +61,7 @@ function forms(html) {
         if (!name) return;
         if (e.attr("disabled") !== undefined) { disabled.push(name); return; }
         const type = (e.attr("type") || "").toLowerCase();
-        if (type === "checkbox" || type === "radio") { if (e.attr("checked") !== undefined) fields[name] = e.attr("value") || "on"; return; }
+        if (type === "checkbox" || type === "radio") { if (e.attr("checked") !== undefined) fields[name] = e.attr("value") ?? "on"; return; }
         if (el.tagName === "select") { fields[name] = e.find("option[selected]").attr("value") ?? e.find("option").first().attr("value") ?? ""; return; }
         fields[name] = el.tagName === "textarea" ? e.text() : (e.attr("value") ?? "");
       });
