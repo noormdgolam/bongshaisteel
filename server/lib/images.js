@@ -122,7 +122,12 @@ function removeUpload(relPath) {
   const files = [m[1] + "." + m[2], ...VARIANTS.map((w) => m[1] + "-" + w + "w.webp")];
   let removed = 0;
   for (const f of files) {
-    try { fs.unlinkSync(path.join(UPLOAD_DIR, f)); removed++; } catch { /* not there */ }
+    try {
+      fs.unlinkSync(path.join(UPLOAD_DIR, f));
+      removed++;
+    } catch (err) {
+      if (err.code !== "ENOENT") throw new ImageError("Could not delete " + f + " (" + err.code + ").");
+    }
   }
   if (!removed) throw new ImageError("That file does not exist.");
   return removed;

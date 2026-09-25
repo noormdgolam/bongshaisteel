@@ -3,9 +3,11 @@
 {% block title %}Content Backups — Bongshai Steel Admin{% endblock %}
 
 {% block header %}
-<div class="topbar-title">
-  <h1>Content Backups</h1>
-  <span class="badge" style="background:var(--grey-100); color:var(--grey-700); font-weight:600;">{{ snapshots.length if snapshots else 0 }} snapshots</span>
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; width:100%;">
+  <div>
+    <h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">Content Backups</h1>
+    <div style="font-size:0.85rem; color:var(--grey-500); margin-top:2px;">{{ snapshots.length if snapshots else 0 }} snapshot{{ "" if snapshots and snapshots.length == 1 else "s" }} — restore puts the whole site content back as it was</div>
+  </div>
 </div>
 {% endblock %}
 
@@ -162,7 +164,7 @@
       <label for="snapshotNoteInput" style="display:block; font-size:0.85rem; font-weight:600; color:var(--grey-700); margin-bottom:6px;">
         Note (optional)
       </label>
-      <input type="text" id="snapshotNoteInput" name="note" maxlength="255" placeholder="e.g. Before changing hero banner" class="form-control" style="width:100%;">
+      <input type="text" id="snapshotNoteInput" name="note" maxlength="255" placeholder="e.g. Before changing hero banner" style="width:100%; padding:10px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.95rem; background:rgba(255,255,255,0.95);">
     </div>
     <button type="submit" class="btn btn-primary" style="white-space:nowrap;">
       Take Snapshot
@@ -215,7 +217,7 @@
           {% endif %}
         </td>
         <td data-label="Note" style="word-break: break-word;">
-          {{ s.note if s.note else "&mdash;" }}
+          {{ s.note if s.note else "—" }}
         </td>
         <td data-label="Counts" style="font-size:0.82rem; color:var(--grey-600);">
           {% if s.counts %}
