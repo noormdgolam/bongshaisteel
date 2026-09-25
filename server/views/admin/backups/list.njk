@@ -1,0 +1,249 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Content Backups — Bongshai Steel Admin{% endblock %}
+
+{% block header %}
+<div class="topbar-title">
+  <h1>Content Backups</h1>
+  <span class="badge" style="background:var(--grey-100); color:var(--grey-700); font-weight:600;">{{ snapshots.length if snapshots else 0 }} snapshots</span>
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+  .backups-info-card {
+    background: #ffffff;
+    border: 1px solid var(--grey-200);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .snapshot-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+    margin-top: 16px;
+  }
+  .snapshot-note-field {
+    flex: 1;
+    min-width: 240px;
+  }
+  .pill-auto {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+  .pill-manual {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+  .pill-before-restore {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .backups-table-wrap {
+    background: #ffffff;
+    border: 1px solid var(--grey-200);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .backups-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  .backups-table th {
+    background: #f8fafc;
+    color: var(--grey-700);
+    font-weight: 600;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--grey-200);
+    white-space: nowrap;
+  }
+  .backups-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--grey-100);
+    color: var(--grey-800);
+    vertical-align: middle;
+  }
+  .backups-table tr:last-child td {
+    border-bottom: none;
+  }
+  .backups-table tr:hover td {
+    background: #f8fafc;
+  }
+  .backup-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .backups-table,
+    .backups-table thead,
+    .backups-table tbody,
+    .backups-table th,
+    .backups-table td,
+    .backups-table tr {
+      display: block;
+    }
+    .backups-table thead {
+      display: none;
+    }
+    .backups-table tr {
+      margin-bottom: 12px;
+      border: 1px solid var(--grey-200);
+      border-radius: 10px;
+      padding: 14px;
+      background: #ffffff;
+    }
+    .backups-table td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--grey-100);
+    }
+    .backups-table td::before {
+      content: attr(data-label);
+      font-weight: 600;
+      color: var(--grey-500);
+      font-size: 0.8rem;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .backups-table td:last-child {
+      border-bottom: none;
+      padding-top: 12px;
+      justify-content: flex-end;
+    }
+    .backup-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .snapshot-form {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>
+
+<div class="backups-info-card">
+  <p style="margin: 0; color: var(--grey-700); font-size: 0.95rem; line-height: 1.5;">
+    A copy is kept automatically before content changes (at most every {{ autoGapMinutes }} minutes). The newest {{ keep }} are kept.
+  </p>
+  <form method="post" action="/admin/backups" class="snapshot-form">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <div class="snapshot-note-field">
+      <label for="snapshotNoteInput" style="display:block; font-size:0.85rem; font-weight:600; color:var(--grey-700); margin-bottom:6px;">
+        Note (optional)
+      </label>
+      <input type="text" id="snapshotNoteInput" name="note" maxlength="255" placeholder="e.g. Before changing hero banner" class="form-control" style="width:100%;">
+    </div>
+    <button type="submit" class="btn btn-primary" style="white-space:nowrap;">
+      Take Snapshot
+    </button>
+  </form>
+</div>
+
+{% if not snapshots or snapshots.length == 0 %}
+<div class="card" style="padding: 48px 24px; text-align: center; color: var(--grey-500); background:#ffffff; border:1px solid var(--grey-200); border-radius:12px;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px; color: var(--grey-400);"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+  <h3 style="font-size: 1.1rem; color: var(--grey-800); margin: 0 0 6px;">No backups recorded yet.</h3>
+  <p style="margin: 0; font-size: 0.9rem;">Take a snapshot using the button above or edit content to trigger an automatic snapshot.</p>
+</div>
+{% else %}
+<div class="backups-table-wrap">
+  <table class="backups-table">
+    <thead>
+      <tr>
+        <th style="width: 70px;">ID</th>
+        <th>Date &amp; Time</th>
+        <th>Taken By</th>
+        <th>Reason</th>
+        <th>Note</th>
+        <th>Counts</th>
+        <th>Size</th>
+        <th style="text-align: right;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in snapshots %}
+      <tr>
+        <td data-label="ID">
+          <strong style="color:var(--grey-900);">#{{ s.id }}</strong>
+        </td>
+        <td data-label="Date &amp; Time" style="white-space:nowrap;">
+          {{ s.created_at | dhaka }}
+        </td>
+        <td data-label="Taken By">
+          {{ s.admin_name if s.admin_name else "system" }}
+        </td>
+        <td data-label="Reason">
+          {% if s.reason == "auto" %}
+            <span class="pill-auto">auto</span>
+          {% elif s.reason == "manual" %}
+            <span class="pill-manual">manual</span>
+          {% elif s.reason == "before-restore" %}
+            <span class="pill-before-restore">before-restore</span>
+          {% else %}
+            <span class="pill-auto">{{ s.reason }}</span>
+          {% endif %}
+        </td>
+        <td data-label="Note" style="word-break: break-word;">
+          {{ s.note if s.note else "&mdash;" }}
+        </td>
+        <td data-label="Counts" style="font-size:0.82rem; color:var(--grey-600);">
+          {% if s.counts %}
+            {{ s.counts.products }} products &middot; {{ s.counts.categories }} categories &middot; {{ s.counts.sections }} section items
+          {% else %}
+            &mdash;
+          {% endif %}
+        </td>
+        <td data-label="Size" style="white-space:nowrap;">
+          {{ (s.bytes / 1024) | round }} KB
+        </td>
+        <td data-label="Actions" style="text-align: right;">
+          <div class="backup-actions">
+            <a href="/admin/backups/{{ s.id }}/download" class="btn btn-sm">
+              Download
+            </a>
+            <form method="post" action="/admin/backups/{{ s.id }}/restore" onsubmit="return confirm('Replace all site content with snapshot #{{ s.id }}? The current content is saved first, so this can be undone.');" style="margin:0;">
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+              <button type="submit" class="btn btn-warning btn-sm">
+                Restore
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}
