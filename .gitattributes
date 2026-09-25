@@ -1,0 +1,5 @@
+# Run on the Linux host: always LF, whatever the committing machine does.
+*.sh text eol=lf
+.htaccess text eol=lf
+*.yml text eol=lf
+*.exclude text eol=lf
