@@ -127,7 +127,7 @@ async function main() {
     check(r.status === 302 && /\/admin\/login/.test(r.location), "signed out: /admin/products redirects too", r.status);
 
     r = await a.req("GET", "/admin/editor.js");
-    check(!r.setCookie.length, "public editor.js creates no session cookie", r.setCookie.join(" | "));
+    check(r.status === 302 && /\/admin\/login/.test(r.location), "the retired PHP editor script is not served", r.status);
 
     r = await a.req("GET", "/admin/login");
     check(r.status === 200 && r.data && r.data.view === "admin/login.njk" && /^[0-9a-f]{48}$/.test(r.data.csrfToken || ""),

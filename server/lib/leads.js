@@ -1,24 +1,23 @@
 /* ==========================================================================
    LEAD INTAKE — Node port of lead.php
    --------------------------------------------------------------------------
-   Same field list, same caps, same honeypot, same rate limit, same files:
-   data/leads.json for the records and admin/backups/ for the rate-limit
-   counter and the activity trail. While both stacks run, the PHP dashboard
-   reads exactly what this writes.
+   Same field list, same caps, same honeypot, same rate limit as the PHP
+   version. Leads go to the database; if it cannot be reached, to the
+   fallback file in server/var/ (outside the docroot on the host, never
+   public), so a message is never lost.
 
-   Note for the host: as long as lead.php exists on disk, LiteSpeed runs the
-   PHP one and this route never sees the request. It takes over only once the
-   PHP files are retired (Phase 5).
+   Note for the host: a lead.php file on disk would be run by LiteSpeed and
+   this route would never see the request — the docroot must not have one.
    ========================================================================== */
 "use strict";
 
 const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
-const { ROOT } = require("./paths");
+const { VAR } = require("./paths");
 
-const LEADS_FILE = path.join(ROOT, "data", "leads.json");
-const BACKUP_DIR = path.join(ROOT, "admin", "backups");
+const LEADS_FILE = path.join(VAR, "leads.json");
+const BACKUP_DIR = VAR;
 const RATE_FILE = path.join(BACKUP_DIR, ".leadrate.json");
 const ACTIVITY_FILE = path.join(BACKUP_DIR, "activity.log");
 
@@ -45,8 +44,6 @@ class LeadError extends Error {
 
 function ensureBackupDir() {
   fs.mkdirSync(BACKUP_DIR, { recursive: true });
-  const ht = path.join(BACKUP_DIR, ".htaccess");
-  if (!fs.existsSync(ht)) fs.writeFileSync(ht, "Require all denied\n");
 }
 
 /** Same key shape as cms_throttle_key(): first 16 hex of sha256(ip). */

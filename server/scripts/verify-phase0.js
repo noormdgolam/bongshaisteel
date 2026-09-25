@@ -14,9 +14,10 @@
       the CMS-owned regions blanked, must be the same document. This catches
       anything the server changed that it had no business touching.
 
-   Needs: headless Chrome with --remote-debugging-port (DBG), a static server
-   for the untouched index.html (STATIC_URL — the PHP dev server does), and
-   the Node app (NODE_URL).
+   Needs: headless Chrome with --remote-debugging-port (DBG) and a file-mode
+   Node app (NODE_URL). The untouched page is served by a static server this
+   script starts itself: server/views/site/index.html at "/", the site files
+   around it (or set STATIC_URL to use another one).
 
      DBG=http://127.0.0.1:9224 node scripts/verify-phase0.js
    ========================================================================== */
@@ -27,7 +28,7 @@ const path = require("node:path");
 const { ROOT } = require("../lib/paths");
 
 const DBG = process.env.DBG || "http://127.0.0.1:9222";
-const STATIC_URL = process.env.STATIC_URL || "http://127.0.0.1:8788/";
+let STATIC_URL = process.env.STATIC_URL || null;
 const NODE_URL = process.env.NODE_URL || "http://127.0.0.1:3100/";
 const LIVE = path.join(ROOT, "data", "content.json");
 const SEED = path.join(ROOT, "data", "content.default.json");
@@ -173,6 +174,17 @@ async function main() {
       "  NODE_URL=http://127.0.0.1:3101/ node scripts/verify-phase0.js\n" +
       "(db mode is covered by scripts/verify-db-mode.js.)");
     process.exit(2);
+  }
+
+  let staticServer = null;
+  if (!STATIC_URL) {
+    const express = require("express");
+    const TEMPLATE = path.join(__dirname, "..", "views", "site", "index.html");
+    const app = express();
+    app.get(["/", "/index.html"], (req, res) => res.type("html").sendFile(TEMPLATE));
+    app.use(express.static(ROOT, { index: false }));
+    staticServer = app.listen(0);
+    STATIC_URL = "http://127.0.0.1:" + staticServer.address().port + "/";
   }
 
   const seed = JSON.parse(fs.readFileSync(SEED, "utf8"));

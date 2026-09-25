@@ -38,3 +38,6 @@ counter.txt
 # Node app dependencies
 /server/node_modules/
 /server/.env
+
+# Node runtime state (lead fallback, counters) — never committed, never public
+/server/var/

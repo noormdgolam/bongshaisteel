@@ -132,15 +132,15 @@ app.all("/lead.php", (req, res) =>
 
 /* Page-view counter. The PHP version counted one hit per PHP session; a
    session cookie gives the same "once per browser visit" behaviour. */
-const COUNTER_FILE = path.join(ROOT, "counter.txt");
+const counter = require("./lib/counter");
 app.get("/counter.php", (req, res) => {
   res.set("Cache-Control", "no-store");
-  let count = 0;
-  try { count = parseInt(fs.readFileSync(COUNTER_FILE, "utf8"), 10) || 0; } catch { /* first hit */ }
+  let count;
   if (!/(?:^|;\s*)bs_seen=1/.test(req.get("cookie") || "")) {
-    count += 1;
-    try { fs.writeFileSync(COUNTER_FILE, String(count)); } catch (err) { console.error("counter:", err); }
+    count = counter.hit();
     res.cookie("bs_seen", "1", { httpOnly: true, sameSite: "lax", secure: req.secure });
+  } else {
+    count = counter.read();
   }
   res.json({ views: count });
 });
@@ -154,7 +154,7 @@ app.set("view engine", "njk");
 if (content.SOURCE === "db") {
   app.use(require("./routes/admin")({ db: require("./lib/db"), content }));
 } else {
-  app.all(/^\/admin(?:\/(?!editor\.(?:js|css)$).*)?$/i, (req, res, next) => {
+  app.all(/^\/admin(?:\/.*)?$/i, (req, res, next) => {
     if (/\.php$/i.test(req.path)) return next();
     res.status(503).type("html").send("<!doctype html><title>Admin unavailable</title>" +
       "<p>The admin panel needs the database. Set CONTENT_SOURCE=db in server/.env.</p>");
@@ -206,9 +206,6 @@ app.get("/sitemap.xml", (req, res, next) => {
 
 /* Node does not execute PHP: without this, the CMS source and its config
    would be handed out as plain text. Also keeps build/tooling dirs private. */
-/* The public page itself loads the dormant visual editor, so those two files
-   are the only part of /admin that is public. */
-const PUBLIC_ADMIN = /^\/admin\/editor\.(?:js|css)$/i;
 const PRIVATE = [
   /^\/admin(?:\/|$)/i,
   /^\/server(?:\/|$)/i,
@@ -221,7 +218,7 @@ const PRIVATE = [
 app.use((req, res, next) => {
   let p;
   try { p = decodeURIComponent(req.path); } catch { return res.status(400).end(); }
-  if (!PUBLIC_ADMIN.test(p) && PRIVATE.some((re) => re.test(p))) return notFound(req, res);
+  if (PRIVATE.some((re) => re.test(p))) return notFound(req, res);
   next();
 });
 

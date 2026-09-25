@@ -15,10 +15,12 @@ const fs = require("node:fs");
 const path = require("node:path");
 const cheerio = require("cheerio");
 
-const { ROOT } = require("./paths");
+const { SERVER } = require("./paths");
 const content = require("./content");
 
-const INDEX = path.join(ROOT, "index.html");
+// The page template lives in the app, not the docroot: a physical index.html
+// in the docroot would be served by LiteSpeed and "/" would never reach Node.
+const INDEX = path.join(SERVER, "views", "site", "index.html");
 
 let cache = { key: null, html: null };
 

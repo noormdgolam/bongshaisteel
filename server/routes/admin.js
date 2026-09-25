@@ -11,14 +11,11 @@
    ========================================================================== */
 "use strict";
 
-const fs = require("node:fs");
-const path = require("node:path");
 const express = require("express");
 const bcrypt = require("bcryptjs");
 
 const auth = require("../lib/auth");
 const snapshots = require("../lib/snapshots");
-const { ROOT } = require("../lib/paths");
 
 // Compared against when a username does not exist, so a wrong name costs the
 // same bcrypt work as a wrong password and timing reveals nothing.
@@ -36,12 +33,6 @@ const on = (v) => v === "on" || v === "1" || v === "true" || v === true;
 
 module.exports = function createAdminRouter({ db, content }) {
   const router = express.Router();
-
-  // The public home page loads admin/editor.js and editor.css. Those must not
-  // touch the session machinery below, or every visitor would get a session
-  // row and a cookie. Skip this whole router for them.
-  router.use("/admin", (req, res, next) =>
-    (/^\/editor\.(?:js|css)$/.test(req.path) ? next("router") : next()));
 
   router.use("/admin", (req, res, next) => {
     res.set("Cache-Control", "private, no-store, max-age=0");
@@ -168,8 +159,7 @@ module.exports = function createAdminRouter({ db, content }) {
         db("activity_log").orderBy("id", "desc").limit(12)
           .select("created_at", "admin_name", "action", "summary"),
       ]);
-      let views = null;
-      try { views = parseInt(fs.readFileSync(path.join(ROOT, "counter.txt"), "utf8"), 10) || 0; } catch { /* no counter yet */ }
+      const views = require("../lib/counter").read();
       res.render("admin/dashboard.njk", view(req, "dashboard", {
         stats: { products, categories, faqs, leadsNew, leadsTotal, views },
         recentActivity,
