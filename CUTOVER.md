@@ -6,18 +6,22 @@ again (live `main` has no `lead.php`, so quote requests are dropped today) and
 
 ## Layout on the host
 
-| What | Where | Updated by |
+Everything is deployed over FTP by `server/scripts/deploy-ftp.js` (owner
+decision: no cPanel Git pull/deploy). It sends the committed HEAD, only once
+it is GitHub's `main`, and only files that changed.
+
+| What | Where | FTP account (in `server/.env`) |
 |---|---|---|
-| Docroot = the git clone of `main` | `/home/abongsha/bongshaisteel.com` | cPanel Git → *Update from Remote* |
-| The Node app (copy of `server/`) | `/home/abongsha/bongshai-steel-node` | cPanel Git → *Deploy HEAD Commit* → `.cpanel.yml` → `deploy/cpanel-deploy.sh` |
-| App secrets | `bongshai-steel-node/.env` (mode 600) | FTP upload to `<docroot>/server/.env`; the deploy moves it into the app |
-| Docroot `.htaccess` | not in git (cPanel edits it) | FTP upload of `deploy/htaccess.docroot` |
+| Public files | `/home/abongsha/bongshaisteel.com` (docroot) | `STEEL_FTP_*` — confined to the docroot |
+| The Node app (`server/` minus tests) | `/home/abongsha/bongshai-steel-node` | `STEEL_APP_FTP_*` — confined to the app folder |
+| App secrets | `bongshai-steel-node/.env`, mode 600 | installed once from `server/.env.host` |
+| Docroot `.htaccess` | not in git (cPanel edits it) | uploaded from `deploy/htaccess.docroot` |
 
 The docroot must never contain `index.html`, `lead.php`, `counter.php` or
-`sitemap.xml`: LiteSpeed serves any file on disk before Passenger sees the
-request, so such a file would hide the Node route. The new `main` deletes the
-tracked ones on pull. `/server/`, `/deploy/`, dotfiles and `*.md` in the
-docroot are forbidden by the `.htaccess`.
+`sitemap.xml`: LiteSpeed serves a file on disk before Passenger sees the
+request. The deploy renames any it finds to `*.retired-<stamp>`. `/server/`,
+`/deploy/`, dotfiles (the old `.git`, `.deploy-manifest.json`) and `*.md` are
+forbidden by the `.htaccess`.
 
 ## Done
 
@@ -28,23 +32,20 @@ docroot are forbidden by the `.htaccess`.
 - [x] Crons: orphan reaper every 15 min, `backup_db.sh` daily at 03:00/03:30.
 - [x] `server/.env.host` generated locally (git-ignored): production `.env`
       with new secrets.
-- [ ] Owner's admin account in the production database (`create-admin.js`).
+- [x] Owner's admin account `admin` (superadmin) in the production database.
+- [x] Docroot `.htaccess` uploaded (https/www, deny rules; `/.git` now 403).
 
-## The switch (a few minutes of downtime between steps 3 and 6)
+## The switch (the site is down from step 2 until step 4 finishes)
 
-1. **Claude** — FTP: upload `deploy/htaccess.docroot` as the docroot
-   `.htaccess` (keeps cPanel's blocks; adds https/www and the deny rules).
-   The live site keeps working: `index.html` is still there.
-2. **Claude** — merge `feat/flat-file-cms` into `main`, push.
-3. **Owner** — cPanel → Git Version Control → `bongshaisteel` → *Pull or
-   Deploy* → **Update from Remote**. (From here `/` has no index.html.)
-4. **Claude** — FTP: upload `server/.env.host` to `<docroot>/server/.env`.
-5. **Owner** — same page → **Deploy HEAD Commit** (copies the app, moves
-   `.env` in, requests a restart). Log: `/home/abongsha/bongshai-steel-deploy.log`.
-6. **Owner** — Setup Node.js App → the app → **Run NPM Install**, then
-   **Start App**. cPanel adds its Passenger block to the docroot `.htaccess`.
-7. **Claude** — the checks below, once each (repeated probes get this IP
-   banned). **Owner** — open the site on mobile data.
+1. **Owner** — cPanel → FTP Accounts: an account whose Directory is
+   `/home/abongsha/bongshai-steel-node`; its login and password go into
+   `server/.env` as `STEEL_APP_FTP_USER` / `STEEL_APP_FTP_PASS`.
+2. **Claude** — `node scripts/deploy-ftp.js all --yes`: app files + `.env` +
+   restart marker to the app folder; 4 changed public files to the docroot;
+   `index.html`, `sitemap.xml`, `counter.php` renamed `*.retired-<stamp>`.
+3. **Owner** — Setup Node.js App → the app → **Run NPM Install**, then
+   **Start App** (cPanel adds its Passenger block to the docroot `.htaccess`).
+4. **Claude** — the checks below, once each. **Owner** — the site on mobile data.
 
 ### Checks
 
@@ -63,16 +64,13 @@ docroot are forbidden by the `.htaccess`.
 ## Rollback
 
 1. Setup Node.js App → **Stop App**.
-2. Git Version Control → *Basic Information* → checked-out branch stays
-   `main`; instead Claude pushes a revert of the merge to `main`, owner
-   clicks **Update from Remote** — `index.html` and the old files return.
-3. If that is not fast enough: File Manager → upload the old `index.html`
-   into the docroot. The static site works with the app stopped.
+2. Claude renames `index.html.retired-…` (and `sitemap.xml.retired-…`) back
+   over FTP. The static site works with the app stopped.
 
 Leads received through Node stay in the database either way.
 
 ## Later deploys
 
-Claude pushes to `main`; owner clicks **Update from Remote**, then **Deploy
-HEAD Commit**. When the deploy log says dependencies changed: **Run NPM
-Install**, then **Restart**.
+Claude commits, pushes to `main`, then `node scripts/deploy-ftp.js all --yes`
+(a dry run without `--yes` shows the plan). When it says the lockfile
+changed: owner → **Run NPM Install**, then **Restart**.
