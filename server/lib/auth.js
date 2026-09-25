@@ -76,10 +76,29 @@ function csrf(req, res, next) {
   if (site && site !== "same-origin" && site !== "none") {
     return res.status(403).type("text").send("Cross-site request blocked.");
   }
+  // A multipart body is not parsed yet, so its _csrf field cannot be read
+  // here. Only the paths listed in MULTIPART are let through, and each of
+  // those handlers calls csrfAfterUpload() once multer has parsed the form.
+  // Any other multipart POST carries no readable token and is refused below.
+  if (req.is("multipart/form-data") && MULTIPART.has(req.originalUrl.split("?")[0]) && !req.get("x-csrf-token")) {
+    req.csrfPending = true;
+    return next();
+  }
   const sent = (req.body && req.body._csrf) || req.get("x-csrf-token");
   if (!sameToken(sent, req.session.csrf)) {
     return res.status(403).type("text").send("This form has expired. Go back, reload the page and try again.");
   }
+  next();
+}
+
+const MULTIPART = new Set(["/admin/media"]);
+
+/** The deferred half of csrf() for a multipart route: run after multer. */
+function csrfAfterUpload(req, res, next) {
+  if (req.csrfPending && !sameToken(req.body && req.body._csrf, req.session.csrf)) {
+    return res.status(403).type("text").send("This form has expired. Go back, reload the page and try again.");
+  }
+  req.csrfPending = false;
   next();
 }
 
@@ -163,7 +182,7 @@ function safeReturn(p) {
 }
 
 module.exports = {
-  sessionMiddleware, csrf, requireAdmin, requireRole,
+  sessionMiddleware, csrf, csrfAfterUpload, requireAdmin, requireRole,
   lockedFor, noteFailure, clearFailures, safeReturn,
   ROLES, IDLE_MS, ABSOLUTE_MS,
   _resetThrottle: () => attempts.clear(),

@@ -17,6 +17,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 
 const auth = require("../lib/auth");
+const snapshots = require("../lib/snapshots");
 const { ROOT } = require("../lib/paths");
 
 // Compared against when a username does not exist, so a wrong name costs the
@@ -150,6 +151,10 @@ module.exports = function createAdminRouter({ db, content }) {
   /* ------------------------------------------------- everything else: auth */
 
   router.use("/admin", auth.requireAdmin(db));
+
+  // Before a content change, keep a restorable copy (at most one per half hour).
+  router.use(["/admin/products", "/admin/content", "/admin/categories"], (req, res, next) =>
+    (req.method === "POST" ? snapshots.auto(db, req.admin).then(() => next(), next) : next()));
 
   router.get("/admin", async (req, res, next) => {
     try {
@@ -487,6 +492,9 @@ module.exports = function createAdminRouter({ db, content }) {
   });
   require("./admin-users")(router, {
     db, auth, logActivity, contentChanged, view, on, FormError, contentRoles: CONTENT_ROLES,
+  });
+  require("./admin-media")(router, {
+    db, auth, logActivity, contentChanged, view, contentRoles: CONTENT_ROLES,
   });
 
   return router;
