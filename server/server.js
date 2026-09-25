@@ -271,7 +271,11 @@ app.use((err, req, res, next) => {
   res.status(500).type("html").send("<!doctype html><title>Error</title><h1>Something went wrong</h1>");
 });
 
-if (require.main === module) {
+// Always boot. Passenger (LiteSpeed's lsnode) loads this file through its own
+// loader, so require.main is not this module there — a require.main guard
+// silently skipped migrations, content loading and the poll timer on the host.
+// Set SERVER_NO_LISTEN=1 only to require the app without starting it.
+if (!process.env.SERVER_NO_LISTEN) {
   // Apply any pending migrations first (a deploy that adds a table then needs
   // no manual step), then load the content before taking traffic. Neither
   // blocks boot: a failed migration is logged, and init() falls back to the
