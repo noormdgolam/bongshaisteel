@@ -213,6 +213,9 @@ function build(d) {
       (a.note ? ' title="' + esc(a.note) + '"' : "") + ">" + esc(a.name) + "</span>").join(""));
   }
 
+  // The chat button only when the chat can answer.
+  if (!require("./ai-assistant").groqKeys().length) $("script[data-chat-widget]").remove();
+
   for (const [id, html] of Object.entries(navMarkup(d))) {
     if ($("#" + id).length) $("#" + id).html(html);
   }

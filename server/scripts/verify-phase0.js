@@ -78,6 +78,8 @@ const SKELETON = `(function (html) {
   var q = function (s) { return doc.querySelectorAll(s); };
   var blank = function (s) { Array.prototype.forEach.call(q(s), function (e) { e.innerHTML = ""; }); };
   blank("[data-cms], [data-cms-set], [data-cms-html], title");
+  // Present or not depending on whether a chat key is configured, not on content.
+  Array.prototype.forEach.call(q("script[data-chat-widget]"), function (e) { e.remove(); });
   ["statsContainer", "trustBarContainer", "servicesGrid", "safetyPoints", "faqList", "footerSister",
    "testimonialsList", "teamList", "serviceAreasList",
    "navProductsMenu", "mobileProductsMenu", "catalogFilterChips", "footerProductLinks"].forEach(function (id) {

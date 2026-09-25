@@ -2,6 +2,7 @@
    DEPLOY OVER FTP
      node scripts/deploy-ftp.js [site|app|all]          dry run: shows the plan
      node scripts/deploy-ftp.js [site|app|all] --yes    do it
+     … app --yes --env                                  also replace the host .env
    site  public files -> the docroot (/home/abongsha/bongshaisteel.com)
    app   server/      -> the Node app (/home/abongsha/bongshai-steel-node)
 
@@ -29,6 +30,8 @@ const { account } = require("./ftp");
 
 const REPO = path.join(__dirname, "..", "..");
 const APPLY = process.argv.includes("--yes");
+// --env replaces the host's .env with server/.env.host (new secret, new key).
+const ENV_REPLACE = process.argv.includes("--env");
 const WHAT = process.argv.slice(2).find((a) => ["site", "app", "all"].includes(a)) || "all";
 const MANIFEST = ".deploy-manifest.json";
 const SHADOWS = ["index.html", "lead.php", "counter.php", "sitemap.xml"];
@@ -142,11 +145,11 @@ function main() {
     for (const [p, sha] of Object.entries(all)) if (isApp(p)) want[p.slice("server/".length)] = sha;
     const base = remoteManifest(acc);
     const baseline = base ? base.files : {};
-    const needEnv = !acc.get(".env");
+    const needEnv = ENV_REPLACE || !acc.get(".env");
     const hostEnv = path.join(REPO, "server", ".env.host");
     const lockChanged = baseline["package-lock.json"] !== want["package-lock.json"];
     const notes = [];
-    if (needEnv) notes.push(fs.existsSync(hostEnv) ? "install .env from server/.env.host (mode 600)" : "WARNING: no .env on the host and no server/.env.host here");
+    if (needEnv) notes.push(fs.existsSync(hostEnv) ? (ENV_REPLACE ? "REPLACE" : "install") + " .env from server/.env.host (mode 600)" : "WARNING: no .env on the host and no server/.env.host here");
     if (lockChanged) notes.push("ACTION after deploy: cPanel > Setup Node.js App > Run NPM Install");
     notes.push("restart: tmp/restart.txt");
     const plan = deploy("app (" + "bongshai-steel-node)", acc, want, baseline, { notes });

@@ -150,6 +150,14 @@ app.post("/lead.php", leadBody, async (req, res) => {
     res.status(500).json({ ok: false, error: "server", message: "Could not save that just now." });
   }
 });
+/* AI sales chat (Groq), English only. Needs GROQ_API_KEY(S) in .env; without
+   a key it answers 503 with the hotline, and the widget says the same. */
+app.use(require("./routes/chat")({
+  content, leads,
+  getProjects: content.SOURCE === "db"
+    ? () => require("./lib/db")("projects").where({ published: true }).orderBy("sort_order").orderBy("id")
+    : null,
+}));
 app.all("/lead.php", (req, res) =>
   res.status(405).json({ ok: false, error: "method", message: "POST required." }));
 

@@ -62,7 +62,7 @@ module.exports = function createCatalogRouter(options = {}) {
   }
 
   function renderView(res, next, viewName, context) {
-    context = { navLines: navLines(getContent() || {}), ...context };
+    context = { navLines: navLines(getContent() || {}), chatEnabled: require("../lib/ai-assistant").groqKeys().length > 0, ...context };
     env.render(viewName, context, (err, html) => {
       if (err) return next(err);
       res.setHeader("Content-Type", "text/html; charset=utf-8");
