@@ -6,97 +6,112 @@
 <h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">Products Management</h1>
 {% endblock %}
 
+{% macro imgsrc(path) %}{% for part in path.split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}{% endmacro %}
+
+{% macro price(p) %}{% if p.price_from %}{{ 'Tk ' if p.price_currency == 'BDT' else '$' }}{{ p.price_from | replace('.00','') }}{{ ' /sqft' if p.price_unit == 'sqft' }}{% endif %}{% endmacro %}
+
 {% block content %}
+<style>
+  .bulk-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:10px 12px; margin-bottom:12px; border:1px solid var(--grey-200); border-radius:8px; background:rgba(255,255,255,0.6); font-size:0.86rem; }
+  .bulk-bar select { padding:7px 10px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.86rem; background:#fff; }
+  .row-check { width:17px; height:17px; cursor:pointer; }
+</style>
 <div class="card">
   <form method="get" action="/admin/products" class="toolbar">
     <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; flex:1;">
-      <input
-        type="text"
-        name="q"
-        value="{{ q or '' }}"
-        placeholder="Search model code, name..."
-        style="padding:8px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.9rem; min-width:220px; background:rgba(255,255,255,0.9);"
-      >
+      <input type="text" name="q" value="{{ q or '' }}" placeholder="Search model code, name..."
+        style="padding:8px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.9rem; min-width:200px; background:rgba(255,255,255,0.9);">
       <select name="category" style="padding:8px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.9rem; background:rgba(255,255,255,0.9);">
         <option value="all" {% if category == 'all' or not category %}selected{% endif %}>All Categories</option>
         {% for cat in categories %}
         <option value="{{ cat.key }}" {% if category == cat.key %}selected{% endif %}>{{ cat.name }}</option>
         {% endfor %}
       </select>
+      <select name="status" style="padding:8px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.9rem; background:rgba(255,255,255,0.9);">
+        {% for v, l in [['all','Any status'],['published','Live'],['draft','Draft'],['featured','Featured'],['no-image','Missing image'],['no-seo','Missing SEO description']] %}
+        <option value="{{ v }}" {% if status == v %}selected{% endif %}>{{ l }}</option>
+        {% endfor %}
+      </select>
       <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-      {% if q or (category and category != 'all') %}
+      {% if q or (category and category != 'all') or (status and status != 'all') %}
       <a href="/admin/products" class="btn btn-sm">Clear</a>
       {% endif %}
     </div>
-    <div>
-      <a href="/admin/products/new" class="btn btn-primary">➕ Add Product</a>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <a href="/admin/products/deleted" class="btn btn-sm">🗑 Recently deleted</a>
+      <a href="/admin/products/new{% if category and category != 'all' %}?category={{ category | urlencode }}{% endif %}" class="btn btn-primary">➕ Add Product</a>
     </div>
   </form>
 
-  <div style="margin-bottom:14px; font-size:0.86rem; color:var(--grey-600); font-weight:600;">
-    Total Products: {{ total if total is defined and total !== null else products.length }}
-  </div>
+  <form method="post" action="/admin/products/bulk" id="bulkForm" class="bulk-bar"
+    onsubmit="var a=this.action.value; if(!a) return false; return a!=='delete' || confirm('Delete the ticked products? They can be brought back from Recently deleted.');">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <input type="hidden" name="back" value="/admin/products?q={{ q | urlencode }}&category={{ category | urlencode }}&status={{ status | urlencode }}">
+    <label style="display:flex; align-items:center; gap:6px; font-weight:600; cursor:pointer;">
+      <input type="checkbox" id="checkAll" class="row-check"> All
+    </label>
+    <span id="checkedCount" style="color:var(--grey-600);">0 ticked</span>
+    <select name="action" id="bulkAction">
+      <option value="">Bulk action…</option>
+      <option value="publish">Publish</option>
+      <option value="unpublish">Unpublish (draft)</option>
+      <option value="feature">Mark featured</option>
+      <option value="unfeature">Remove featured</option>
+      <option value="move">Move to category…</option>
+      <option value="delete">Delete</option>
+    </select>
+    <select name="category_id" id="bulkCategory" style="display:none;">
+      {% for cat in categories %}<option value="{{ cat.id }}">{{ cat.name }}</option>{% endfor %}
+    </select>
+    <button type="submit" class="btn btn-sm btn-primary">Apply</button>
+    <span style="margin-left:auto; color:var(--grey-600); font-weight:600;">Total: {{ total }}</span>
+  </form>
 
   <div class="table-responsive">
     <table>
       <thead>
         <tr>
+          <th style="width:32px;"></th>
           <th style="width:68px;">Image</th>
           <th style="width:130px;">Model Code</th>
           <th>Product Name</th>
           <th style="width:150px;">Category</th>
-          <th style="width:70px;">Order</th>
-          <th style="width:140px;">Status</th>
-          <th style="width:90px; text-align:right;">Actions</th>
+          <th style="width:110px;">Price</th>
+          <th style="width:150px;">Status</th>
+          <th style="width:120px; text-align:right;">Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for p in products %}
         <tr>
+          <td><input type="checkbox" class="row-check pick" name="ids" value="{{ p.id }}" form="bulkForm"></td>
           <td>
             {% if p.image %}
-            <img
-              src="{% for part in p.image.split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}"
-              alt="{{ p.name }}"
-              class="product-thumb"
-              loading="lazy"
-            >
+            <img src="{{ imgsrc(p.image) }}" alt="{{ p.name }}" class="product-thumb" loading="lazy">
             {% else %}
             <div class="product-thumb placeholder-thumb">No img</div>
             {% endif %}
           </td>
-          <td>
-            <code style="font-size:0.88rem; font-weight:700; color:var(--primary);">{{ p.model_code }}</code>
-          </td>
-          <td>
-            <strong style="color:var(--grey-900); font-size:0.94rem;">{{ p.name }}</strong>
-          </td>
-          <td>
-            <span class="pill pill-muted">{{ p.category_name or 'General' }}</span>
-          </td>
-          <td>
-            <span style="font-family:monospace; color:var(--grey-600); font-weight:600;">#{{ p.sort_order if p.sort_order is defined and p.sort_order !== null else 0 }}</span>
-          </td>
+          <td><code style="font-size:0.88rem; font-weight:700; color:var(--primary);">{{ p.model_code }}</code></td>
+          <td><strong style="color:var(--grey-900); font-size:0.94rem;">{{ p.name }}</strong></td>
+          <td><span class="pill pill-muted">{{ p.category_name or 'General' }}</span></td>
+          <td style="font-size:0.85rem; color:var(--grey-700);">{{ price(p) or '—' }}</td>
           <td>
             <div style="display:flex; gap:4px; flex-wrap:wrap;">
-              {% if p.featured %}
-              <span class="pill pill-gold">Featured</span>
-              {% endif %}
-              {% if p.published %}
-              <span class="pill pill-success">Live</span>
-              {% else %}
-              <span class="pill pill-danger">Draft</span>
-              {% endif %}
+              {% if p.featured %}<span class="pill pill-gold">Featured</span>{% endif %}
+              {% if p.published %}<span class="pill pill-success">Live</span>{% else %}<span class="pill pill-danger">Draft</span>{% endif %}
+              {% if not p.meta_description %}<span class="pill pill-muted" title="No SEO description">SEO</span>{% endif %}
             </div>
           </td>
           <td style="text-align:right; white-space:nowrap;">
+            {% if p.published %}<a href="/products/{{ p.model_code | urlencode }}" target="_blank" rel="noopener" class="btn btn-sm" title="View live page">↗</a>{% endif %}
             <a href="/admin/products/{{ p.id }}/edit" class="btn btn-sm">Edit</a>
           </td>
         </tr>
         {% else %}
         <tr>
-          <td colspan="7" style="text-align:center; padding:36px 20px; color:var(--grey-500);">
-            No products found matching your search. <a href="/admin/products/new">Add a new product</a>
+          <td colspan="8" style="text-align:center; padding:36px 20px; color:var(--grey-500);">
+            No products found. <a href="/admin/products/new">Add a new product</a>
           </td>
         </tr>
         {% endfor %}
@@ -108,13 +123,9 @@
     {% for p in products %}
     <div class="admin-mobile-card product-card">
       <div style="display:flex; gap:12px; align-items:flex-start;">
+        <input type="checkbox" class="row-check pick" name="ids" value="{{ p.id }}" form="bulkForm" style="margin-top:4px;">
         {% if p.image %}
-        <img
-          src="{% for part in p.image.split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}"
-          alt="{{ p.name }}"
-          class="product-thumb"
-          loading="lazy"
-        >
+        <img src="{{ imgsrc(p.image) }}" alt="{{ p.name }}" class="product-thumb" loading="lazy">
         {% else %}
         <div class="product-thumb placeholder-thumb">No img</div>
         {% endif %}
@@ -126,24 +137,47 @@
           <strong style="color:var(--grey-900); font-size:0.95rem; display:block; margin-bottom:6px; word-break:break-word;">{{ p.name }}</strong>
           <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; font-size:0.8rem;">
             <span class="pill pill-muted">{{ p.category_name or 'General' }}</span>
-            <span style="font-family:monospace; color:var(--grey-600); font-weight:600;">#{{ p.sort_order if p.sort_order is defined and p.sort_order !== null else 0 }}</span>
-            {% if p.featured %}
-            <span class="pill pill-gold">Featured</span>
-            {% endif %}
-            {% if p.published %}
-            <span class="pill pill-success">Live</span>
-            {% else %}
-            <span class="pill pill-danger">Draft</span>
-            {% endif %}
+            {% if p.price_from %}<span>{{ price(p) }}</span>{% endif %}
+            {% if p.featured %}<span class="pill pill-gold">Featured</span>{% endif %}
+            {% if p.published %}<span class="pill pill-success">Live</span>{% else %}<span class="pill pill-danger">Draft</span>{% endif %}
           </div>
         </div>
       </div>
     </div>
     {% else %}
     <div class="admin-mobile-card" style="text-align:center; padding:32px 16px; color:var(--grey-500);">
-      No products found matching your search. <a href="/admin/products/new">Add a new product</a>
+      No products found. <a href="/admin/products/new">Add a new product</a>
     </div>
     {% endfor %}
   </div>
 </div>
+
+<script>
+(function () {
+  // Each product has a box in the table and one in the phone list: keep the pair in step.
+  var picks = Array.prototype.slice.call(document.querySelectorAll('.pick'));
+  var all = document.getElementById('checkAll');
+  function count() {
+    var ids = {};
+    picks.forEach(function (c) { if (c.checked) ids[c.value] = 1; });
+    var n = Object.keys(ids).length;
+    document.getElementById('checkedCount').textContent = n + ' ticked';
+    all.checked = n > 0 && n === picks.length / 2;
+  }
+  picks.forEach(function (c) {
+    c.addEventListener('change', function () {
+      picks.forEach(function (o) { if (o.value === c.value) o.checked = c.checked; });
+      count();
+    });
+  });
+  all.addEventListener('change', function () {
+    picks.forEach(function (c) { c.checked = all.checked; });
+    count();
+  });
+  var act = document.getElementById('bulkAction');
+  act.addEventListener('change', function () {
+    document.getElementById('bulkCategory').style.display = act.value === 'move' ? '' : 'none';
+  });
+})();
+</script>
 {% endblock %}

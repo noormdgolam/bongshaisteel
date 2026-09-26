@@ -27,7 +27,12 @@ async function req(method, url, body, headers = {}) {
   await wait();
   const h = { "user-agent": "Mozilla/5.0 (owner edit audit)", "sec-fetch-site": "same-origin", ...headers };
   if (jar.size) h.cookie = [...jar].map(([k, v]) => k + "=" + v).join("; ");
-  if (body && !(body instanceof FormData)) { body = new URLSearchParams(body).toString(); h["content-type"] = "application/x-www-form-urlencoded"; }
+  if (body && !(body instanceof FormData)) {
+    // A field that repeats (spec rows) is an array: one pair per value, in order.
+    const qs = new URLSearchParams();
+    for (const [k, v] of Object.entries(body)) for (const x of Array.isArray(v) ? v : [v]) qs.append(k, x == null ? "" : x);
+    body = qs.toString(); h["content-type"] = "application/x-www-form-urlencoded";
+  }
   const r = await fetch(BASE + url, { method, headers: h, body, redirect: "manual" });
   for (const c of r.headers.getSetCookie()) {
     const [pair] = c.split(";"); const i = pair.indexOf("=");
@@ -42,13 +47,20 @@ function forms(html) {
   const $ = cheerio.load(html);
   return $("form").toArray().filter((f) => ($(f).attr("method") || "get").toLowerCase() === "post").map((f) => {
     const fields = {};
+    // spec_label / spec_value repeat: those names always collect into arrays.
+    const put = (name, v) => {
+      if (/^spec_/.test(name)) (fields[name] = fields[name] || []).push(v);
+      else fields[name] = v;
+    };
     $(f).find("input, textarea, select").each((_, el) => {
       const e = $(el), name = e.attr("name");
       if (!name || e.attr("disabled") !== undefined || (e.attr("type") || "") === "file") return;
+      if (e.closest("template").length) return;
       const type = (e.attr("type") || "").toLowerCase();
-      if (type === "checkbox" || type === "radio") { if (e.attr("checked") !== undefined) fields[name] = e.attr("value") ?? "on"; return; }
-      if (el.tagName === "select") { fields[name] = e.find("option[selected]").attr("value") ?? e.find("option").first().attr("value") ?? ""; return; }
-      fields[name] = el.tagName === "textarea" ? e.text() : (e.attr("value") ?? "");
+      if (type === "submit" || type === "button") return;
+      if (type === "checkbox" || type === "radio") { if (e.attr("checked") !== undefined) put(name, e.attr("value") ?? "on"); return; }
+      if (el.tagName === "select") { put(name, e.find("option[selected]").attr("value") ?? e.find("option").first().attr("value") ?? ""); return; }
+      put(name, el.tagName === "textarea" ? e.text() : (e.attr("value") ?? ""));
     });
     return { action: $(f).attr("action") || "", fields };
   });
@@ -73,10 +85,70 @@ async function editRoundTrip(label, formUrl, action, field, publicUrl) {
   check((r.status === 302 || r.status === 303) && gone, label + ": original restored", r.status);
 }
 
+/** Specs, price, SEO, history restore, duplicate, bulk publish, delete and bring back. */
+async function productDetails(pEdit, pid, code) {
+  const action = "/admin/products/" + pid;
+  const pubUrl = "/products/" + encodeURIComponent(code);
+  let r = await req("GET", pEdit);
+  const f = formAt(r.html, action);
+  if (!f) return check(false, "product details: form found");
+  const orig = { ...f.fields };
+  const labels = [...(orig.spec_label || []), "Audit span " + MARK];
+  const values = [...(orig.spec_value || []), "42 ft"];
+  r = await req("POST", action, {
+    ...orig, spec_label: labels, spec_value: values,
+    price_from: "1234", price_unit: "sqft", price_currency: "BDT",
+    meta_title: "Audit title " + MARK, meta_description: "Audit description " + MARK, image_alt: "Audit alt " + MARK,
+  });
+  const page = await pub(pubUrl);
+  check(r.status === 302 && page.includes("Audit span " + MARK) && page.includes("42 ft"), "product specs: a new row shows in the spec table", r.status);
+  check(/Tk 1,234 per sq ft/.test(page), "product price: shown as Tk 1,234 per sq ft");
+  check(page.includes("<title>Audit title " + MARK), "product SEO title: used as the page title");
+  check(page.includes("Audit description " + MARK) && page.includes('alt="Audit alt ' + MARK), "product SEO description and image alt: on the page");
+
+  // History: the version before the audit edit is the newest entry; restoring it undoes the edit.
+  r = await req("GET", pEdit);
+  const rev = firstLink(r.html, /\/admin\/products\/revisions\/\d+\/restore/);
+  const rf = rev && formAt(r.html, rev);
+  r = rf ? await req("POST", rev, rf.fields) : { status: 0 };
+  const back = await pub(pubUrl);
+  check(r.status === 302 && !back.includes(MARK), "edit history: restore puts the previous version back", r.status + " " + rev);
+  // And the form is exactly what it was.
+  const now = formAt((await req("GET", pEdit)).html, action);
+  const same = now && JSON.stringify([now.fields.spec_label, now.fields.spec_value, now.fields.meta_title, now.fields.price_from])
+    === JSON.stringify([orig.spec_label, orig.spec_value, orig.meta_title, orig.price_from]);
+  check(!!same, "edit history: specs, price and SEO fields match the original");
+
+  // Duplicate -> draft copy (not public) -> bulk publish -> public -> delete -> recently deleted -> forget.
+  r = await req("GET", pEdit);
+  const dupAction = action + "/duplicate";
+  const df = formAt(r.html, dupAction);
+  r = df ? await req("POST", dupAction, df.fields) : { status: 0, location: "" };
+  const copyId = (/\/admin\/products\/(\d+)\/edit/.exec(r.location) || [])[1];
+  const copyForm = copyId && formAt((await req("GET", "/admin/products/" + copyId + "/edit")).html, "/admin/products/" + copyId);
+  const copyCode = copyForm && copyForm.fields.model_code;
+  const status = async (u) => { await wait(); return (await fetch(BASE + u, { redirect: "manual" })).status; };
+  check(!!copyCode && (await status("/products/" + encodeURIComponent(copyCode))) === 404, "duplicate: the copy is a draft, not public", r.status + " " + copyCode);
+  if (copyId) {
+    const bulk = formAt((await req("GET", "/admin/products")).html, "/admin/products/bulk");
+    r = await req("POST", "/admin/products/bulk", { ...(bulk ? bulk.fields : {}), action: "publish", ids: [copyId] });
+    check(r.status === 302 && (await status("/products/" + encodeURIComponent(copyCode))) === 200, "bulk publish: the copy goes live", r.status);
+    r = await req("POST", "/admin/products/bulk", { ...(bulk ? bulk.fields : {}), action: "delete", ids: [copyId] });
+    check(r.status === 302 && (await status("/products/" + encodeURIComponent(copyCode))) === 404, "bulk delete: the copy is gone", r.status);
+    const del = await req("GET", "/admin/products/deleted");
+    const forget = formAt(del.html, "/admin/products/deleted/" + copyId + "/forget");
+    check(del.html.includes(copyCode) && !!forget, "recently deleted: lists the copy with Bring back");
+    if (forget) {
+      r = await req("POST", "/admin/products/deleted/" + copyId + "/forget", forget.fields);
+      check(!(await req("GET", "/admin/products/deleted")).html.includes(copyCode), "recently deleted: forget removes it", r.status);
+    }
+  }
+}
+
 async function main() {
   if (!PASS) throw new Error("set ADMIN_PASSWORD");
   let r = await req("GET", "/admin/login");
-  r = await req("POST", "/admin/login", { ...formAt(r.html, "/admin/login").fields, username: "admin", password: PASS });
+  r = await req("POST", "/admin/login", { ...formAt(r.html, "/admin/login").fields, username: process.env.ADMIN_USER || "admin", password: PASS });
   check(r.status === 302, "owner signs in", r.status);
 
   // Safety net first.
@@ -103,6 +175,7 @@ async function main() {
     const pid = pEdit.match(/\d+/)[0];
     const code = (formAt(pr.html, "/admin/products/" + pid) || { fields: {} }).fields.model_code;
     await editRoundTrip("product " + code, pEdit, "/admin/products/" + pid, "description", "/products/" + encodeURIComponent(code));
+    await productDetails(pEdit, pid, code);
   } else check(false, "products: an edit link");
 
   // 3. Category blurb (factory).

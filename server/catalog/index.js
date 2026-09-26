@@ -174,8 +174,8 @@ module.exports = function createCatalogRouter(options = {}) {
         robots: categoryProducts.length ? undefined : "noindex, follow",
         waLink: buildWhatsAppLink(content.settings && content.settings.whatsappNumber,
           "Hello Bongshai Steel! I would like a quote for a " + category.name + "."),
-        pageTitle: `${category.name} Exporter & Manufacturer | Bongshai Steel`,
-        pageDescription: `Explore ${category.name} models by Bongshai Steel. ${category.blurb || ""} AISC 360, BNBC 2020 & Eurocode certified manufacturing in Bangladesh.`,
+        pageTitle: category.metaTitle || `${category.name} Exporter & Manufacturer | Bongshai Steel`,
+        pageDescription: category.metaDescription || `Explore ${category.name} models by Bongshai Steel. ${category.blurb || ""} AISC 360, BNBC 2020 & Eurocode certified manufacturing in Bangladesh.`,
         canonicalUrl,
         ogTitle: `${category.name} | Bongshai Steel`,
         ogDescription: category.blurb || `Certified ${category.name} models manufactured by Bongshai Steel.`,
@@ -228,18 +228,35 @@ module.exports = function createCatalogRouter(options = {}) {
           imageSrc: buildSrcset(p.image, content.media)
         }));
 
+      // Rows with an empty value are placeholders from a template: not shown.
+      const specs = (Array.isArray(product.specs) ? product.specs : []).filter((s) => s && s.value);
+      const price = product.priceFrom ? {
+        amount: product.priceFrom,
+        currency: product.priceCurrency || "BDT",
+        perSqft: product.priceUnit === "sqft",
+        text: (product.priceCurrency === "USD" ? "US$ " : "Tk ") +
+          Number(product.priceFrom).toLocaleString("en-IN", { maximumFractionDigits: 2 }) +
+          (product.priceUnit === "sqft" ? " per sq ft" : ""),
+      } : null;
+      const title = product.metaTitle || `${product.name} (${product.modelCode}) | Bongshai Steel`;
+      const description = product.metaDescription ||
+        `${product.desc || product.name} Certified pre-engineered steel building by Bongshai Steel engineered to AISC 360 & BNBC standards. Request a custom quote.`;
+
       const context = {
         product,
+        specs,
+        price,
+        imageAlt: product.imageAlt || `${product.name} - Model ${product.modelCode}`,
         imageSrc: buildSrcset(product.image, content.media),
         fullImageUrl,
         waLink,
         relatedProducts,
-        pageTitle: `${product.name} (${product.modelCode}) | Bongshai Steel`,
-        pageDescription: `${product.desc} Certified pre-engineered steel building by Bongshai Steel engineered to AISC 360 & BNBC standards. Request a custom quote.`,
+        pageTitle: title,
+        pageDescription: description,
         canonicalUrl,
         ogType: "product",
-        ogTitle: `${product.name} (${product.modelCode}) | Bongshai Steel`,
-        ogDescription: product.desc,
+        ogTitle: title,
+        ogDescription: product.metaDescription || product.desc,
         ogImage: fullImageUrl,
         categoryUrl,
         siteOrigin: origin,

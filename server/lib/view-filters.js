@@ -22,10 +22,25 @@ function digits(value) {
   return String(value == null ? "" : value).replace(/\D+/g, "");
 }
 
+// The two JS line separators, built from code points so no editor mangles them.
+const LS = new RegExp(String.fromCharCode(0x2028), "g");
+const PS = new RegExp(String.fromCharCode(0x2029), "g");
+
+/** JSON for inside a <script>: no string can close the element. */
+function jsonScript(value) {
+  return (JSON.stringify(value === undefined ? null : value) || "null")
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(LS, "\\u2028")
+    .replace(PS, "\\u2029");
+}
+
 function register(env) {
   env.addFilter("dhaka", dhaka);
   env.addFilter("digits", digits);
+  env.addFilter("jsonScript", jsonScript);
   return env;
 }
 
-module.exports = { register, dhaka, digits };
+module.exports = { register, dhaka, digits, jsonScript };

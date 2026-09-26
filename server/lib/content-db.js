@@ -19,7 +19,7 @@ function compact(obj) {
 async function loadFromDb(db) {
   const [
     siteRows, mains, cats, products, stats, trust, services, safety, faqs,
-    testimonials, team, areas,
+    testimonials, team, areas, specs,
   ] = await Promise.all([
     db("site_content").select("section", "data"),
     db("main_categories").orderBy("sort_order").orderBy("id"),
@@ -36,7 +36,15 @@ async function loadFromDb(db) {
     db("testimonials").where("published", true).orderBy("sort_order").orderBy("id"),
     db("team_members").where("published", true).orderBy("sort_order").orderBy("id"),
     db("service_areas").orderBy("sort_order").orderBy("id"),
+    db("product_specs").orderBy("product_id").orderBy("sort_order").orderBy("id")
+      .select("product_id", "label", "value"),
   ]);
+
+  const specsOf = new Map();
+  for (const s of specs) {
+    if (!specsOf.has(s.product_id)) specsOf.set(s.product_id, []);
+    specsOf.get(s.product_id).push({ label: s.label, value: s.value });
+  }
 
   const site = {};
   for (const r of siteRows) {
@@ -80,6 +88,7 @@ async function loadFromDb(db) {
     categories: visibleCats.map((c) => compact({
       key: c.key, name: c.name, icon: c.icon, blurb: c.blurb, image: c.image,
       main: mainKey[c.main_category_id],
+      metaTitle: c.meta_title, metaDescription: c.meta_description,
     })),
     products: products.map((p) => compact({
       id: p.slug,
@@ -90,6 +99,14 @@ async function loadFromDb(db) {
       desc: p.description,
       image: p.image,
       order: p.sort_order,
+      imageAlt: p.image_alt,
+      metaTitle: p.meta_title,
+      metaDescription: p.meta_description,
+      priceFrom: p.price_from == null ? null : Number(p.price_from),
+      priceUnit: p.price_from == null ? null : p.price_unit || "total",
+      priceCurrency: p.price_from == null ? null : p.price_currency || "BDT",
+      specs: specsOf.get(p.id),
+      updated: p.updated_at ? new Date(p.updated_at).toISOString().slice(0, 10) : null,
     })),
     featuredIds: featured,
     media: site.media || {},

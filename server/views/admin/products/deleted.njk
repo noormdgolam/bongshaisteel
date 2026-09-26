@@ -1,0 +1,45 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Recently deleted products{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">Recently deleted products</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <p style="margin:0 0 14px; color:var(--grey-600); font-size:0.88rem;">
+    Deleted models are kept here with their specs. "Bring back" restores one exactly as it was — as a draft if you then want to check it before publishing.
+    <a href="/admin/products">← Back to products</a>
+  </p>
+  <div class="table-responsive" style="display:block;">
+    <table>
+      <thead>
+        <tr><th>Model Code</th><th>Deleted</th><th>By</th><th style="text-align:right;">Action</th></tr>
+      </thead>
+      <tbody>
+        {% for d in deleted %}
+        <tr>
+          <td><code style="font-weight:700;">{{ d.model_code }}</code></td>
+          <td>{{ d.created_at | dhaka }}</td>
+          <td>{{ d.admin_name or '—' }}</td>
+          <td style="text-align:right;">
+            <form method="post" action="/admin/products/revisions/{{ d.id }}/restore" style="display:inline;">
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+              <button type="submit" class="btn btn-sm btn-primary">Bring back</button>
+            </form>
+            <form method="post" action="/admin/products/deleted/{{ d.product_id }}/forget" style="display:inline;"
+              onsubmit="return confirm('Forget {{ d.model_code }} for good? It can no longer be brought back.');">
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+              <button type="submit" class="btn btn-sm">Forget</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" style="text-align:center; padding:30px; color:var(--grey-500);">Nothing deleted.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

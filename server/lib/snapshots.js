@@ -20,10 +20,13 @@
 
 // Children before parents: the order rows are deleted in. Inserts run in reverse.
 const TABLES = [
-  "products", "categories", "main_categories",
+  "product_specs", "products", "categories", "main_categories",
   "stats", "trust_items", "services", "safety_points", "faqs",
   "testimonials", "team_members", "service_areas", "site_content",
 ];
+// Added after the first snapshots were taken: an older snapshot without them
+// restores them as empty instead of being refused.
+const LATER_TABLES = new Set(["product_specs"]);
 const FORMAT = "bongshai-steel/content-snapshot@1";
 const AUTO_GAP_MS = 30 * 60 * 1000;
 const KEEP = 60;
@@ -116,6 +119,7 @@ async function restore(db, id, admin) {
   const data = snap.data;
   if (!data || data.format !== FORMAT || !data.tables) throw new SnapshotError("That snapshot is unreadable.");
   for (const t of TABLES) {
+    if (!Array.isArray(data.tables[t]) && LATER_TABLES.has(t)) data.tables[t] = [];
     if (!Array.isArray(data.tables[t])) throw new SnapshotError("That snapshot is missing the " + t + " table.");
   }
   if (!data.tables.products.length || !data.tables.categories.length) {

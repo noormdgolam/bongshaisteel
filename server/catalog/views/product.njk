@@ -36,7 +36,7 @@
     <span class="trust-badge-pill">AWS D1.1 Welding Quality</span>
     <span><strong>Author / Manufacturer:</strong> Bongshai Steel Engineering Team</span>
     <span><strong>Model:</strong> {{ product.modelCode }}</span>
-    <span><strong>Last Updated:</strong> 2026-09-24</span>
+    {% if product.updated %}<span><strong>Last Updated:</strong> {{ product.updated }}</span>{% endif %}
   </div>
 
   <!-- Primary Product Hero & Details -->
@@ -47,7 +47,7 @@
       <div class="product-thumb" style="height: 380px; border-radius: var(--radius-md) var(--radius-md) 0 0;">
         <img src="{{ imageSrc.src }}"
              {% if imageSrc.srcset %}srcset="{{ imageSrc.srcset }}" sizes="(max-width: 900px) 100vw, 600px"{% endif %}
-             alt="{{ product.name }} - Model {{ product.modelCode }}"
+             alt="{{ imageAlt }}"
              style="width: 100%; height: 100%; object-fit: cover;">
         <span class="product-badge">{{ product.modelCode }}</span>
       </div>
@@ -68,7 +68,14 @@
       <span class="product-category">{{ product.categoryName }}</span>
       <h1 class="product-name" style="font-size: 2.2rem; margin-bottom: 16px;">{{ product.name }}</h1>
       <p style="font-size: 1.1rem; color: var(--primary-navy); font-weight: 700; margin-bottom: 16px;">Model Code: {{ product.modelCode }}</p>
-      
+      {% if price %}
+      <p class="pd-price" style="font-size: 1.05rem; margin: -6px 0 16px;">
+        <span style="color: var(--text-muted);">Starting from</span>
+        <strong style="font-size: 1.35rem; color: var(--accent-gold, #b7791f);">{{ price.text }}</strong>
+        <span style="display:block; font-size: 0.82rem; color: var(--text-muted);">Final price depends on size, site and finish — ask for an exact quote.</span>
+      </p>
+      {% endif %}
+
       <p class="product-desc" style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px;">
         {{ product.desc }}
       </p>
@@ -108,6 +115,28 @@
     </div>
   </div>
 
+  {% if specs.length %}
+  <!-- Model specifications, from the admin -->
+  <section style="margin-bottom: 50px;">
+    <div class="section-header" style="text-align: left; margin-bottom: 20px;">
+      <span class="section-subtitle">Specifications</span>
+      <h2 class="section-title" style="font-size: 1.75rem;">{{ product.modelCode }} technical specifications</h2>
+    </div>
+    <div class="cat-card" style="padding: 0; overflow: hidden;">
+      <table class="pd-spec-table" style="width: 100%; border-collapse: collapse;">
+        <tbody>
+          {% for s in specs %}
+          <tr style="border-bottom: 1px solid var(--border-light);">
+            <th scope="row" style="text-align: left; padding: 12px 18px; width: 42%; font-weight: 700; color: var(--primary-navy); background: rgba(0,0,0,0.02);">{{ s.label }}</th>
+            <td style="padding: 12px 18px; color: var(--text-dark, inherit);">{{ s.value }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
   <!-- Detailed Technical FAQ & Engineering Breakdown -->
   <section style="margin-bottom: 60px;">
     <div class="section-header" style="text-align: left; margin-bottom: 24px;">
@@ -129,7 +158,7 @@
     <div class="cat-card" style="padding: 28px;">
       <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--primary-navy); margin-bottom: 12px;">How to order or request an official quote for {{ product.modelCode }}?</h3>
       <p style="color: var(--text-muted); line-height: 1.7; margin: 0;">
-        Because every pre-engineered building is custom engineered to client site dimensions, soil conditions, and eave heights, Bongshai Steel does not publish static price lists. Submit your required square footage and site location below or reach out via WhatsApp at {{ settings.hotline }} to receive a comprehensive technical proposal and cost estimate within 24 hours.
+        Because every pre-engineered building is custom engineered to client site dimensions, soil conditions, and eave heights, {% if price %}the price above is a starting figure only.{% else %}Bongshai Steel does not publish static price lists.{% endif %} Submit your required square footage and site location below or reach out via WhatsApp at {{ settings.hotline }} to receive a comprehensive technical proposal and cost estimate within 24 hours.
       </p>
     </div>
   </section>
@@ -199,7 +228,7 @@
         <div class="product-thumb">
           <img src="{{ rel.imageSrc.src }}"
                {% if rel.imageSrc.srcset %}srcset="{{ rel.imageSrc.srcset }}" sizes="(max-width: 900px) 100vw, 400px"{% endif %}
-               alt="{{ rel.name }}"
+               alt="{{ rel.imageAlt or rel.name }}"
                loading="lazy">
           <span class="product-badge">{{ rel.modelCode }}</span>
         </div>
@@ -233,7 +262,18 @@
   "mpn": {{ product.modelCode | dump | safe }},
   "category": {{ product.categoryName | dump | safe }},
   "image": {{ fullImageUrl | dump | safe }},
-  "description": {{ product.desc | dump | safe }},
+  "description": {{ (product.metaDescription or product.desc) | dump | safe }},
+  {% if specs.length %}"additionalProperty": [
+    {% for s in specs %}{ "@type": "PropertyValue", "name": {{ s.label | dump | safe }}, "value": {{ s.value | dump | safe }} }{% if not loop.last %},{% endif %}
+    {% endfor %}],{% endif %}
+  {% if price and not price.perSqft %}"offers": {
+    "@type": "Offer",
+    "url": {{ canonicalUrl | dump | safe }},
+    "priceCurrency": {{ price.currency | dump | safe }},
+    "price": {{ price.amount | dump | safe }},
+    "availability": "https://schema.org/MadeToOrder",
+    "seller": { "@type": "Organization", "name": "Bongshai Steel" }
+  },{% endif %}
   "brand": {
     "@type": "Organization",
     "name": "Bongshai Steel",

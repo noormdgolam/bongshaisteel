@@ -261,7 +261,17 @@ module.exports = function registerUserRoutes(router, deps) {
         throw new FormError("Pick a main category from the list.");
       }
     }
-    return { ...(existing ? {} : { key }), name, icon: icon || null, blurb: blurb || null, image: image || null, main_category_id };
+    const spec_template = String(body.spec_template || "").split(/\r?\n/)
+      .map((l) => l.trim()).filter(Boolean).slice(0, 40);
+    if (spec_template.some((l) => l.length > 100)) throw new FormError("Spec labels: 100 characters at most each.");
+    const meta_title = String(body.meta_title || "").trim();
+    if (meta_title.length > 255) throw new FormError("SEO title is too long (255 characters at most).");
+    const meta_description = String(body.meta_description || "").trim();
+    if (meta_description.length > 500) throw new FormError("SEO description is too long (500 characters at most).");
+    return {
+      ...(existing ? {} : { key }), name, icon: icon || null, blurb: blurb || null, image: image || null, main_category_id,
+      spec_template: spec_template.join("\n") || null, meta_title: meta_title || null, meta_description: meta_description || null,
+    };
   }
 
   async function categoryForm(req, category, body, error) {
@@ -331,6 +341,38 @@ module.exports = function registerUserRoutes(router, deps) {
       await contentChanged();
       await logActivity(req, "category.delete", "category", existing.id, "deleted " + existing.key + " — " + existing.name);
       res.redirect("/admin/categories?notice=" + encodeURIComponent("Deleted " + existing.name + "."));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  /* Adds every template label a product in this category does not have yet,
+     with an empty value to fill in. Existing rows are never touched. */
+  router.post("/admin/categories/:id/sync-specs", async (req, res, next) => {
+    try {
+      const existing = await findCategory(req.params.id);
+      if (!existing) return next();
+      const labels = String(existing.spec_template || "").split("\n").map((l) => l.trim()).filter(Boolean);
+      if (!labels.length) {
+        return res.redirect("/admin/categories/" + existing.id + "/edit?error=" + encodeURIComponent("Save a spec template first."));
+      }
+      let added = 0;
+      const ids = await db("products").where({ category_id: existing.id }).pluck("id");
+      await db.transaction(async (trx) => {
+        for (const id of ids) {
+          const have = new Set((await trx("product_specs").where({ product_id: id }).pluck("label")).map((l) => l.toLowerCase()));
+          const [{ m }] = await trx("product_specs").where({ product_id: id }).max({ m: "sort_order" });
+          let order = m == null ? 0 : m + 1;
+          const rows = labels.filter((l) => !have.has(l.toLowerCase()))
+            .map((label) => ({ product_id: id, label, value: "", sort_order: order++ }));
+          if (rows.length) { await trx("product_specs").insert(rows); added += rows.length; }
+        }
+      });
+      await contentChanged();
+      await logActivity(req, "category.sync-specs", "category", existing.id,
+        "added " + added + " empty spec row(s) to " + ids.length + " product(s) in " + existing.key);
+      res.redirect("/admin/categories/" + existing.id + "/edit?notice=" +
+        encodeURIComponent("Added " + added + " spec row(s) across " + ids.length + " product(s). Empty rows stay hidden on the site until filled."));
     } catch (err) {
       next(err);
     }

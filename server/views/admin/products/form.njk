@@ -1,164 +1,303 @@
 {% extends "admin/layout.njk" %}
 
-{% block title %}{% if product.id %}Edit Product #{{ product.id }}{% else %}New Product{% endif %} — Bongshai Steel Admin{% endblock %}
+{% block title %}{% if product.id %}Edit {{ product.model_code }}{% else %}New Product{% endif %} — Bongshai Steel Admin{% endblock %}
 
 {% block header %}
-<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">
-  {% if product.id %}Edit Product: {{ product.model_code or product.name }}{% else %}Create New Product{% endif %}
-</h1>
+<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+  <h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">
+    {% if product.id %}Edit {{ product.model_code or product.name }}{% else %}Create New Product{% endif %}
+  </h1>
+  {% if product.id and product.published and product.model_code %}
+  <a href="/products/{{ product.model_code | urlencode }}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">View Live Page ↗</a>
+  {% elif product.id %}
+  <span class="pill pill-muted">Draft — not on the site</span>
+  {% endif %}
+</div>
 {% endblock %}
 
 {% block content %}
-{% if error %}
-<div class="error-box">{{ error }}</div>
-{% endif %}
+<style>
+  .pf-grid { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:20px; align-items:start; }
+  .pf-two { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; }
+  .pf-sec { font-weight:700; font-size:0.95rem; color:var(--grey-900); margin:22px 0 10px; padding-top:16px; border-top:1px solid var(--grey-200); }
+  .pf-help { font-size:0.78rem; color:var(--grey-500); margin-top:4px; }
+  .pf-count { float:right; font-weight:500; font-size:0.75rem; color:var(--grey-500); }
+  .pf-count.over { color:var(--danger); }
+  .spec-row { display:grid; grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr) auto; gap:8px; margin-bottom:8px; }
+  .spec-row input { width:100%; padding:9px 11px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.9rem; background:rgba(255,255,255,0.95); }
+  .img-box { display:flex; gap:14px; align-items:flex-start; padding:12px; border:1px solid var(--grey-200); border-radius:8px; background:rgba(255,255,255,0.6); flex-wrap:wrap; }
+  .img-box img { width:130px; height:98px; object-fit:cover; border-radius:6px; border:1px solid var(--grey-300); background:#fff; }
+  .serp { padding:12px 14px; border:1px solid var(--grey-200); border-radius:8px; background:#fff; font-family:arial, sans-serif; }
+  .serp .u { color:#202124; font-size:12px; }
+  .serp .t { color:#1a0dab; font-size:18px; line-height:1.3; margin:3px 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .serp .d { color:#4d5156; font-size:13px; line-height:1.45; }
+  .side-card { padding:16px; }
+  .side-card h3 { font-size:0.9rem; margin:0 0 10px; }
+  .rev { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--grey-100); font-size:0.8rem; }
+  @media (max-width: 1000px) { .pf-grid { grid-template-columns:1fr; } }
+  @media (max-width: 560px) { .spec-row { grid-template-columns:1fr auto; } .spec-row .sv { grid-column:1 / 2; } }
+</style>
 
-<div class="card" style="max-width:860px;">
-  <form method="post" action="{% if product.id %}/admin/products/{{ product.id }}{% else %}/admin/products{% endif %}">
+<div class="pf-grid">
+<div class="card">
+  <form method="post" id="productForm" action="{% if product.id %}/admin/products/{{ product.id }}{% else %}/admin/products{% endif %}">
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
+    <div class="pf-two">
       <div class="form-row">
         <label for="model_code">Model Code <span style="color:var(--danger);">*</span></label>
-        <input
-          type="text"
-          id="model_code"
-          name="model_code"
-          value="{{ product.model_code or '' }}"
-          placeholder="e.g. BH-FS-1001"
-          required
-        >
+        <input type="text" id="model_code" name="model_code" value="{{ product.model_code or '' }}" placeholder="e.g. BH-IS-1013" required>
+        <div class="pf-help">Becomes the page address: /products/<span id="codePreview">{{ product.model_code or 'MODEL' }}</span></div>
       </div>
-
       <div class="form-row">
         <label for="slug">URL Slug</label>
-        <input
-          type="text"
-          id="slug"
-          name="slug"
-          value="{{ product.slug or '' }}"
-          placeholder="e.g. factory-shed-bh-fs-1001"
-        >
+        <input type="text" id="slug" name="slug" value="{{ product.slug or '' }}" placeholder="blank = model code in lower case">
       </div>
     </div>
 
     <div class="form-row">
       <label for="name">Product Name <span style="color:var(--danger);">*</span></label>
-      <input
-        type="text"
-        id="name"
-        name="name"
-        value="{{ product.name or '' }}"
-        placeholder="e.g. Heavy Industrial Factory Shed"
-        required
-      >
+      <input type="text" id="name" name="name" value="{{ product.name or '' }}" placeholder="e.g. Heavy Industrial Factory Shed" required>
     </div>
 
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
+    <div class="pf-two">
       <div class="form-row">
-        <label for="category_id">Category</label>
-        <select id="category_id" name="category_id">
+        <label for="category_id">Category <span style="color:var(--danger);">*</span></label>
+        <select id="category_id" name="category_id" required>
           <option value="">Select a category...</option>
           {% for cat in categories %}
           <option value="{{ cat.id }}" {% if product.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
           {% endfor %}
         </select>
       </div>
-
       <div class="form-row">
         <label for="sort_order">Display Sort Order</label>
-        <input
-          type="number"
-          id="sort_order"
-          name="sort_order"
-          value="{{ product.sort_order if product.sort_order is defined and product.sort_order !== null else 0 }}"
-          min="0"
-        >
+        <input type="number" id="sort_order" name="sort_order" min="0"
+          value="{{ product.sort_order if product.sort_order is defined and product.sort_order !== null else 0 }}">
       </div>
     </div>
 
-    <div class="form-row">
-      <label for="image">Image Path</label>
-      <input
-        type="text"
-        id="image"
-        name="image"
-        value="{{ product.image or '' }}"
-        placeholder="e.g. images/products/Model No-BH-IS-1001.webp"
-      >
-      {% if product.image %}
-      <div style="margin-top:10px; display:flex; align-items:center; gap:12px;">
-        <span style="font-size:0.82rem; color:var(--grey-600); font-weight:600;">Current Preview:</span>
-        <img
-          src="{% for part in product.image.split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}"
-          alt="Current image preview"
-          style="max-height:90px; border-radius:6px; border:1px solid var(--grey-300); background:#ffffff;"
-        >
+    <div class="pf-sec">🖼️ Main Image</div>
+    <div class="img-box">
+      <img id="imgPreview" alt="Preview"
+        src="{% if product.image %}{% for part in product.image.split('/') %}{% if part %}/{{ part | urlencode }}{% endif %}{% endfor %}{% endif %}"
+        {% if not product.image %}style="display:none"{% endif %}>
+      <div style="flex:1; min-width:220px;">
+        <label style="font-weight:600; font-size:0.85rem;">📁 Upload image file</label>
+        <input type="file" id="imgFile" accept="image/jpeg,image/png,image/webp,image/gif" style="display:block; margin:6px 0; font-size:0.85rem;">
+        <div class="pf-help" id="imgStatus">JPEG, PNG, WebP or GIF up to 8 MB — converted to WebP with phone-size copies.</div>
+        <div class="form-row" style="margin:10px 0 0;">
+          <label for="image" style="font-size:0.8rem;">Or site path</label>
+          <input type="text" id="image" name="image" value="{{ product.image or '' }}" placeholder="images/products/Model No-BH-IS-1001.webp">
+        </div>
       </div>
-      {% endif %}
+    </div>
+    <div class="form-row" style="margin-top:12px;">
+      <label for="image_alt">Image Alt Text <span style="font-weight:400; color:var(--grey-500);">(optional — blank uses the name and model code)</span></label>
+      <input type="text" id="image_alt" name="image_alt" maxlength="255" value="{{ product.image_alt or '' }}" placeholder="e.g. BH-IS-1001 steel factory shed with roll-up door, front view">
     </div>
 
+    <div class="pf-sec">📝 Description</div>
     <div class="form-row">
-      <label for="description">Product Description &amp; Technical Specifications</label>
-      <textarea
-        id="description"
-        name="description"
-        rows="6"
-        placeholder="Detailed structural specifications, building codes (AISC 360, Eurocode 3, BNBC 2020), wind loads, etc."
-      >{{ product.description or '' }}</textarea>
+      <textarea id="description" name="description" rows="5"
+        placeholder="What the building is for, its size, main features.">{{ product.description or '' }}</textarea>
+    </div>
+
+    <div class="pf-sec">
+      📐 Technical Specifications
+      <button type="button" class="btn btn-sm" id="loadTemplate" style="float:right;">Load category template</button>
+    </div>
+    <div class="pf-help" style="margin:-4px 0 10px;">Shown as a table on the product page. A row with an empty value is not shown.</div>
+    <div id="specRows">
+      {% for s in specs %}
+      <div class="spec-row">
+        <input type="text" name="spec_label" value="{{ s.label }}" placeholder="Label, e.g. Clear span" maxlength="100">
+        <input type="text" class="sv" name="spec_value" value="{{ s.value }}" placeholder="Value, e.g. 60 ft" maxlength="255">
+        <button type="button" class="btn btn-sm spec-del" title="Remove row">✕</button>
+      </div>
+      {% endfor %}
+    </div>
+    <button type="button" class="btn btn-sm" id="addSpec">➕ Add row</button>
+
+    <div class="pf-sec">💰 Price <span style="font-weight:400; font-size:0.8rem; color:var(--grey-500);">(optional — blank shows "price on request")</span></div>
+    <div class="pf-two">
+      <div class="form-row">
+        <label for="price_from">Starting price</label>
+        <input type="text" id="price_from" name="price_from" inputmode="decimal"
+          value="{{ product.price_from | replace('.00','') if product.price_from else '' }}" placeholder="e.g. 1450">
+      </div>
+      <div class="form-row">
+        <label for="price_unit">Per</label>
+        <select id="price_unit" name="price_unit">
+          <option value="sqft" {% if product.price_unit == 'sqft' %}selected{% endif %}>per sq ft</option>
+          <option value="total" {% if product.price_unit != 'sqft' %}selected{% endif %}>whole building</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="price_currency">Currency</label>
+        <select id="price_currency" name="price_currency">
+          {% for c in currencies %}
+          <option value="{{ c }}" {% if product.price_currency == c or (not product.price_currency and c == 'BDT') %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="pf-sec">🔍 SEO (search result appearance)</div>
+    <div class="form-row">
+      <label for="meta_title">SEO Title <span class="pf-count" data-for="meta_title" data-max="60"></span></label>
+      <input type="text" id="meta_title" name="meta_title" maxlength="255" value="{{ product.meta_title or '' }}"
+        placeholder="Blank = Name (Model Code) | Bongshai Steel">
+    </div>
+    <div class="form-row">
+      <label for="meta_description">SEO Description <span class="pf-count" data-for="meta_description" data-max="160"></span></label>
+      <textarea id="meta_description" name="meta_description" rows="2" maxlength="500"
+        placeholder="Blank = built from the description. Aim for 120-160 characters.">{{ product.meta_description or '' }}</textarea>
+    </div>
+    <div class="serp" aria-label="Google preview">
+      <div class="u">bongshaisteel.com › products › <span id="serpCode">{{ product.model_code or 'MODEL' }}</span></div>
+      <div class="t" id="serpTitle"></div>
+      <div class="d" id="serpDesc"></div>
     </div>
 
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin:20px 0; padding:14px; background:rgba(255,255,255,0.6); border:1px solid var(--grey-200); border-radius:8px;">
-      <div>
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; font-size:0.9rem; margin:0;">
-          <input
-            type="checkbox"
-            id="published"
-            name="published"
-            value="1"
-            style="width:auto;"
-            {% if product.id %}{% if product.published %}checked{% endif %}{% else %}checked{% endif %}
-          >
-          <span>Published Live (Public Catalogue)</span>
-        </label>
-        <div style="font-size:0.78rem; color:var(--grey-500); margin-left:24px; margin-top:2px;">Visible to public buyers and search index</div>
-      </div>
-
-      <div>
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; font-size:0.9rem; margin:0;">
-          <input
-            type="checkbox"
-            id="featured"
-            name="featured"
-            value="1"
-            style="width:auto;"
-            {% if product.featured %}checked{% endif %}
-          >
-          <span>Featured Model</span>
-        </label>
-        <div style="font-size:0.78rem; color:var(--grey-500); margin-left:24px; margin-top:2px;">Highlighted on home and catalog headers</div>
-      </div>
+      <label style="display:flex; gap:8px; cursor:pointer; font-weight:600; font-size:0.9rem; margin:0;">
+        <input type="checkbox" name="published" value="1" style="width:auto;" {% if product.published %}checked{% endif %}>
+        <span>Published Live<br><span style="font-weight:400; font-size:0.78rem; color:var(--grey-500);">Visible to buyers and search engines</span></span>
+      </label>
+      <label style="display:flex; gap:8px; cursor:pointer; font-weight:600; font-size:0.9rem; margin:0;">
+        <input type="checkbox" name="featured" value="1" style="width:auto;" {% if product.featured %}checked{% endif %}>
+        <span>Featured Model<br><span style="font-weight:400; font-size:0.78rem; color:var(--grey-500);">Highlighted on the home page</span></span>
+      </label>
     </div>
 
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">
-        {% if product.id %}Save Changes{% else %}Create Product{% endif %}
-      </button>
+    <div class="form-actions" style="flex-wrap:wrap;">
+      <button type="submit" class="btn btn-primary">{% if product.id %}Save Changes{% else %}Create Product{% endif %}</button>
+      {% if product.id %}<button type="submit" name="after" value="list" class="btn">Save &amp; back to list</button>{% endif %}
       <a href="/admin/products" class="btn">Cancel</a>
     </div>
   </form>
 </div>
 
-{% if product.id %}
-<div class="card" style="max-width:860px; border-top:3px solid var(--danger); margin-top:20px;">
-  <h3 style="font-size:1rem; font-weight:700; color:var(--danger); margin:0 0 6px;">Delete Product</h3>
-  <p style="font-size:0.85rem; color:var(--grey-600); margin:0 0 16px;">
-    Permanently delete this product model from the database. This action cannot be undone.
-  </p>
-  <form method="post" action="/admin/products/{{ product.id }}/delete" onsubmit="return confirm('Are you sure you want to permanently delete this product?');">
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-    <button type="submit" class="btn btn-danger">Delete Product</button>
-  </form>
+<div>
+  {% if product.id %}
+  <div class="card side-card">
+    <h3>Actions</h3>
+    {% if product.published %}
+    <a href="/products/{{ product.model_code | urlencode }}" target="_blank" rel="noopener" class="btn btn-sm" style="width:100%; justify-content:center; margin-bottom:8px;">View live page ↗</a>
+    {% endif %}
+    <form method="post" action="/admin/products/{{ product.id }}/duplicate" style="margin-bottom:8px;">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <button type="submit" class="btn btn-sm" style="width:100%; justify-content:center;">⧉ Duplicate as draft</button>
+    </form>
+    <form method="post" action="/admin/products/{{ product.id }}/delete" onsubmit="return confirm('Delete this product? It can be brought back from Recently deleted.');">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <button type="submit" class="btn btn-sm btn-danger" style="width:100%; justify-content:center;">Delete</button>
+    </form>
+  </div>
+
+  <div class="card side-card" style="margin-top:16px;">
+    <h3>🕘 Edit history</h3>
+    {% if revisions.length %}
+    <div class="pf-help" style="margin:0 0 6px;">Each entry is the version <em>before</em> that change.</div>
+    {% for r in revisions %}
+    <div class="rev">
+      <span>{{ r.created_at | dhaka }}<br><span style="color:var(--grey-500);">{{ r.action }} · {{ r.admin_name or '—' }}</span></span>
+      <form method="post" action="/admin/products/revisions/{{ r.id }}/restore" onsubmit="return confirm('Put this version back? The current one is kept in history.');">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-sm">Restore</button>
+      </form>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="pf-help" style="margin:0;">No edits yet. After each save, the previous version appears here.</div>
+    {% endif %}
+  </div>
+  {% endif %}
 </div>
-{% endif %}
+</div>
+
+<template id="specTpl">
+  <div class="spec-row">
+    <input type="text" name="spec_label" placeholder="Label, e.g. Clear span" maxlength="100">
+    <input type="text" class="sv" name="spec_value" placeholder="Value, e.g. 60 ft" maxlength="255">
+    <button type="button" class="btn btn-sm spec-del" title="Remove row">✕</button>
+  </div>
+</template>
+
+<script>
+(function () {
+  var templates = {{ templates | jsonScript | safe }};
+  var csrf = {{ csrfToken | jsonScript | safe }};
+  var $ = function (id) { return document.getElementById(id); };
+  var rows = $('specRows');
+
+  function addRow(label, value) {
+    var node = $('specTpl').content.firstElementChild.cloneNode(true);
+    var inputs = node.querySelectorAll('input');
+    inputs[0].value = label || ''; inputs[1].value = value || '';
+    rows.appendChild(node);
+    return inputs;
+  }
+  $('addSpec').addEventListener('click', function () { addRow()[0].focus(); });
+  rows.addEventListener('click', function (e) {
+    if (e.target.classList.contains('spec-del')) e.target.closest('.spec-row').remove();
+  });
+  $('loadTemplate').addEventListener('click', function () {
+    var labels = templates[$('category_id').value] || [];
+    if (!labels.length) { alert('This category has no spec template. Add one under Categories.'); return; }
+    var have = {};
+    rows.querySelectorAll('input[name=spec_label]').forEach(function (i) { have[i.value.trim().toLowerCase()] = 1; });
+    var added = 0;
+    labels.forEach(function (l) { if (!have[l.toLowerCase()]) { addRow(l, ''); added++; } });
+    if (!added) alert('Every template row is already here.');
+  });
+
+  // Image upload: goes through the media library, then fills the path.
+  $('imgFile').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var st = $('imgStatus');
+    st.textContent = 'Uploading ' + f.name + '…';
+    var fd = new FormData();
+    fd.append('_csrf', csrf);
+    fd.append('file', f);
+    fetch('/admin/media', { method: 'POST', body: fd, headers: { 'Accept': 'application/json', 'X-CSRF-Token': csrf }, credentials: 'same-origin' })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.j.path) throw new Error(res.j.error || 'Upload failed.');
+        $('image').value = res.j.path;
+        $('imgPreview').src = '/' + res.j.path;
+        $('imgPreview').style.display = '';
+        st.textContent = 'Uploaded — ' + res.j.path + '. Save the product to use it.';
+      })
+      .catch(function (e) { st.textContent = '⚠ ' + e.message; });
+  });
+  $('image').addEventListener('change', function () {
+    var v = this.value.trim();
+    $('imgPreview').style.display = v ? '' : 'none';
+    if (v) $('imgPreview').src = '/' + v.split('/').map(encodeURIComponent).join('/');
+  });
+
+  // Character counters and the Google preview.
+  function refresh() {
+    document.querySelectorAll('.pf-count').forEach(function (c) {
+      var n = $(c.dataset.for).value.length, max = +c.dataset.max;
+      c.textContent = n + ' / ' + max;
+      c.classList.toggle('over', n > max);
+    });
+    var code = $('model_code').value.trim() || 'MODEL';
+    $('codePreview').textContent = code;
+    $('serpCode').textContent = code;
+    $('serpTitle').textContent = $('meta_title').value.trim() ||
+      (($('name').value.trim() || 'Product name') + ' (' + code + ') | Bongshai Steel');
+    var d = $('meta_description').value.trim() || $('description').value.trim();
+    $('serpDesc').textContent = d.length > 160 ? d.slice(0, 157) + '…' : (d || 'Add a description.');
+  }
+  ['model_code', 'name', 'meta_title', 'meta_description', 'description'].forEach(function (id) {
+    $(id).addEventListener('input', refresh);
+  });
+  refresh();
+})();
+</script>
 {% endblock %}
