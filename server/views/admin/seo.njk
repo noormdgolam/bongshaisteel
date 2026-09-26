@@ -1,0 +1,71 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}SEO — Bongshai Steel Admin{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">SEO</h1>
+{% endblock %}
+
+{% block content %}
+<style>
+  .seo-issue { font-size:0.82rem; margin:2px 0; }
+  .seo-issue.error { color:#b91c1c; } .seo-issue.warn { color:#b45309; } .seo-issue.info { color:var(--grey-600); }
+  .seo-links { display:flex; gap:8px; flex-wrap:wrap; }
+</style>
+
+<div class="stat-grid">
+  <div class="stat-card"><div class="num">{{ score }}%</div><div class="label">Models in good shape</div></div>
+  <div class="stat-card"><div class="num" style="color:#b91c1c;">{{ counts.error }}</div><div class="label">Pages with errors</div></div>
+  <div class="stat-card"><div class="num" style="color:#b45309;">{{ counts.warn }}</div><div class="label">Pages with warnings</div></div>
+  <div class="stat-card"><div class="num">{{ counts.ok + counts.info }}</div><div class="label">Pages fine / tips only</div></div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h3 style="margin:0 0 8px; font-size:1rem;">Quick fixes</h3>
+  {% if missingDesc %}
+  <form method="post" action="/admin/seo/fill-descriptions" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:12px;"
+    onsubmit="return confirm('Write an SEO description for the {{ missingDesc }} model(s) that have none? Each can be edited afterwards.');">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <button type="submit" class="btn btn-primary btn-sm">✍️ Write the {{ missingDesc }} missing SEO descriptions</button>
+    <span style="font-size:0.82rem; color:var(--grey-600);">Built from each model's name, type and specs. Blank ones only — nothing you wrote is changed.</span>
+  </form>
+  {% endif %}
+  <div class="seo-links">
+    <a href="/sitemap.xml" target="_blank" rel="noopener" class="btn btn-sm">🗺 Sitemap</a>
+    <a href="/robots.txt" target="_blank" rel="noopener" class="btn btn-sm">🤖 robots.txt</a>
+    <a href="https://search.google.com/search-console" target="_blank" rel="noopener" class="btn btn-sm">Google Search Console ↗</a>
+    <a href="https://pagespeed.web.dev/analysis?url={{ origin | urlencode }}" target="_blank" rel="noopener" class="btn btn-sm">PageSpeed test ↗</a>
+    <a href="https://search.google.com/test/rich-results?url={{ (origin + '/products') | urlencode }}" target="_blank" rel="noopener" class="btn btn-sm">Rich results test ↗</a>
+    <a href="/admin/content/site" class="btn btn-sm">Home page title &amp; description</a>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+    <a href="/admin/seo?show=problems" class="btn btn-sm {% if show == 'problems' %}btn-primary{% endif %}">Needs work ({{ counts.error + counts.warn }})</a>
+    <a href="/admin/seo?show=error" class="btn btn-sm {% if show == 'error' %}btn-primary{% endif %}">Errors ({{ counts.error }})</a>
+    <a href="/admin/seo?show=info" class="btn btn-sm {% if show == 'info' %}btn-primary{% endif %}">Tips ({{ counts.info }})</a>
+    <a href="/admin/seo?show=ok" class="btn btn-sm {% if show == 'ok' %}btn-primary{% endif %}">All good ({{ counts.ok }})</a>
+  </div>
+  <div class="table-responsive" style="display:block;">
+    <table>
+      <thead><tr><th style="width:110px;">Type</th><th>Page</th><th>What to fix</th><th style="width:120px; text-align:right;"></th></tr></thead>
+      <tbody>
+        {% for it in items %}
+        <tr>
+          <td><span class="pill pill-muted">{{ it.type }}</span></td>
+          <td><a href="{{ it.url }}" target="_blank" rel="noopener">{{ it.name }}</a></td>
+          <td>
+            {% for i in it.issues %}<div class="seo-issue {{ i.level }}">{{ '⛔' if i.level == 'error' else ('⚠️' if i.level == 'warn' else 'ℹ️') }} {{ i.text }}</div>
+            {% else %}<span class="seo-issue" style="color:#15803d;">✓ Good</span>{% endfor %}
+          </td>
+          <td style="text-align:right;"><a href="{{ it.edit }}" class="btn btn-sm">Fix</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" style="text-align:center; padding:30px; color:var(--grey-500);">Nothing here. 🎉</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Chat #{{ chat.id }} — Bongshai Steel Admin{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">Chat #{{ chat.id }}</h1>
+{% endblock %}
+
+{% block content %}
+<style>
+  .chat-grid { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:20px; align-items:start; }
+  .bubble { max-width:80%; padding:10px 14px; border-radius:14px; margin:8px 0; white-space:pre-wrap; word-break:break-word; font-size:0.9rem; line-height:1.5; }
+  .bubble.user { margin-left:auto; background:#1e3a8a; color:#fff; border-bottom-right-radius:4px; }
+  .bubble.assistant { background:rgba(255,255,255,0.9); border:1px solid var(--grey-200); border-bottom-left-radius:4px; }
+  .who { font-size:0.72rem; color:var(--grey-500); }
+  @media (max-width: 900px) { .chat-grid { grid-template-columns:1fr; } .bubble { max-width:92%; } }
+</style>
+<p style="margin:0 0 14px;"><a href="/admin/chats">← All chats</a></p>
+<div class="chat-grid">
+  <div class="card">
+    {% for m in messages %}
+    <div class="bubble {{ 'user' if m.role == 'user' else 'assistant' }}">{{ m.content }}</div>
+    {% else %}
+    <p style="color:var(--grey-500);">No messages.</p>
+    {% endfor %}
+  </div>
+  <div>
+    <div class="card" style="padding:16px;">
+      <div style="font-size:0.84rem; color:var(--grey-600); line-height:1.7;">
+        <div><strong>Started:</strong> {{ chat.created_at | dhaka }}</div>
+        <div><strong>Last message:</strong> {{ chat.updated_at | dhaka }}</div>
+        <div><strong>Messages:</strong> {{ chat.message_count }}</div>
+        {% if chat.first_page %}<div><strong>Started on:</strong> {{ chat.first_page }}</div>{% endif %}
+        {% if chat.last_page and chat.last_page != chat.first_page %}<div><strong>Last page:</strong> {{ chat.last_page }}</div>{% endif %}
+      </div>
+      <div style="margin-top:12px;">
+        {% if lead %}
+        <a href="/admin/leads/{{ lead.id }}" class="btn btn-sm" style="width:100%; justify-content:center;">📞 Open lead: {{ lead.name }} ({{ lead.status }})</a>
+        {% else %}
+        <a href="/admin/leads/new?chat={{ chat.id }}" class="btn btn-sm btn-primary" style="width:100%; justify-content:center;">➕ Make this a lead</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card" style="padding:16px; margin-top:16px;">
+      <form method="post" action="/admin/chats/{{ chat.id }}">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <div class="form-row">
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            {% for s in statuses %}<option value="{{ s }}" {% if chat.status == s %}selected{% endif %}>{{ s | capitalize }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="note">Note</label>
+          <textarea id="note" name="note" rows="3" maxlength="2000">{{ chat.note or '' }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+      </form>
+    </div>
+    <div class="card" style="padding:16px; margin-top:16px;">
+      <form method="post" action="/admin/chats/{{ chat.id }}/delete" onsubmit="return confirm('Delete this chat for good?');">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-sm btn-danger">Delete chat</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

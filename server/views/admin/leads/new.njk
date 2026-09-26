@@ -1,0 +1,82 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Add a lead — Bongshai Steel Admin{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">Add a lead by hand</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:860px;">
+  <p style="margin:0 0 16px; font-size:0.86rem; color:var(--grey-600);">
+    For an enquiry that did not come through the website — a phone call, WhatsApp, Facebook, a visit.
+    <a href="/admin/leads">← Back to messages</a>
+  </p>
+  <form method="post" action="/admin/leads/new">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    {% if lead.chat_id %}<input type="hidden" name="chat_id" value="{{ lead.chat_id }}">{% endif %}
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+      <div class="form-row">
+        <label for="name">Name <span style="color:var(--danger);">*</span></label>
+        <input type="text" id="name" name="name" maxlength="120" value="{{ lead.name or '' }}" required>
+      </div>
+      <div class="form-row">
+        <label for="phone">Phone / WhatsApp <span style="color:var(--danger);">*</span></label>
+        <input type="text" id="phone" name="phone" maxlength="60" value="{{ lead.phone or '' }}" required placeholder="+8801…">
+      </div>
+      <div class="form-row">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" maxlength="160" value="{{ lead.email or '' }}">
+      </div>
+      <div class="form-row">
+        <label for="company">Company</label>
+        <input type="text" id="company" name="company" maxlength="160" value="{{ lead.company or '' }}">
+      </div>
+      <div class="form-row">
+        <label for="source">Came from</label>
+        <select id="source" name="source">
+          {% if lead.source == 'ai chat' %}<option value="ai chat" selected>AI chat</option>{% endif %}
+          {% for s in sources %}<option value="{{ s }}" {% if lead.source == s %}selected{% endif %}>{{ s | capitalize }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="kind">Type</label>
+        <select id="kind" name="kind">
+          <option value="quote" {% if lead.kind != 'contact' %}selected{% endif %}>Quote request</option>
+          <option value="contact" {% if lead.kind == 'contact' %}selected{% endif %}>General enquiry</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          {% for s in statuses %}<option value="{{ s }}" {% if lead.status == s %}selected{% endif %}>{{ s | capitalize }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="model_code">Model</label>
+        <input type="text" id="model_code" name="model_code" maxlength="60" value="{{ lead.model_code or '' }}" placeholder="e.g. BH-IS-1001">
+      </div>
+      <div class="form-row">
+        <label for="destination">Location</label>
+        <input type="text" id="destination" name="destination" maxlength="200" value="{{ lead.destination or '' }}" placeholder="e.g. Gazipur">
+      </div>
+      <div class="form-row">
+        <label for="dimensions">Size</label>
+        <input type="text" id="dimensions" name="dimensions" maxlength="200" value="{{ lead.dimensions or '' }}" placeholder="e.g. 100 x 60 ft, 24 ft eave">
+      </div>
+    </div>
+    <div class="form-row">
+      <label for="message">What they asked</label>
+      <textarea id="message" name="message" rows="5" maxlength="4000">{{ lead.message or '' }}</textarea>
+    </div>
+    <div class="form-row">
+      <label for="note">Internal note</label>
+      <textarea id="note" name="note" rows="2" maxlength="2000">{{ lead.note or '' }}</textarea>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Add lead</button>
+      <a href="/admin/leads" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

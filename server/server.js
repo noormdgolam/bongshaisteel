@@ -84,6 +84,9 @@ app.use(helmet({
 }));
 app.use(compression());
 
+// Visitor analytics for Admin → Analytics (database mode only; counted after the response).
+if (content.SOURCE === "db") app.use(require("./lib/analytics").tracker(require("./lib/db")));
+
 /* ---------------------------------------------------------------- routes */
 
 /* The home page, rendered with the CMS content already applied. */
@@ -154,6 +157,7 @@ app.post("/lead.php", leadBody, async (req, res) => {
    a key it answers 503 with the hotline, and the widget says the same. */
 app.use(require("./routes/chat")({
   content, leads,
+  db: content.SOURCE === "db" ? require("./lib/db") : null,
   getProjects: content.SOURCE === "db"
     ? () => require("./lib/db")("projects").where({ published: true }).orderBy("sort_order").orderBy("id")
     : null,

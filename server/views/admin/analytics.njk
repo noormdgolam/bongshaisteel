@@ -1,0 +1,101 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Analytics — Bongshai Steel Admin{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">Analytics</h1>
+{% endblock %}
+
+{% block content %}
+<style>
+  .an-bars { display:flex; align-items:flex-end; gap:2px; height:180px; padding:8px 0 0; border-bottom:1px solid var(--grey-300); }
+  .an-bar { flex:1; min-width:3px; display:flex; flex-direction:column; justify-content:flex-end; height:100%; position:relative; }
+  .an-bar .v { background:#93c5fd; border-radius:3px 3px 0 0; }
+  .an-bar .u { background:#1d4ed8; border-radius:3px 3px 0 0; position:absolute; bottom:0; left:20%; right:20%; }
+  .an-bar .l { position:absolute; bottom:-7px; left:50%; width:7px; height:7px; margin-left:-3.5px; border-radius:50%; background:#16a34a; }
+  .an-legend { display:flex; gap:16px; flex-wrap:wrap; font-size:0.78rem; color:var(--grey-600); margin-top:14px; }
+  .an-legend i { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:-1px; }
+  .an-cols { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px; margin-top:16px; }
+  .an-row { display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px solid var(--grey-100); font-size:0.86rem; }
+  .an-row span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+</style>
+
+<div class="card" style="padding:12px 16px; margin-bottom:16px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+  <span style="font-weight:600; font-size:0.9rem;">Period:</span>
+  {% for d in ranges %}<a href="/admin/analytics?days={{ d }}" class="btn btn-sm {% if d == days %}btn-primary{% endif %}">Last {{ d }} days</a>{% endfor %}
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card"><div class="num">{{ today.visitors }}</div><div class="label">Visitors today</div></div>
+  <div class="stat-card"><div class="num">{{ totals.visitors }}</div><div class="label">Visitors · {{ days }} days</div></div>
+  <div class="stat-card"><div class="num">{{ totals.views }}</div><div class="label">Page views · {{ days }} days</div></div>
+  <div class="stat-card"><div class="num">{{ totals.leads }}</div><div class="label">Enquiries · {{ days }} days ({{ totals.conversion }}% of visitors)</div></div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h3 style="margin:0 0 6px; font-size:1rem;">Daily traffic</h3>
+  <div class="an-bars" role="img" aria-label="Daily page views and visitors">
+    {% for s in series %}
+    <div class="an-bar" title="{{ s.day }}: {{ s.views }} views, {{ s.visitors }} visitors{% if s.leads %}, {{ s.leads }} enquiries{% endif %}">
+      <div class="v" style="height:{{ (s.views / max * 100) | round(1) }}%"></div>
+      <div class="u" style="height:{{ (s.visitors / max * 100) | round(1) }}%"></div>
+      {% if s.leads %}<div class="l"></div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div style="display:flex; justify-content:space-between; font-size:0.72rem; color:var(--grey-500); margin-top:10px;">
+    <span>{{ series[0].day }}</span><span>{{ today.day }}</span>
+  </div>
+  <div class="an-legend">
+    <span><i style="background:#93c5fd"></i>Page views</span>
+    <span><i style="background:#1d4ed8"></i>Visitors</span>
+    <span><i style="background:#16a34a; border-radius:50%"></i>Day with an enquiry</span>
+  </div>
+</div>
+
+<div class="an-cols">
+  <div class="card">
+    <h3 style="margin:0 0 8px; font-size:1rem;">Top pages</h3>
+    {% for p in pages %}
+    <div class="an-row"><span><a href="{{ p.path }}" target="_blank" rel="noopener">{{ p.path }}</a></span><span>{{ p.views }} views · {{ p.visitors }} visitors</span></div>
+    {% else %}<p style="color:var(--grey-500); font-size:0.86rem;">No visits recorded yet.</p>{% endfor %}
+  </div>
+  <div>
+    <div class="card">
+      <h3 style="margin:0 0 8px; font-size:1rem;">Where visitors came from</h3>
+      {% for r in refs %}
+      <div class="an-row"><span>{{ r.referrer_host }}</span><span>{{ r.views }}</span></div>
+      {% else %}<p style="color:var(--grey-500); font-size:0.86rem;">Only direct visits so far (typed address, bookmarks, apps).</p>{% endfor %}
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin:0 0 8px; font-size:1rem;">Devices</h3>
+      {% for d in devices %}
+      <div class="an-row"><span style="text-transform:capitalize;">{{ d.device }}</span><span>{{ d.pct }}% · {{ d.visitors }}</span></div>
+      {% else %}<p style="color:var(--grey-500); font-size:0.86rem;">—</p>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h3 style="margin:0 0 6px; font-size:1rem;">Don't count my own visits</h3>
+  <p style="margin:0 0 10px; font-size:0.84rem; color:var(--grey-600);">
+    Visits from these IP addresses are not counted. Your address right now: <code>{{ myIp }}</code>.
+    Search engines and bots are never counted. Visits older than {{ keepDays }} days are removed.
+  </p>
+  {% for e in excluded %}
+  <div class="an-row">
+    <span><code>{{ e.ip }}</code> {% if e.note %}— {{ e.note }}{% endif %}</span>
+    <form method="post" action="/admin/analytics/exclude-ip/{{ e.id }}/delete">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <button type="submit" class="btn btn-sm">Remove</button>
+    </form>
+  </div>
+  {% endfor %}
+  <form method="post" action="/admin/analytics/exclude-ip" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <input type="text" name="ip" value="{{ myIp }}" style="padding:8px 10px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.88rem;">
+    <input type="text" name="note" placeholder="Note, e.g. office" maxlength="120" style="padding:8px 10px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.88rem;">
+    <button type="submit" class="btn btn-sm btn-primary">Stop counting this IP</button>
+  </form>
+</div>
+{% endblock %}

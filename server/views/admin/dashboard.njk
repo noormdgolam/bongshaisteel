@@ -43,6 +43,18 @@
     <div class="num">{% if stats.views is defined and stats.views !== null %}{{ stats.views }}{% else %}—{% endif %}</div>
     <div class="label">Site Views</div>
   </div>
+  <a href="/admin/analytics" class="stat-card" style="border-left:4px solid #1d4ed8; text-decoration:none; color:inherit;">
+    <div class="num">{{ stats.visitorsToday or 0 }}</div>
+    <div class="label">Visitors today · {{ stats.visitorsWeek or 0 }} this week</div>
+  </a>
+  <a href="/admin/chats?status=open" class="stat-card" style="border-left:4px solid #0d9488; text-decoration:none; color:inherit;">
+    <div class="num">{{ stats.chatsOpen or 0 }}</div>
+    <div class="label">Open support chats</div>
+  </a>
+  <a href="/admin/seo" class="stat-card" style="border-left:4px solid #b45309; text-decoration:none; color:inherit;">
+    <div class="num">{{ stats.noSeo or 0 }}</div>
+    <div class="label">Models without an SEO description</div>
+  </a>
 </div>
 
 <div class="card" style="margin-top:24px;">

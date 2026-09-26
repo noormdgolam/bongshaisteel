@@ -190,6 +190,12 @@ async function main() {
     await editRoundTrip("category " + (cf && cf.fields.key), catEdit, "/admin/categories/" + cid, "blurb", "/category/" + (cf && cf.fields.key));
   } else check(false, "categories: an edit link");
 
+  // 3b. Menu line name (the first column of the Products menu).
+  r = await req("GET", "/admin/menu-lines");
+  const lineAction = (forms(r.html).find((f) => /^\/admin\/menu-lines\/\d+$/.test(f.action)) || {}).action;
+  if (lineAction) await editRoundTrip("menu line", "/admin/menu-lines", lineAction, "name", "/products");
+  else check(false, "menu lines: an edit form");
+
   // 4. FAQ: create, see it, delete it.
   r = await req("GET", "/admin/content/faqs/new");
   const nf = formAt(r.html, "/admin/content/faqs");
@@ -244,10 +250,75 @@ async function main() {
     r = await req("POST", "/admin/leads/" + id, { ...(lf ? lf.fields : {}), status: "contacted", note: MARK });
     const after = (await req("GET", leadLink)).html;
     check((r.status === 302 || r.status === 303) && after.includes(MARK), "leads: status and note saved", r.status);
+    // Quick status from the list, then bulk status.
+    let list = await req("GET", "/admin/leads");
+    const qs = formAt(list.html, "/admin/leads/" + id + "/quick-status");
+    r = await req("POST", "/admin/leads/" + id + "/quick-status", { ...(qs ? qs.fields : {}), status: "quoted" });
+    list = await req("GET", "/admin/leads?status=quoted");
+    check(r.status === 302 && list.html.includes(MARK), "leads: quick status from the list", r.status);
+    const bulk = formAt(list.html, "/admin/leads/bulk");
+    r = await req("POST", "/admin/leads/bulk", { ...(bulk ? bulk.fields : {}), action: "status:won", ids: [id] });
+    check(r.status === 302 && (await req("GET", "/admin/leads?status=won")).html.includes(MARK), "leads: bulk status", r.status);
     const del = formAt(after, "/admin/leads/" + id + "/delete");
     r = await req("POST", "/admin/leads/" + id + "/delete", del ? del.fields : {});
     check(!(await req("GET", "/admin/leads")).html.includes(MARK), "leads: deleted again", r.status);
   }
+
+  // Lead typed in by hand, then bulk-deleted.
+  r = await req("GET", "/admin/leads/new");
+  const nl = formAt(r.html, "/admin/leads/new");
+  r = await req("POST", "/admin/leads/new", { ...(nl ? nl.fields : {}), name: MARK + " Manual", phone: "01700000008", source: "phone call", message: "audit — please ignore" });
+  const manualId = (/\/admin\/leads\/(\d+)/.exec(r.location) || [])[1];
+  check(r.status === 302 && !!manualId && (await req("GET", "/admin/leads")).html.includes(MARK + " Manual"), "leads: added by hand", r.status + " " + r.location);
+  if (manualId) {
+    const bulk = formAt((await req("GET", "/admin/leads")).html, "/admin/leads/bulk");
+    r = await req("POST", "/admin/leads/bulk", { ...(bulk ? bulk.fields : {}), action: "delete", ids: [manualId] });
+    check(!(await req("GET", "/admin/leads")).html.includes(MARK), "leads: bulk delete", r.status);
+  }
+
+  // Support chat: one real message to the assistant is logged; then deleted.
+  await wait();
+  const chatId = "zzaudit" + Date.now().toString(36);
+  const cr = await fetch(BASE + "/api/chat", {
+    method: "POST", headers: { "content-type": "application/json", "sec-fetch-site": "same-origin" },
+    body: JSON.stringify({ chat: chatId, page: { path: "/", title: "audit" }, messages: [{ role: "user", content: "Hello, this is an automatic test " + MARK + ". Reply with one word." }] }),
+  }).then((x) => x.json()).catch(() => ({}));
+  if (cr.ok) {
+    await wait();
+    const chats = await req("GET", "/admin/chats?q=" + encodeURIComponent(MARK));
+    const link = firstLink(chats.html, /\/admin\/chats\/\d+/);
+    check(!!link, "support chats: the conversation is logged");
+    if (link) {
+      const detail = await req("GET", link);
+      check(detail.html.includes(MARK) && detail.html.includes("bubble assistant"), "support chats: transcript with the assistant's reply");
+      const dl = formAt(detail.html, link + "/delete");
+      r = await req("POST", link + "/delete", dl ? dl.fields : {});
+      // The search box repeats the marker, so look for the chat's link instead.
+      check(!(await req("GET", "/admin/chats?q=" + encodeURIComponent(MARK))).html.includes('href="' + link + '"'), "support chats: deleted", r.status);
+    }
+  } else check(true, "support chats: assistant unavailable here (" + (cr.error || "no reply") + ") — logging not tested");
+
+  // Analytics and SEO pages, and the IP exclusion list.
+  r = await req("GET", "/admin/analytics");
+  check(r.status === 200 && r.html.includes("Daily traffic") && r.html.includes("Top pages"), "analytics: page opens", r.status);
+  const ex = formAt(r.html, "/admin/analytics/exclude-ip");
+  r = await req("POST", "/admin/analytics/exclude-ip", { ...(ex ? ex.fields : {}), ip: "203.0.113.77", note: MARK });
+  const exPage = (await req("GET", "/admin/analytics")).html;
+  const exDel = firstLink(exPage, /\/admin\/analytics\/exclude-ip\/\d+\/delete/);
+  check(exPage.includes("203.0.113.77") && !!exDel, "analytics: an IP can be left out", r.status);
+  if (exDel) {
+    const xf = formAt(exPage, exDel);
+    // Only remove the audit's own entry: it is the one whose row shows the marker.
+    const $x = cheerio.load(exPage);
+    let mine = null;
+    $x("form[action^='/admin/analytics/exclude-ip/']").each((_, f) => { if (!mine && $x(f).closest(".an-row").text().includes(MARK)) mine = $x(f).attr("action"); });
+    if (mine) r = await req("POST", mine, formAt(exPage, mine).fields);
+    check(!!mine && !(await req("GET", "/admin/analytics")).html.includes(MARK), "analytics: and put back", xf ? r.status : "no form");
+  }
+  r = await req("GET", "/admin/seo");
+  check(r.status === 200 && r.html.includes("Models in good shape"), "SEO: audit page opens", r.status);
+  r = await req("GET", "/admin");
+  check(r.html.includes("Visitors today") && r.html.includes("Open support chats"), "dashboard: visitors and chats cards");
 
   // 8. Media: upload through the form, then delete.
   r = await req("GET", "/admin/media");

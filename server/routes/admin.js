@@ -160,8 +160,16 @@ module.exports = function createAdminRouter({ db, content }) {
           .select("created_at", "admin_name", "action", "summary"),
       ]);
       const views = require("../lib/counter").read();
+      const day = (n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
+      const distinct = async (q) => Number(((await q.countDistinct({ n: "visitor_hash" }))[0] || {}).n || 0);
+      const [visitorsToday, visitorsWeek, chatsOpen, noSeo] = await Promise.all([
+        distinct(db("page_views").where("day", day(0))),
+        distinct(db("page_views").where("day", ">=", day(6))),
+        count(db("chat_sessions").where({ status: "open" })),
+        count(db("products").where("published", true).whereNull("meta_description")),
+      ]);
       res.render("admin/dashboard.njk", view(req, "dashboard", {
-        stats: { products, categories, faqs, leadsNew, leadsTotal, views },
+        stats: { products, categories, faqs, leadsNew, leadsTotal, views, visitorsToday, visitorsWeek, chatsOpen, noSeo },
         recentActivity,
       }));
     } catch (err) {
@@ -176,6 +184,9 @@ module.exports = function createAdminRouter({ db, content }) {
   });
 
   /* ------------------------------------------------------------- messages */
+
+  // Before /admin/leads/:id, so /admin/leads/new and /bulk are not read as ids.
+  require("./admin-sales")(router, { db, auth, logActivity, view, FormError });
 
   const STATUSES = ["new", "contacted", "quoted", "won", "lost"];
   const LEAD_LIST_CAP = 500;
@@ -207,7 +218,7 @@ module.exports = function createAdminRouter({ db, content }) {
       const f = leadFilters(req.query);
       const [leads, byStatus] = await Promise.all([
         applyLeadFilters(db("leads"), f).orderBy("created_at", "desc").orderBy("id", "desc").limit(LEAD_LIST_CAP)
-          .select("id", "kind", "status", "name", "phone", "email", "company", "model_code", "destination", "created_at"),
+          .select("id", "kind", "status", "name", "phone", "email", "company", "model_code", "destination", "source", "created_at"),
         db("leads").select("status").count({ n: "*" }).groupBy("status"),
       ]);
       const counts = { all: 0, new: 0, contacted: 0, quoted: 0, won: 0, lost: 0 };
@@ -322,6 +333,9 @@ module.exports = function createAdminRouter({ db, content }) {
     db, auth, logActivity, contentChanged, view, on, FormError, contentRoles: CONTENT_ROLES,
   });
   require("./admin-media")(router, {
+    db, auth, logActivity, contentChanged, view, contentRoles: CONTENT_ROLES,
+  });
+  require("./admin-insights")(router, {
     db, auth, logActivity, contentChanged, view, contentRoles: CONTENT_ROLES,
   });
   require("./admin-projects")(router, {

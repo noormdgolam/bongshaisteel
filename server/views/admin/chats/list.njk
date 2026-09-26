@@ -1,0 +1,70 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Support Chats — Bongshai Steel Admin{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">Support Chats</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom:16px; padding:12px 16px;">
+  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+    <a href="/admin/chats?status=all&lead={{ withLead }}" class="btn btn-sm {% if status == 'all' %}btn-primary{% endif %}">All ({{ counts.all or 0 }})</a>
+    {% for s in statuses %}
+    <a href="/admin/chats?status={{ s }}&lead={{ withLead }}" class="btn btn-sm {% if status == s %}btn-primary{% endif %}">{{ s | capitalize }} ({{ counts[s] or 0 }})</a>
+    {% endfor %}
+  </div>
+  <form method="get" action="/admin/chats" class="toolbar" style="margin:0;">
+    <input type="hidden" name="status" value="{{ status }}">
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; flex:1;">
+      <select name="lead" style="padding:8px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.9rem; background:rgba(255,255,255,0.9);">
+        <option value="all" {% if withLead == 'all' %}selected{% endif %}>With or without phone</option>
+        <option value="yes" {% if withLead == 'yes' %}selected{% endif %}>Gave a phone (lead)</option>
+        <option value="no" {% if withLead == 'no' %}selected{% endif %}>No phone yet</option>
+      </select>
+      <input type="text" name="q" value="{{ q }}" placeholder="Search the conversation…"
+        style="padding:8px 12px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.9rem; min-width:220px; background:rgba(255,255,255,0.9);">
+      <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <p style="margin:0 0 12px; font-size:0.84rem; color:var(--grey-600);">Every conversation with the website's AI assistant. A chat where the visitor gave a phone number also created a message under Messages.</p>
+  <div class="table-responsive" style="display:block;">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:150px;">Last message</th>
+          <th>Visitor asked</th>
+          <th style="width:80px;">Messages</th>
+          <th style="width:110px;">Status</th>
+          <th style="width:90px;">Lead</th>
+          <th style="width:70px; text-align:right;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in chats %}
+        <tr>
+          <td style="font-size:0.84rem; color:var(--grey-600); white-space:nowrap;">{{ c.updated_at | dhaka }}</td>
+          <td>
+            <a href="/admin/chats/{{ c.id }}" style="color:var(--grey-900); text-decoration:none;">{{ c.preview or '—' }}</a>
+            {% if c.first_page %}<div style="font-size:0.74rem; color:var(--grey-500);">started on {{ c.first_page }}</div>{% endif %}
+          </td>
+          <td>{{ c.message_count }}</td>
+          <td>
+            {% if c.status == 'open' %}<span class="pill pill-gold">Open</span>
+            {% elif c.status == 'closed' %}<span class="pill pill-muted">Closed</span>
+            {% else %}<span class="pill pill-success">Followed up</span>{% endif %}
+          </td>
+          <td>{% if c.lead_id %}<a href="/admin/leads/{{ c.lead_id }}" class="pill pill-success" style="text-decoration:none;">📞 Lead</a>{% else %}—{% endif %}</td>
+          <td style="text-align:right;"><a href="/admin/chats/{{ c.id }}" class="btn btn-sm">Read</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" style="text-align:center; padding:36px 20px; color:var(--grey-500);">No chats yet. They appear here as visitors talk to the assistant.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

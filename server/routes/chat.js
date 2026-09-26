@@ -34,7 +34,8 @@ function limited(ip) {
   return false;
 }
 
-module.exports = function createChatRouter({ content, leads, getProjects }) {
+module.exports = function createChatRouter({ content, leads, getProjects, db }) {
+  const { saveChat } = require("../lib/analytics");
   const router = express.Router();
 
   router.post("/api/chat", express.json({ limit: "24kb" }), async (req, res) => {
@@ -63,6 +64,7 @@ module.exports = function createChatRouter({ content, leads, getProjects }) {
         ctx: { pagePath: String(page.path || "/").slice(0, 200), pageTitle: String(page.title || "").slice(0, 200) },
       });
 
+      let leadId = null;
       if (out.lead && chatId && !leadChats.has(chatId)) {
         leadChats.set(chatId, Date.now());
         if (leadChats.size > 5000) leadChats.delete(leadChats.keys().next().value);
@@ -76,12 +78,19 @@ module.exports = function createChatRouter({ content, leads, getProjects }) {
             source: "ai chat",
             message: ((out.lead.summary ? out.lead.summary + "\n\n" : "") + "— chat —\n" + transcript).slice(0, 3900),
           }, { ip: req.ip, agent: req.get("user-agent") });
+          if (db) {
+            const row = await db("leads").where({ source: "ai chat", phone: String(out.lead.phone || "").slice(0, 60) })
+              .orderBy("id", "desc").first("id");
+            leadId = row ? row.id : null;
+          }
         } catch (err) {
           console.error("chat lead:", err.message); // a failed lead must not break the reply
           leadChats.delete(chatId);
         }
       }
-      res.json({ ok: true, reply: out.reply || "Sorry — could you say that again?" });
+      const reply = out.reply || "Sorry — could you say that again?";
+      res.json({ ok: true, reply });
+      saveChat(db, { chatId, messages, reply, page, ip: req.ip, agent: req.get("user-agent"), leadId });
     } catch (err) {
       console.error("chat:", err.code || err.message);
       const s = (content.load().settings) || {};

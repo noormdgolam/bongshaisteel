@@ -1,0 +1,35 @@
+{% extends "admin/layout.njk" %}
+
+{% block title %}Menu lines — Bongshai Steel Admin{% endblock %}
+
+{% block header %}
+<h1 style="font-size:1.25rem; font-weight:700; margin:0; color:var(--grey-900);">Products menu: lines</h1>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom:16px;">
+  <p style="margin:0; font-size:0.86rem; color:var(--grey-600);">
+    The columns of the Products menu, in order. Each building type is put under a line on its own page in
+    <a href="/admin/categories">Categories</a>. The key is part of the site's links and cannot change.
+  </p>
+</div>
+{% for l in lines %}
+<div class="card" style="margin-bottom:12px;">
+  <div style="display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;">
+    <div style="display:flex; flex-direction:column; gap:4px;">
+      <form method="post" action="/admin/menu-lines/{{ l.id }}/move"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><input type="hidden" name="direction" value="up"><button class="btn btn-sm" {% if loop.first %}disabled{% endif %} title="Move up">▲</button></form>
+      <form method="post" action="/admin/menu-lines/{{ l.id }}/move"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><input type="hidden" name="direction" value="down"><button class="btn btn-sm" {% if loop.last %}disabled{% endif %} title="Move down">▼</button></form>
+    </div>
+    <form method="post" action="/admin/menu-lines/{{ l.id }}" style="flex:1; min-width:260px;">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <div style="display:grid; grid-template-columns:80px minmax(0,1fr); gap:10px;">
+        <div class="form-row"><label>Icon</label><input type="text" name="icon" maxlength="32" value="{{ l.icon or '' }}"></div>
+        <div class="form-row"><label>Name <code style="font-weight:400; color:var(--grey-500);">{{ l.key }}</code> · {{ l.types }} building type(s)</label><input type="text" name="name" maxlength="255" value="{{ l.name }}" required></div>
+      </div>
+      <div class="form-row"><label>Short description</label><textarea name="blurb" rows="2">{{ l.blurb or '' }}</textarea></div>
+      <button type="submit" class="btn btn-sm btn-primary">Save</button>
+    </form>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

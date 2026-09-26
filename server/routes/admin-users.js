@@ -346,6 +346,62 @@ module.exports = function registerUserRoutes(router, deps) {
     }
   });
 
+  /* ------------------------------------------ menu lines (main categories)
+     The four columns of the Products menu. Their keys are fixed (links use
+     them); name, icon, blurb and order are editable. */
+
+  router.use("/admin/menu-lines", auth.requireRole(...contentRoles));
+
+  router.get("/admin/menu-lines", async (req, res, next) => {
+    try {
+      const lines = await db("main_categories as m").leftJoin("categories as c", "c.main_category_id", "m.id")
+        .groupBy("m.id").orderBy("m.sort_order").orderBy("m.id")
+        .select("m.id", "m.key", "m.name", "m.icon", "m.blurb", "m.sort_order").count({ types: "c.id" });
+      res.render("admin/categories/lines.njk", view(req, "categories", { lines }));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post("/admin/menu-lines/:id", async (req, res, next) => {
+    try {
+      const line = await db("main_categories").where({ id: parseInt(req.params.id, 10) || 0 }).first("id", "key");
+      if (!line) return next();
+      const name = String(req.body.name || "").trim();
+      const icon = String(req.body.icon || "").trim();
+      const blurb = String(req.body.blurb || "").trim();
+      const bad = !name ? "Name is required." : name.length > 255 ? "Name is too long." : icon.length > 32 ? "Icon: one emoji." : blurb.length > 5000 ? "Description is too long." : null;
+      if (bad) return res.redirect("/admin/menu-lines?error=" + encodeURIComponent(bad));
+      await db("main_categories").where({ id: line.id }).update({ name, icon: icon || null, blurb: blurb || null, updated_at: db.fn.now() });
+      await contentChanged();
+      await logActivity(req, "menu.update", "main_category", line.id, "edited menu line " + line.key);
+      res.redirect("/admin/menu-lines?notice=" + encodeURIComponent("Saved " + name + "."));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post("/admin/menu-lines/:id/move", async (req, res, next) => {
+    try {
+      const dir = req.body.direction === "up" ? -1 : req.body.direction === "down" ? 1 : 0;
+      if (dir) {
+        await db.transaction(async (trx) => {
+          const rows = await trx("main_categories").orderBy("sort_order").orderBy("id").select("id");
+          const i = rows.findIndex((r) => r.id === parseInt(req.params.id, 10));
+          const j = i + dir;
+          if (i < 0 || j < 0 || j >= rows.length) return;
+          [rows[i], rows[j]] = [rows[j], rows[i]];
+          for (const [pos, r] of rows.entries()) await trx("main_categories").where({ id: r.id }).update({ sort_order: pos });
+        });
+        await contentChanged();
+        await logActivity(req, "menu.move", "main_category", req.params.id, "moved a menu line " + (dir < 0 ? "up" : "down"));
+      }
+      res.redirect("/admin/menu-lines");
+    } catch (err) {
+      next(err);
+    }
+  });
+
   /* Adds every template label a product in this category does not have yet,
      with an empty value to fill in. Existing rows are never touched. */
   router.post("/admin/categories/:id/sync-specs", async (req, res, next) => {

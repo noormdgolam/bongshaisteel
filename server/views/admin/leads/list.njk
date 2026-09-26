@@ -72,7 +72,8 @@
       {% endif %}
     </div>
 
-    <div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <a href="/admin/leads/new" class="btn btn-sm btn-primary">➕ Add lead</a>
       <a
         href="/admin/leads.csv?status={{ (status or 'all') | urlencode }}&kind={{ (kind or 'all') | urlencode }}&q={{ (q or '') | urlencode }}"
         class="btn btn-sm"
@@ -85,14 +86,32 @@
 </div>
 
 <div class="card">
-  <div style="margin-bottom:12px; font-size:0.86rem; color:var(--grey-600); font-weight:600;">
-    Total Matching Inquiries: {{ total if total is defined and total !== null else leads.length }}
-  </div>
+  <style>
+    .lead-bulk { display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:10px 12px; margin-bottom:12px; border:1px solid var(--grey-200); border-radius:8px; background:rgba(255,255,255,0.6); font-size:0.86rem; }
+    .lead-bulk select, .qs select { padding:5px 8px; border:1px solid var(--grey-300); border-radius:7px; font-size:0.82rem; background:#fff; }
+    .row-check { width:17px; height:17px; cursor:pointer; }
+    .qs select.st-new { background:#fef3c7; } .qs select.st-won { background:#dcfce7; } .qs select.st-lost { background:#fee2e2; } .qs select.st-quoted { background:#e0e7ff; }
+  </style>
+  <form method="post" action="/admin/leads/bulk" id="leadBulk" class="lead-bulk"
+    onsubmit="var a=this.action.value; if(!a) return false; return a!=='delete' || confirm('Delete the ticked messages for good?');">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <input type="hidden" name="back" value="/admin/leads?status={{ (status or 'all') | urlencode }}&kind={{ (kind or 'all') | urlencode }}&q={{ (q or '') | urlencode }}">
+    <label style="display:flex; align-items:center; gap:6px; font-weight:600; cursor:pointer;"><input type="checkbox" id="leadAll" class="row-check"> All</label>
+    <span id="leadCount" style="color:var(--grey-600);">0 ticked</span>
+    <select name="action">
+      <option value="">Bulk action…</option>
+      {% for s in ['new','contacted','quoted','won','lost'] %}<option value="status:{{ s }}">Mark {{ s }}</option>{% endfor %}
+      <option value="delete">Delete</option>
+    </select>
+    <button type="submit" class="btn btn-sm btn-primary">Apply</button>
+    <span style="margin-left:auto; color:var(--grey-600); font-weight:600;">Total: {{ total if total is defined and total !== null else leads.length }}</span>
+  </form>
 
   <div class="table-responsive">
     <table>
       <thead>
         <tr>
+          <th style="width:32px;"></th>
           <th style="width:140px;">Date</th>
           <th style="width:90px;">Type</th>
           <th style="width:100px;">Status</th>
@@ -106,6 +125,7 @@
       <tbody>
         {% for l in leads %}
         <tr>
+          <td><input type="checkbox" class="row-check lpick" name="ids" value="{{ l.id }}" form="leadBulk"></td>
           <td style="white-space:nowrap; font-size:0.84rem; color:var(--grey-600);">
             {{ l.created_at | dhaka }}
           </td>
@@ -115,19 +135,17 @@
             {% else %}
             <span class="pill pill-muted" style="text-transform:capitalize;">Contact</span>
             {% endif %}
+            {% if l.source %}<div style="font-size:0.72rem; color:var(--grey-500); margin-top:3px;">{{ l.source }}</div>{% endif %}
           </td>
           <td>
-            {% if l.status == 'new' %}
-            <span class="pill pill-gold">New</span>
-            {% elif l.status == 'won' %}
-            <span class="pill pill-success">Won</span>
-            {% elif l.status == 'lost' %}
-            <span class="pill pill-danger">Lost</span>
-            {% elif l.status == 'quoted' %}
-            <span class="pill pill-muted" style="background:#e0e7ff; color:#3730a3;">Quoted</span>
-            {% else %}
-            <span class="pill pill-muted">{{ l.status | capitalize }}</span>
-            {% endif %}
+            <form method="post" action="/admin/leads/{{ l.id }}/quick-status" class="qs">
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+              <input type="hidden" name="back" value="/admin/leads?status={{ (status or 'all') | urlencode }}&kind={{ (kind or 'all') | urlencode }}&q={{ (q or '') | urlencode }}">
+              <select name="status" class="st-{{ l.status }}" onchange="this.form.submit()" aria-label="Status of {{ l.name }}">
+                {% for s in statuses %}<option value="{{ s }}" {% if l.status == s %}selected{% endif %}>{{ s | capitalize }}</option>{% endfor %}
+              </select>
+              <noscript><button type="submit" class="btn btn-sm">Set</button></noscript>
+            </form>
           </td>
           <td>
             <a href="/admin/leads/{{ l.id }}" style="color:var(--grey-900); font-weight:700; text-decoration:none;">
@@ -174,7 +192,7 @@
         </tr>
         {% else %}
         <tr>
-          <td colspan="8" style="text-align:center; padding:36px 20px; color:var(--grey-500);">
+          <td colspan="9" style="text-align:center; padding:36px 20px; color:var(--grey-500);">
             No messages found matching your criteria.
           </td>
         </tr>
@@ -188,7 +206,8 @@
     {% for l in leads %}
     <div class="admin-mobile-card lead-card">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; gap:8px;">
-        <div>
+        <input type="checkbox" class="row-check lpick" name="ids" value="{{ l.id }}" form="leadBulk" style="margin-top:3px;">
+        <div style="flex:1; min-width:0;">
           <a href="/admin/leads/{{ l.id }}" style="font-size:0.95rem; font-weight:700; color:var(--grey-900);">
             {{ l.name }}
           </a>
@@ -206,15 +225,14 @@
         <span class="pill pill-muted">Contact</span>
         {% endif %}
 
-        {% if l.status == 'new' %}
-        <span class="pill pill-gold">New</span>
-        {% elif l.status == 'won' %}
-        <span class="pill pill-success">Won</span>
-        {% elif l.status == 'lost' %}
-        <span class="pill pill-danger">Lost</span>
-        {% else %}
-        <span class="pill pill-muted">{{ l.status | capitalize }}</span>
-        {% endif %}
+        <form method="post" action="/admin/leads/{{ l.id }}/quick-status" class="qs">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          <input type="hidden" name="back" value="/admin/leads?status={{ (status or 'all') | urlencode }}&kind={{ (kind or 'all') | urlencode }}&q={{ (q or '') | urlencode }}">
+          <select name="status" class="st-{{ l.status }}" onchange="this.form.submit()" aria-label="Status of {{ l.name }}">
+            {% for s in statuses %}<option value="{{ s }}" {% if l.status == s %}selected{% endif %}>{{ s | capitalize }}</option>{% endfor %}
+          </select>
+        </form>
+        {% if l.source %}<span style="font-size:0.75rem; color:var(--grey-500);">{{ l.source }}</span>{% endif %}
 
         {% if l.model_code %}
         <code style="font-size:0.82rem; color:var(--primary);">{{ l.model_code }}</code>
@@ -246,4 +264,24 @@
     {% endfor %}
   </div>
 </div>
+<script>
+(function () {
+  var picks = Array.prototype.slice.call(document.querySelectorAll('.lpick'));
+  var all = document.getElementById('leadAll');
+  function count() {
+    var ids = {};
+    picks.forEach(function (c) { if (c.checked) ids[c.value] = 1; });
+    var n = Object.keys(ids).length;
+    document.getElementById('leadCount').textContent = n + ' ticked';
+    all.checked = n > 0 && n === picks.length / 2;
+  }
+  picks.forEach(function (c) {
+    c.addEventListener('change', function () {
+      picks.forEach(function (o) { if (o.value === c.value) o.checked = c.checked; });
+      count();
+    });
+  });
+  all.addEventListener('change', function () { picks.forEach(function (c) { c.checked = all.checked; }); count(); });
+})();
+</script>
 {% endblock %}
